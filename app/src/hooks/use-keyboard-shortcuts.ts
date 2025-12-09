@@ -47,6 +47,14 @@ function isInputFocused(): boolean {
     return true;
   }
 
+  // Check for project picker dropdown being open
+  const projectPickerDropdown = document.querySelector(
+    '[data-testid="project-picker-dropdown"]'
+  );
+  if (projectPickerDropdown) {
+    return true;
+  }
+
   return false;
 }
 
