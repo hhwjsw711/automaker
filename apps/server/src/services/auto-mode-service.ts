@@ -58,7 +58,9 @@ interface PlanSpec {
 const PLANNING_PROMPTS = {
   lite: `## Planning Phase (Lite Mode)
 
-Before implementing, create a brief planning outline:
+IMPORTANT: Do NOT output exploration text, tool usage, or thinking before the plan. Start DIRECTLY with the planning outline format below. Silently analyze the codebase first, then output ONLY the structured plan.
+
+Create a brief planning outline:
 
 1. **Goal**: What are we accomplishing? (1 sentence)
 2. **Approach**: How will we do it? (2-3 sentences)
@@ -73,7 +75,9 @@ Then proceed with implementation.`,
 
   lite_with_approval: `## Planning Phase (Lite Mode)
 
-Before implementing, create a brief planning outline:
+IMPORTANT: Do NOT output exploration text, tool usage, or thinking before the plan. Start DIRECTLY with the planning outline format below. Silently analyze the codebase first, then output ONLY the structured plan.
+
+Create a brief planning outline:
 
 1. **Goal**: What are we accomplishing? (1 sentence)
 2. **Approach**: How will we do it? (2-3 sentences)
@@ -88,7 +92,9 @@ DO NOT proceed with implementation until you receive explicit approval.`,
 
   spec: `## Specification Phase (Spec Mode)
 
-Before implementing, generate a specification with an actionable task breakdown. WAIT for approval before implementing.
+IMPORTANT: Do NOT output exploration text, tool usage, or thinking before the spec. Start DIRECTLY with the specification format below. Silently analyze the codebase first, then output ONLY the structured specification.
+
+Generate a specification with an actionable task breakdown. WAIT for approval before implementing.
 
 ### Specification Format
 
@@ -134,7 +140,9 @@ This allows real-time progress tracking during implementation.`,
 
   full: `## Full Specification Phase (Full SDD Mode)
 
-Before implementing, generate a comprehensive specification with phased task breakdown. WAIT for approval before implementing.
+IMPORTANT: Do NOT output exploration text, tool usage, or thinking before the spec. Start DIRECTLY with the specification format below. Silently analyze the codebase first, then output ONLY the structured specification.
+
+Generate a comprehensive specification with phased task breakdown. WAIT for approval before implementing.
 
 ### Specification Format
 
@@ -523,15 +531,10 @@ export class AutoModeService {
       // Update feature status to in_progress
       await this.updateFeatureStatus(projectPath, featureId, "in_progress");
 
-      // Use custom prompt if provided, otherwise build the prompt with planning phase
-      let prompt: string;
-      if (customPrompt) {
-        prompt = customPrompt;
-      } else {
-        const featurePrompt = this.buildFeaturePrompt(feature);
-        const planningPrefix = this.getPlanningPromptPrefix(feature);
-        prompt = planningPrefix + featurePrompt;
-      }
+      // Build the prompt with planning phase
+      const featurePrompt = this.buildFeaturePrompt(feature);
+      const planningPrefix = this.getPlanningPromptPrefix(feature);
+      const prompt = planningPrefix + featurePrompt;
 
       // Emit planning mode info
       if (feature.planningMode && feature.planningMode !== 'skip') {

@@ -24,8 +24,6 @@ export interface Feature {
   spec?: string;
   model?: string;
   imagePaths?: Array<string | { path: string; [key: string]: unknown }>;
-  status?: string;
-  model?: string;
   skipTests?: boolean;
   thinkingLevel?: string;
   planningMode?: 'skip' | 'lite' | 'spec' | 'full';
