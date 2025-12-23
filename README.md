@@ -118,7 +118,10 @@ cd automaker
 # 2. Install dependencies
 npm install
 
-# 3. Run Automaker (pick your mode)
+# 3. Build local shared packages
+npm run build:packages
+
+# 4. Run Automaker (pick your mode)
 npm run dev
 # Then choose your run mode when prompted, or use specific commands below
 ```

@@ -10,6 +10,7 @@ import { spawn, ChildProcess } from 'child_process';
 import fs from 'fs';
 import http, { Server } from 'http';
 import { app, BrowserWindow, ipcMain, dialog, shell, screen } from 'electron';
+import { findNodeExecutable, buildEnhancedPath } from '@automaker/platform';
 
 // Development environment
 const isDev = !app.isPackaged;
@@ -274,12 +275,22 @@ async function startStaticServer(): Promise<void> {
  * Start the backend server
  */
 async function startServer(): Promise<void> {
-  let command: string;
+  // Find Node.js executable (handles desktop launcher scenarios)
+  const nodeResult = findNodeExecutable({
+    skipSearch: isDev,
+    logger: (msg: string) => console.log(`[Electron] ${msg}`),
+  });
+  const command = nodeResult.nodePath;
+
+  // Validate that the found Node executable actually exists
+  if (command !== 'node' && !fs.existsSync(command)) {
+    throw new Error(`Node.js executable not found at: ${command} (source: ${nodeResult.source})`);
+  }
+
   let args: string[];
   let serverPath: string;
 
   if (isDev) {
-    command = 'node';
     serverPath = path.join(__dirname, '../../server/src/index.ts');
 
     const serverNodeModules = path.join(__dirname, '../../server/node_modules/tsx');
@@ -302,7 +313,6 @@ async function startServer(): Promise<void> {
 
     args = [tsxCliPath, 'watch', serverPath];
   } else {
-    command = 'node';
     serverPath = path.join(process.resourcesPath, 'server', 'index.js');
     args = [serverPath];
 
@@ -315,8 +325,15 @@ async function startServer(): Promise<void> {
     ? path.join(process.resourcesPath, 'server', 'node_modules')
     : path.join(__dirname, '../../server/node_modules');
 
+  // Build enhanced PATH that includes Node.js directory (cross-platform)
+  const enhancedPath = buildEnhancedPath(command, process.env.PATH || '');
+  if (enhancedPath !== process.env.PATH) {
+    console.log(`[Electron] Enhanced PATH with Node directory: ${path.dirname(command)}`);
+  }
+
   const env = {
     ...process.env,
+    PATH: enhancedPath,
     PORT: SERVER_PORT.toString(),
     DATA_DIR: app.getPath('userData'),
     NODE_PATH: serverNodeModules,
@@ -511,6 +528,16 @@ app.whenReady().then(async () => {
     createWindow();
   } catch (error) {
     console.error('[Electron] Failed to start:', error);
+    const errorMessage = (error as Error).message;
+    const isNodeError = errorMessage.includes('Node.js');
+    dialog.showErrorBox(
+      'Automaker Failed to Start',
+      `The application failed to start.\n\n${errorMessage}\n\n${
+        isNodeError
+          ? 'Please install Node.js from https://nodejs.org or via a package manager (Homebrew, nvm, fnm).'
+          : 'Please check the application logs for more details.'
+      }`
+    );
     app.quit();
   }
 

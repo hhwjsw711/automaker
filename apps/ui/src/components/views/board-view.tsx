@@ -21,6 +21,7 @@ import { BoardHeader } from './board-view/board-header';
 import { BoardSearchBar } from './board-view/board-search-bar';
 import { BoardControls } from './board-view/board-controls';
 import { KanbanBoard } from './board-view/kanban-board';
+import { GraphView } from './graph-view';
 import {
   AddFeatureDialog,
   AgentOutputModal,
@@ -69,6 +70,8 @@ export function BoardView() {
     aiProfiles,
     kanbanCardDetailLevel,
     setKanbanCardDetailLevel,
+    boardViewMode,
+    setBoardViewMode,
     specCreatingForProject,
     setSpecCreatingForProject,
     pendingPlanApproval,
@@ -433,9 +436,9 @@ export function BoardView() {
 
       // Create the feature
       const featureData = {
+        title: `Address PR #${prNumber} Review Comments`,
         category: 'PR Review',
         description,
-        steps: [],
         images: [],
         imagePaths: [],
         skipTests: defaultSkipTests,
@@ -475,9 +478,9 @@ export function BoardView() {
 
       // Create the feature
       const featureData = {
+        title: `Resolve Merge Conflicts`,
         category: 'Maintenance',
         description,
-        steps: [],
         images: [],
         imagePaths: [],
         skipTests: defaultSkipTests,
@@ -989,40 +992,54 @@ export function BoardView() {
             completedCount={completedFeatures.length}
             kanbanCardDetailLevel={kanbanCardDetailLevel}
             onDetailLevelChange={setKanbanCardDetailLevel}
+            boardViewMode={boardViewMode}
+            onBoardViewModeChange={setBoardViewMode}
           />
         </div>
-        {/* Kanban Columns */}
-        <KanbanBoard
-          sensors={sensors}
-          collisionDetectionStrategy={collisionDetectionStrategy}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          activeFeature={activeFeature}
-          getColumnFeatures={getColumnFeatures}
-          backgroundImageStyle={backgroundImageStyle}
-          backgroundSettings={backgroundSettings}
-          onEdit={(feature) => setEditingFeature(feature)}
-          onDelete={(featureId) => handleDeleteFeature(featureId)}
-          onViewOutput={handleViewOutput}
-          onVerify={handleVerifyFeature}
-          onResume={handleResumeFeature}
-          onForceStop={handleForceStopFeature}
-          onManualVerify={handleManualVerify}
-          onMoveBackToInProgress={handleMoveBackToInProgress}
-          onFollowUp={handleOpenFollowUp}
-          onCommit={handleCommitFeature}
-          onComplete={handleCompleteFeature}
-          onImplement={handleStartImplementation}
-          onViewPlan={(feature) => setViewPlanFeature(feature)}
-          onApprovePlan={handleOpenApprovalDialog}
-          featuresWithContext={featuresWithContext}
-          runningAutoTasks={runningAutoTasks}
-          shortcuts={shortcuts}
-          onStartNextFeatures={handleStartNextFeatures}
-          onShowSuggestions={() => setShowSuggestionsDialog(true)}
-          suggestionsCount={suggestionsCount}
-          onArchiveAllVerified={() => setShowArchiveAllVerifiedDialog(true)}
-        />
+        {/* View Content - Kanban or Graph */}
+        {boardViewMode === 'kanban' ? (
+          <KanbanBoard
+            sensors={sensors}
+            collisionDetectionStrategy={collisionDetectionStrategy}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            activeFeature={activeFeature}
+            getColumnFeatures={getColumnFeatures}
+            backgroundImageStyle={backgroundImageStyle}
+            backgroundSettings={backgroundSettings}
+            onEdit={(feature) => setEditingFeature(feature)}
+            onDelete={(featureId) => handleDeleteFeature(featureId)}
+            onViewOutput={handleViewOutput}
+            onVerify={handleVerifyFeature}
+            onResume={handleResumeFeature}
+            onForceStop={handleForceStopFeature}
+            onManualVerify={handleManualVerify}
+            onMoveBackToInProgress={handleMoveBackToInProgress}
+            onFollowUp={handleOpenFollowUp}
+            onCommit={handleCommitFeature}
+            onComplete={handleCompleteFeature}
+            onImplement={handleStartImplementation}
+            onViewPlan={(feature) => setViewPlanFeature(feature)}
+            onApprovePlan={handleOpenApprovalDialog}
+            featuresWithContext={featuresWithContext}
+            runningAutoTasks={runningAutoTasks}
+            shortcuts={shortcuts}
+            onStartNextFeatures={handleStartNextFeatures}
+            onShowSuggestions={() => setShowSuggestionsDialog(true)}
+            suggestionsCount={suggestionsCount}
+            onArchiveAllVerified={() => setShowArchiveAllVerifiedDialog(true)}
+          />
+        ) : (
+          <GraphView
+            features={hookFeatures}
+            runningAutoTasks={runningAutoTasks}
+            currentWorktreePath={currentWorktreePath}
+            currentWorktreeBranch={currentWorktreeBranch}
+            projectPath={currentProject?.path || null}
+            onEditFeature={(feature) => setEditingFeature(feature)}
+            onViewOutput={handleViewOutput}
+          />
+        )}
       </div>
 
       {/* Board Background Modal */}

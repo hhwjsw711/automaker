@@ -52,3 +52,14 @@ export function pathsEqual(p1: string | undefined | null, p2: string | undefined
   if (!p1 || !p2) return p1 === p2;
   return normalizePath(p1) === normalizePath(p2);
 }
+
+/**
+ * Detect if running on macOS.
+ * Checks Electron process.platform first, then falls back to navigator APIs.
+ */
+export const isMac =
+  typeof process !== 'undefined' && process.platform === 'darwin'
+    ? true
+    : typeof navigator !== 'undefined' &&
+      (/Mac/.test(navigator.userAgent) ||
+        (navigator.platform ? navigator.platform.toLowerCase().includes('mac') : false));

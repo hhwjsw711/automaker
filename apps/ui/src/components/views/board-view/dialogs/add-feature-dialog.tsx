@@ -62,7 +62,6 @@ interface AddFeatureDialogProps {
     title: string;
     category: string;
     description: string;
-    steps: string[];
     images: FeatureImage[];
     imagePaths: DescriptionImagePath[];
     textFilePaths: DescriptionTextFilePath[];
@@ -105,7 +104,6 @@ export function AddFeatureDialog({
     title: '',
     category: '',
     description: '',
-    steps: [''],
     images: [] as FeatureImage[],
     imagePaths: [] as DescriptionImagePath[],
     textFilePaths: [] as DescriptionTextFilePath[],
@@ -193,7 +191,6 @@ export function AddFeatureDialog({
       title: newFeature.title,
       category,
       description: newFeature.description,
-      steps: newFeature.steps.filter((s) => s.trim()),
       images: newFeature.images,
       imagePaths: newFeature.imagePaths,
       textFilePaths: newFeature.textFilePaths,
@@ -211,7 +208,6 @@ export function AddFeatureDialog({
       title: '',
       category: '',
       description: '',
-      steps: [''],
       images: [],
       imagePaths: [],
       textFilePaths: [],
@@ -502,8 +498,6 @@ export function AddFeatureDialog({
             <TestingTabContent
               skipTests={newFeature.skipTests}
               onSkipTestsChange={(skipTests) => setNewFeature({ ...newFeature, skipTests })}
-              steps={newFeature.steps}
-              onStepsChange={(steps) => setNewFeature({ ...newFeature, steps })}
             />
           </TabsContent>
         </Tabs>

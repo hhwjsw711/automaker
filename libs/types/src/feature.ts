@@ -27,7 +27,6 @@ export interface Feature {
   titleGenerating?: boolean;
   category: string;
   description: string;
-  steps?: string[];
   passes?: boolean;
   priority?: number;
   status?: string;
