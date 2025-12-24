@@ -63,10 +63,8 @@ For each suggestion, provide:
 
 The response will be automatically formatted as structured JSON.`;
 
-  events.emit('suggestions:event', {
-    type: 'suggestions_progress',
-    content: `Starting ${suggestionType} analysis...\n`,
-  });
+  // Don't send initial message - let the agent output speak for itself
+  // The first agent message will be captured as an info entry
 
   const options = createSuggestionsOptions({
     cwd: projectPath,
