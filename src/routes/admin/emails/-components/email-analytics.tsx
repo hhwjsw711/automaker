@@ -1,18 +1,16 @@
 import { useMemo } from "react";
 import {
-  LineChart,
-  Line,
+  LazyBarChart,
+  LazyAreaChart,
+  LazyResponsiveContainer,
+  LazyChartContainer,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
   Bar,
   Area,
-  AreaChart,
-} from "recharts";
+} from "~/components/charts/lazy-recharts";
 import { Button } from "~/components/ui/button";
 import {
   Select,
@@ -29,7 +27,9 @@ import {
   Calendar,
   Loader2,
 } from "lucide-react";
-import { parseISO, format, getDate } from "date-fns";
+import { parseISO } from "date-fns/parseISO";
+import { format } from "date-fns/format";
+import { getDate } from "date-fns/getDate";
 
 interface EmailAnalyticsProps {
   analyticsData: Array<{ date: string; count: number }> | undefined;
@@ -151,70 +151,72 @@ export function EmailAnalytics({
                     <TrendingUp className="h-5 w-5" />
                     Signup Trend Over Time
                   </h3>
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={chartData}>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          className="opacity-30"
-                        />
-                        <XAxis
-                          dataKey="day"
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <YAxis
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
-                              const data = payload[0].payload;
-                              return (
-                                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                                  <p className="font-medium">
-                                    {data.formattedDate}
-                                  </p>
-                                  <p className="text-theme-600 dark:text-theme-400">
-                                    Signups: {payload[0].value}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="count"
-                          stroke="#3b82f6"
-                          fill="url(#colorGradient)"
-                          strokeWidth={2}
-                        />
-                        <defs>
-                          <linearGradient
-                            id="colorGradient"
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="5%"
-                              stopColor="#3b82f6"
-                              stopOpacity={0.3}
-                            />
-                            <stop
-                              offset="95%"
-                              stopColor="#3b82f6"
-                              stopOpacity={0.05}
-                            />
-                          </linearGradient>
-                        </defs>
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
+                  <LazyChartContainer height={320}>
+                    <div className="h-80 w-full">
+                      <LazyResponsiveContainer width="100%" height="100%">
+                        <LazyAreaChart data={chartData}>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            className="opacity-30"
+                          />
+                          <XAxis
+                            dataKey="day"
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload;
+                                return (
+                                  <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                    <p className="font-medium">
+                                      {data.formattedDate}
+                                    </p>
+                                    <p className="text-theme-600 dark:text-theme-400">
+                                      Signups: {payload[0].value}
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Area
+                            type="monotone"
+                            dataKey="count"
+                            stroke="#3b82f6"
+                            fill="url(#colorGradient)"
+                            strokeWidth={2}
+                          />
+                          <defs>
+                            <linearGradient
+                              id="colorGradient"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="5%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.3}
+                              />
+                              <stop
+                                offset="95%"
+                                stopColor="#3b82f6"
+                                stopOpacity={0.05}
+                              />
+                            </linearGradient>
+                          </defs>
+                        </LazyAreaChart>
+                      </LazyResponsiveContainer>
+                    </div>
+                  </LazyChartContainer>
                 </div>
 
                 {/* Bar Chart */}
@@ -223,48 +225,50 @@ export function EmailAnalytics({
                     <BarChart3 className="h-5 w-5" />
                     Daily Signup Volume
                   </h3>
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          className="opacity-30"
-                        />
-                        <XAxis
-                          dataKey="day"
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <YAxis
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
-                              const data = payload[0].payload;
-                              return (
-                                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                                  <p className="font-medium">
-                                    {data.formattedDate}
-                                  </p>
-                                  <p className="text-theme-600 dark:text-theme-400">
-                                    Signups: {payload[0].value}
-                                  </p>
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Bar
-                          dataKey="count"
-                          fill="#3b82f6"
-                          radius={[4, 4, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                  <LazyChartContainer height={320}>
+                    <div className="h-80 w-full">
+                      <LazyResponsiveContainer width="100%" height="100%">
+                        <LazyBarChart data={chartData}>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            className="opacity-30"
+                          />
+                          <XAxis
+                            dataKey="day"
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                const data = payload[0].payload;
+                                return (
+                                  <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                    <p className="font-medium">
+                                      {data.formattedDate}
+                                    </p>
+                                    <p className="text-theme-600 dark:text-theme-400">
+                                      Signups: {payload[0].value}
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Bar
+                            dataKey="count"
+                            fill="#3b82f6"
+                            radius={[4, 4, 0, 0]}
+                          />
+                        </LazyBarChart>
+                      </LazyResponsiveContainer>
+                    </div>
+                  </LazyChartContainer>
                 </div>
               </>
             ) : (

@@ -18,17 +18,22 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  LineChart,
+  LazyLineChart,
+  LazyResponsiveContainer,
+  LazyChartContainer,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-} from "recharts";
+} from "~/components/charts/lazy-recharts";
 import { useMemo, useState } from "react";
-import { parseISO, format, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { parseISO } from "date-fns/parseISO";
+import { format } from "date-fns/format";
+import { startOfMonth } from "date-fns/startOfMonth";
+import { endOfMonth } from "date-fns/endOfMonth";
+import { eachDayOfInterval } from "date-fns/eachDayOfInterval";
 import { Page } from "./-components/page";
 import { PageHeader } from "./-components/page-header";
 import { StatsCard } from "~/components/stats-card";
@@ -359,54 +364,56 @@ function UtmAnalyticsPage() {
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-theme-500"></div>
             </div>
           ) : chartData.length > 0 && enabledCampaigns.size > 0 ? (
-            <div className="h-80 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis
-                    dataKey="formattedDate"
-                    tick={{ fontSize: 12 }}
-                    tickLine={{ stroke: "#6b7280" }}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 12 }}
-                    tickLine={{ stroke: "#6b7280" }}
-                  />
-                  <Tooltip
-                    content={({ active, payload, label }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                            <p className="font-medium mb-2">{label}</p>
-                            {payload.map((entry, index) => (
-                              <p key={index} style={{ color: entry.color }} className="text-sm">
-                                {entry.dataKey}: {entry.value} views
-                              </p>
-                            ))}
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Legend />
-                  {uniqueCampaignKeys
-                    .filter((item) => enabledCampaigns.has(item.campaign))
-                    .map((item) => (
-                      <Line
-                        key={item.campaign}
-                        type="monotone"
-                        dataKey={item.campaign}
-                        stroke={getCampaignColor(item.campaign)}
-                        strokeWidth={2}
-                        dot={{ fill: getCampaignColor(item.campaign), r: 3 }}
-                        name={item.campaign}
-                        connectNulls
-                      />
-                    ))}
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            <LazyChartContainer height={320}>
+              <div className="h-80 w-full">
+                <LazyResponsiveContainer width="100%" height="100%">
+                  <LazyLineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                    <XAxis
+                      dataKey="formattedDate"
+                      tick={{ fontSize: 12 }}
+                      tickLine={{ stroke: "#6b7280" }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12 }}
+                      tickLine={{ stroke: "#6b7280" }}
+                    />
+                    <Tooltip
+                      content={({ active, payload, label }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                              <p className="font-medium mb-2">{label}</p>
+                              {payload.map((entry, index) => (
+                                <p key={index} style={{ color: entry.color }} className="text-sm">
+                                  {entry.dataKey}: {entry.value} views
+                                </p>
+                              ))}
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Legend />
+                    {uniqueCampaignKeys
+                      .filter((item) => enabledCampaigns.has(item.campaign))
+                      .map((item) => (
+                        <Line
+                          key={item.campaign}
+                          type="monotone"
+                          dataKey={item.campaign}
+                          stroke={getCampaignColor(item.campaign)}
+                          strokeWidth={2}
+                          dot={{ fill: getCampaignColor(item.campaign), r: 3 }}
+                          name={item.campaign}
+                          connectNulls
+                        />
+                      ))}
+                  </LazyLineChart>
+                </LazyResponsiveContainer>
+              </div>
+            </LazyChartContainer>
           ) : (
             <div className="flex flex-col items-center justify-center h-80 text-muted-foreground">
               <BarChart3 className="h-16 w-16 mb-4 opacity-30" />

@@ -23,7 +23,14 @@ import "nprogress/nprogress.css";
 import { shouldShowEarlyAccessFn } from "~/fn/early-access";
 import { useAnalytics } from "~/hooks/use-analytics";
 import { publicEnv } from "~/utils/env-public";
-import { DevFloatingMenu } from "~/components/dev-menu/dev-floating-menu";
+import { lazy, Suspense } from "react";
+
+// Lazy load DevFloatingMenu - only needed in development
+const DevFloatingMenu = lazy(() =>
+  import("~/components/dev-menu/dev-floating-menu").then((m) => ({
+    default: m.DevFloatingMenu,
+  }))
+);
 import { getCurrentUserIdFn } from "~/fn/auth";
 
 // OpenGraph image configuration
@@ -37,13 +44,17 @@ const isDev = process.env.NODE_ENV === "development";
 
 function ThemedToaster() {
   const { theme } = useTheme();
-  const resolvedTheme: ToasterProps["theme"] =
-    theme === "system"
-      ? typeof window !== "undefined" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light"
-      : theme;
+  const [resolvedTheme, setResolvedTheme] =
+    React.useState<ToasterProps["theme"]>("light");
+
+  React.useEffect(() => {
+    if (theme === "system") {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setResolvedTheme(isDark ? "dark" : "light");
+    } else {
+      setResolvedTheme(theme);
+    }
+  }, [theme]);
 
   return <Toaster theme={resolvedTheme} />;
 }
@@ -86,6 +97,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           href: "https://fonts.gstatic.com",
           crossOrigin: "anonymous",
         },
+        // Preload fonts for faster rendering
+        {
+          rel: "preload",
+          as: "style",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        },
         // Preload CSS for faster discovery
         { rel: "preload", href: appCss, as: "style" },
         { rel: "stylesheet", href: appCss },
@@ -110,14 +131,37 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "icon", href: "/favicon.ico" },
       ],
       scripts: [
+        // Theme detection script - must run before page renders to prevent flash
+        {
+          id: "theme-init",
+          children: `(function() {
+            var THEME_COOKIE_NAME = 'ui-theme';
+            var COOKIE_EXPIRY_DAYS = 365;
+            var MILLISECONDS_PER_DAY = 864e5;
+            var DARK_MODE_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+            var THEME_CLASSES = { LIGHT: 'light', DARK: 'dark' };
+            var theme = document.cookie.match(new RegExp('(^| )' + THEME_COOKIE_NAME + '=([^;]+)'))?.[2];
+            var resolvedTheme;
+            var root = document.documentElement;
+            root.classList.remove(THEME_CLASSES.LIGHT, THEME_CLASSES.DARK);
+            if (!theme || theme === 'system') {
+              resolvedTheme = window.matchMedia(DARK_MODE_MEDIA_QUERY).matches ? THEME_CLASSES.DARK : THEME_CLASSES.LIGHT;
+              if (!theme) {
+                var expires = new Date(Date.now() + COOKIE_EXPIRY_DAYS * MILLISECONDS_PER_DAY).toUTCString();
+                document.cookie = THEME_COOKIE_NAME + '=system; expires=' + expires + '; path=/; SameSite=Lax';
+              }
+            } else {
+              resolvedTheme = theme;
+            }
+            root.classList.add(resolvedTheme);
+            root.setAttribute('data-theme', theme || 'system');
+            root.setAttribute('data-resolved-theme', resolvedTheme);
+          })();`,
+        },
         {
           src: "https://umami-production-101d.up.railway.app/script.js",
           defer: true,
           "data-website-id": "a25b9b45-4772-4642-b752-052c04e52cf5",
-        },
-        {
-          src: "https://www.googletagmanager.com/gtag/js?id=AW-11111910585",
-          async: true,
         },
       ],
     }),
@@ -137,6 +181,32 @@ function RootComponent() {
   // Initialize analytics tracking
   useAnalytics();
   const routerState = useRouterState();
+
+  // Load Google Analytics scripts client-side only to avoid hydration mismatch
+  // (gtag dynamically injects scripts which breaks React hydration)
+  React.useEffect(() => {
+    // Check if already loaded
+    if (document.getElementById("gtag-script")) return;
+
+    // Load gtag.js
+    const gtagScript = document.createElement("script");
+    gtagScript.id = "gtag-script";
+    gtagScript.src =
+      "https://www.googletagmanager.com/gtag/js?id=AW-11111910585";
+    gtagScript.async = true;
+    document.head.appendChild(gtagScript);
+
+    // Initialize gtag
+    const gtagInit = document.createElement("script");
+    gtagInit.id = "gtag-init";
+    gtagInit.textContent = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-11111910585');
+    `;
+    document.head.appendChild(gtagInit);
+  }, []);
 
   // Ensure home page starts at top on initial load (prevents scroll restoration issues)
   React.useEffect(() => {
@@ -195,90 +265,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html className="font-inter" suppressHydrationWarning>
       <head>
         <HeadContent />
-        {/* Non-blocking font loading - loads fonts after initial render */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var fonts = [
-                  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-                  'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap'
-                ];
-                fonts.forEach(function(href) {
-                  var link = document.createElement('link');
-                  link.rel = 'stylesheet';
-                  link.href = href;
-                  document.head.appendChild(link);
-                });
-              })();
-            `,
-          }}
-        />
-        {/* Google tag (gtag.js) */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'AW-11111910585');
-            `,
-          }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                // Constants (must match ThemeProvider.tsx)
-                const THEME_COOKIE_NAME = 'ui-theme';
-                const COOKIE_EXPIRY_DAYS = 365;
-                const MILLISECONDS_PER_DAY = 864e5;
-                const DARK_MODE_MEDIA_QUERY = '(prefers-color-scheme: dark)';
-                const THEME_CLASSES = { LIGHT: 'light', DARK: 'dark' };
-
-                // Get theme from cookie
-                let theme = document.cookie.match(new RegExp('(^| )' + THEME_COOKIE_NAME + '=([^;]+)'))?.[2];
-
-                let resolvedTheme;
-                let root = document.documentElement;
-
-                // Clear any existing theme classes
-                root.classList.remove(THEME_CLASSES.LIGHT, THEME_CLASSES.DARK);
-
-                if (!theme || theme === 'system') {
-                  // Use system preference for system theme or if no theme is set
-                  resolvedTheme = window.matchMedia(DARK_MODE_MEDIA_QUERY).matches ? THEME_CLASSES.DARK : THEME_CLASSES.LIGHT;
-
-                  if (!theme) {
-                    // Set cookie with system preference on first visit
-                    const expires = new Date(Date.now() + COOKIE_EXPIRY_DAYS * MILLISECONDS_PER_DAY).toUTCString();
-                    document.cookie = THEME_COOKIE_NAME + '=system; expires=' + expires + '; path=/; SameSite=Lax';
-                  }
-                } else {
-                  resolvedTheme = theme;
-                }
-
-                root.classList.add(resolvedTheme);
-
-                // Add data attribute for debugging
-                root.setAttribute('data-theme', theme || 'system');
-                root.setAttribute('data-resolved-theme', resolvedTheme);
-              })();
-            `,
-          }}
-        />
-        <style>{`
-          #nprogress .bar {
-            background: #00acc1 !important;
-            height: 3px;
-          }
-          #nprogress .peg {
-            box-shadow: 0 0 10px #00acc1, 0 0 5px #00acc1;
-          }
-          #nprogress .spinner-icon {
-            display: none;
-          }
-        `}</style>
       </head>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider>
@@ -311,7 +297,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             </div>
           )}
           <ThemedToaster />
-          {showDevMenu && <DevFloatingMenu currentUserId={currentUserId} />}
+          {showDevMenu && (
+            <Suspense fallback={null}>
+              <DevFloatingMenu currentUserId={currentUserId} />
+            </Suspense>
+          )}
           {/* <TanStackRouterDevtools position="bottom-right" />
           <ReactQueryDevtools buttonPosition="bottom-left" /> */}
           <Scripts />

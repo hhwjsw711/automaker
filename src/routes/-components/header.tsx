@@ -560,6 +560,8 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                     src="/logo.png"
                     alt="Beginner React Challenges"
                     className="size-12 transition-transform duration-300 group-hover:scale-105"
+                    fetchPriority="high"
+                    loading="eager"
                   />
                   {/* Subtle glow on logo hover */}
                   <div className="absolute inset-0 rounded-full bg-theme-500/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

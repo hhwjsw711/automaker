@@ -368,3 +368,17 @@ a {
 [data-sonner-toast][data-type="error"] {
   @apply !bg-destructive !text-white !border-none;
 }
+
+/* NProgress loading bar styles */
+#nprogress .bar {
+  background: #00acc1 !important;
+  height: 3px;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #00acc1, 0 0 5px #00acc1;
+}
+
+#nprogress .spinner-icon {
+  display: none;
+}

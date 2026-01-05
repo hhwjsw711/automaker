@@ -1,29 +1,46 @@
-import { useState } from "react";
-import { Play } from "lucide-react";
-import { VideoPlayer } from "~/routes/learn/-components/video-player";
+import { useState, lazy, Suspense } from "react";
+import { Play, Loader2 } from "lucide-react";
+
+// Dynamically import VideoPlayer to keep it out of the main bundle
+const VideoPlayer = lazy(() =>
+  import("~/routes/learn/-components/video-player").then((module) => ({
+    default: module.VideoPlayer,
+  }))
+);
 
 interface LazyVideoPlayerProps {
   segmentId: number;
   videoKey: string;
   thumbnailUrl?: string | null;
+  onAutoComplete?: () => void;
 }
 
 export function LazyVideoPlayer({
   segmentId,
   videoKey,
   thumbnailUrl,
+  onAutoComplete,
 }: LazyVideoPlayerProps) {
   const [isActivated, setIsActivated] = useState(false);
 
   // Once activated, render the actual video player
   if (isActivated) {
     return (
-      <VideoPlayer
-        segmentId={segmentId}
-        videoKey={videoKey}
-        initialThumbnailUrl={thumbnailUrl ?? null}
-        autoPlay
-      />
+      <Suspense
+        fallback={
+          <div className="w-full h-full flex items-center justify-center bg-slate-900">
+            <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+          </div>
+        }
+      >
+        <VideoPlayer
+          segmentId={segmentId}
+          videoKey={videoKey}
+          initialThumbnailUrl={thumbnailUrl ?? null}
+          onAutoComplete={onAutoComplete}
+          autoPlay
+        />
+      </Suspense>
     );
   }
 

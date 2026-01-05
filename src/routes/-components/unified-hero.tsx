@@ -1,56 +1,14 @@
-import { Button, buttonVariants } from "~/components/ui/button";
+import { buttonVariants } from "~/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { useContinueSlug } from "~/hooks/use-continue-slug";
-import { createServerFn } from "@tanstack/react-start";
 import { LazyVideoPlayer } from "./lazy-video-player";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, ShoppingCart, CheckCircle2 } from "lucide-react";
 import { NewsletterForm } from "./newsletter-form";
-import { getStorage } from "~/utils/storage";
-import { getThumbnailKey } from "~/utils/video-transcoding";
-import { database } from "~/db";
-import { segments, modules } from "~/db/schema";
-import { eq } from "drizzle-orm";
 import { GlassPanel } from "~/components/ui/glass-panel";
 import { useAuth } from "~/hooks/use-auth";
-
-const getFirstVideoSegmentFn = createServerFn().handler(async () => {
-  // Get segments ordered by module order, then segment order
-  const result = await database
-    .select({
-      segment: segments,
-      moduleOrder: modules.order,
-    })
-    .from(segments)
-    .innerJoin(modules, eq(segments.moduleId, modules.id))
-    .orderBy(modules.order, segments.order);
-
-  // Find the first segment that has a video and is not premium
-  // (Landing page should show free preview content)
-  const firstVideoSegment = result
-    .map((row) => row.segment)
-    .find(
-      (segment) =>
-        segment.videoKey && !segment.isPremium && !segment.isComingSoon
-    );
-
-  // Get thumbnail URL server-side if available
-  let thumbnailUrl: string | null = null;
-  if (firstVideoSegment?.videoKey) {
-    const { storage, type } = getStorage();
-    if (type === "r2") {
-      const thumbnailKey =
-        firstVideoSegment.thumbnailKey ||
-        getThumbnailKey(firstVideoSegment.videoKey);
-      const exists = await storage.exists(thumbnailKey);
-      if (exists) {
-        thumbnailUrl = await storage.getPresignedUrl(thumbnailKey);
-      }
-    }
-  }
-
-  return { segment: firstVideoSegment, thumbnailUrl };
-});
+import { getNewsletterStatsFn } from "~/fn/newsletter";
+import { getFirstVideoSegmentFn } from "~/fn/segments";
 
 interface UnifiedHeroProps {
   isEarlyAccess: boolean;
@@ -62,7 +20,7 @@ import { GridPattern } from "~/components/ui/background-patterns";
 
 export function UnifiedHero({
   isEarlyAccess,
-  waitlistCount,
+  waitlistCount: initialWaitlistCount,
   initialVideoData,
 }: UnifiedHeroProps) {
   const continueSlug = useContinueSlug();
@@ -76,6 +34,13 @@ export function UnifiedHero({
     initialData: initialVideoData, // Use server-fetched data as initial data
   });
 
+  const { data: newsletterStats } = useQuery({
+    queryKey: ["newsletter-stats"],
+    queryFn: () => getNewsletterStatsFn(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  const waitlistCount = newsletterStats?.waitlist ?? initialWaitlistCount;
   const firstVideoSegment = firstVideoData?.segment;
   const thumbnailUrl = firstVideoData?.thumbnailUrl;
 
@@ -154,7 +119,10 @@ export function UnifiedHero({
                         }
                       }}
                     >
-                      <ShoppingCart className="mr-2 h-5 w-5" aria-hidden="true" />
+                      <ShoppingCart
+                        className="mr-2 h-5 w-5"
+                        aria-hidden="true"
+                      />
                       Get Lifetime Access
                     </Link>
                   )}
@@ -271,6 +239,8 @@ function EarlyAccessHeroContent({ waitlistCount }: { waitlistCount?: number }) {
                 src="/logo.png"
                 alt="Agentic Jumpstart"
                 className="size-24 md:size-32 mx-auto"
+                fetchPriority="high"
+                loading="eager"
               />
             </div>
           </div>

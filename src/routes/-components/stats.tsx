@@ -1,13 +1,31 @@
-import { BookOpen, Play, Clock } from "lucide-react";
+import { BookOpen, Play, Clock, Loader2 } from "lucide-react";
 import type { CourseStats } from "~/use-cases/stats";
 import { GlassPanel } from "~/components/ui/glass-panel";
 import { DotPattern } from "~/components/ui/background-patterns";
+import { useQuery } from "@tanstack/react-query";
+import { getCourseStatsFn } from "~/fn/stats";
 
 interface StatsProps {
-  stats: CourseStats;
+  stats?: CourseStats;
 }
 
-export function StatsSection({ stats }: StatsProps) {
+export function StatsSection({ stats: initialStats }: StatsProps) {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["course-stats"],
+    queryFn: () => getCourseStatsFn(),
+    initialData: initialStats,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+
+  if (isLoading && !stats) {
+    return (
+      <div className="w-full py-16 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+      </div>
+    );
+  }
+
+  if (!stats) return null;
 
   const statsData = [
     {

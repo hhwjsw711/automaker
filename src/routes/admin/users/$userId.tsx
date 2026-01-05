@@ -27,7 +27,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 
 export const Route = createFileRoute("/admin/users/$userId")({
   beforeLoad: () => assertIsAdminFn(),

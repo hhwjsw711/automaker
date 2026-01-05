@@ -16,19 +16,23 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  LineChart,
+  LazyLineChart,
+  LazyBarChart,
+  LazyResponsiveContainer,
+  LazyChartContainer,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
-  BarChart,
   Bar,
-} from "recharts";
+} from "~/components/charts/lazy-recharts";
 import { useMemo, useState } from "react";
-import { parseISO, format, startOfMonth, endOfMonth } from "date-fns";
+import { parseISO } from "date-fns/parseISO";
+import { format } from "date-fns/format";
+import { startOfMonth } from "date-fns/startOfMonth";
+import { endOfMonth } from "date-fns/endOfMonth";
 
 // Data series configuration
 const DATA_SERIES = {
@@ -240,124 +244,128 @@ function OverviewPage() {
                 </TabsList>
 
                 <TabsContent value="line">
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={chartData}>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          className="opacity-30"
-                        />
-                        <XAxis
-                          dataKey="formattedDate"
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <YAxis
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                                  <p className="font-medium mb-2">{label}</p>
-                                  {payload.map((entry, index) => {
-                                    const seriesKey =
-                                      entry.dataKey as SeriesKey;
-                                    const series = DATA_SERIES[seriesKey];
-                                    return (
-                                      <p
-                                        key={index}
-                                        style={{ color: entry.color }}
-                                        className="text-sm"
-                                      >
-                                        {series?.label || entry.dataKey}:{" "}
-                                        {entry.value}
-                                      </p>
-                                    );
-                                  })}
-                                </div>
-                              );
+                  <LazyChartContainer height={320}>
+                    <div className="h-80 w-full">
+                      <LazyResponsiveContainer width="100%" height="100%">
+                        <LazyLineChart data={chartData}>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            className="opacity-30"
+                          />
+                          <XAxis
+                            dataKey="formattedDate"
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                return (
+                                  <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                    <p className="font-medium mb-2">{label}</p>
+                                    {payload.map((entry, index) => {
+                                      const seriesKey =
+                                        entry.dataKey as SeriesKey;
+                                      const series = DATA_SERIES[seriesKey];
+                                      return (
+                                        <p
+                                          key={index}
+                                          style={{ color: entry.color }}
+                                          className="text-sm"
+                                        >
+                                          {series?.label || entry.dataKey}:{" "}
+                                          {entry.value}
+                                        </p>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Legend />
+                          <Line
+                            type="monotone"
+                            dataKey={selectedMetric}
+                            stroke={DATA_SERIES[selectedMetric].color}
+                            strokeWidth={3}
+                            dot={{
+                              fill: DATA_SERIES[selectedMetric].color,
+                              r: 4,
+                            }}
+                            name={DATA_SERIES[selectedMetric].label}
+                            strokeDasharray={
+                              selectedMetric === "googleAdsPurchases"
+                                ? "5 5"
+                                : undefined
                             }
-                            return null;
-                          }}
-                        />
-                        <Legend />
-                        <Line
-                          type="monotone"
-                          dataKey={selectedMetric}
-                          stroke={DATA_SERIES[selectedMetric].color}
-                          strokeWidth={3}
-                          dot={{
-                            fill: DATA_SERIES[selectedMetric].color,
-                            r: 4,
-                          }}
-                          name={DATA_SERIES[selectedMetric].label}
-                          strokeDasharray={
-                            selectedMetric === "googleAdsPurchases"
-                              ? "5 5"
-                              : undefined
-                          }
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
+                          />
+                        </LazyLineChart>
+                      </LazyResponsiveContainer>
+                    </div>
+                  </LazyChartContainer>
                 </TabsContent>
 
                 <TabsContent value="bar">
-                  <div className="h-80 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData}>
-                        <CartesianGrid
-                          strokeDasharray="3 3"
-                          className="opacity-30"
-                        />
-                        <XAxis
-                          dataKey="formattedDate"
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <YAxis
-                          tick={{ fontSize: 12 }}
-                          tickLine={{ stroke: "#6b7280" }}
-                        />
-                        <Tooltip
-                          content={({ active, payload, label }) => {
-                            if (active && payload && payload.length) {
-                              return (
-                                <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                                  <p className="font-medium mb-2">{label}</p>
-                                  {payload.map((entry, index) => {
-                                    const seriesKey =
-                                      entry.dataKey as SeriesKey;
-                                    const series = DATA_SERIES[seriesKey];
-                                    return (
-                                      <p
-                                        key={index}
-                                        style={{ color: entry.color }}
-                                        className="text-sm"
-                                      >
-                                        {series?.label || entry.dataKey}:{" "}
-                                        {entry.value}
-                                      </p>
-                                    );
-                                  })}
-                                </div>
-                              );
-                            }
-                            return null;
-                          }}
-                        />
-                        <Legend />
-                        <Bar
-                          dataKey={selectedMetric}
-                          fill={DATA_SERIES[selectedMetric].color}
-                          name={DATA_SERIES[selectedMetric].label}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
+                  <LazyChartContainer height={320}>
+                    <div className="h-80 w-full">
+                      <LazyResponsiveContainer width="100%" height="100%">
+                        <LazyBarChart data={chartData}>
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            className="opacity-30"
+                          />
+                          <XAxis
+                            dataKey="formattedDate"
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <YAxis
+                            tick={{ fontSize: 12 }}
+                            tickLine={{ stroke: "#6b7280" }}
+                          />
+                          <Tooltip
+                            content={({ active, payload, label }) => {
+                              if (active && payload && payload.length) {
+                                return (
+                                  <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                    <p className="font-medium mb-2">{label}</p>
+                                    {payload.map((entry, index) => {
+                                      const seriesKey =
+                                        entry.dataKey as SeriesKey;
+                                      const series = DATA_SERIES[seriesKey];
+                                      return (
+                                        <p
+                                          key={index}
+                                          style={{ color: entry.color }}
+                                          className="text-sm"
+                                        >
+                                          {series?.label || entry.dataKey}:{" "}
+                                          {entry.value}
+                                        </p>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }}
+                          />
+                          <Legend />
+                          <Bar
+                            dataKey={selectedMetric}
+                            fill={DATA_SERIES[selectedMetric].color}
+                            name={DATA_SERIES[selectedMetric].label}
+                          />
+                        </LazyBarChart>
+                      </LazyResponsiveContainer>
+                    </div>
+                  </LazyChartContainer>
                 </TabsContent>
               </Tabs>
             </CardContent>

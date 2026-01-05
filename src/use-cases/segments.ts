@@ -85,7 +85,7 @@ export async function deleteSegmentUseCase(segmentId: number) {
   // Get and delete all attachment files
   const attachments = await getSegmentAttachments(segmentId);
   await Promise.all(
-    attachments.map(async attachment => {
+    attachments.map(async (attachment) => {
       await storage.delete(attachment.fileKey);
       // await deleteAttachment(attachment.id);
     })
@@ -98,7 +98,7 @@ export async function deleteSegmentUseCase(segmentId: number) {
 export async function reorderSegmentsUseCase(
   updates: { id: number; order: number }[]
 ) {
-  return database.transaction(async tx => {
+  return database.transaction(async (tx) => {
     const results = [];
     for (const update of updates) {
       const [result] = await tx
@@ -110,4 +110,45 @@ export async function reorderSegmentsUseCase(
     }
     return results;
   });
+}
+
+export async function getFirstVideoSegmentUseCase() {
+  const { modules } = await import("~/db/schema");
+  const { getThumbnailKey } = await import("~/utils/video-transcoding");
+
+  // Get segments ordered by module order, then segment order
+  const result = await database
+    .select({
+      segment: segments,
+      moduleOrder: modules.order,
+    })
+    .from(segments)
+    .innerJoin(modules, eq(segments.moduleId, modules.id))
+    .orderBy(modules.order, segments.order);
+
+  // Find the first segment that has a video and is not premium
+  // (Landing page should show free preview content)
+  const firstVideoSegment = result
+    .map((row) => row.segment)
+    .find(
+      (segment) =>
+        segment.videoKey && !segment.isPremium && !segment.isComingSoon
+    );
+
+  // Get thumbnail URL server-side if available
+  let thumbnailUrl: string | null = null;
+  if (firstVideoSegment?.videoKey) {
+    const { storage, type } = getStorage();
+    if (type === "r2") {
+      const thumbnailKey =
+        firstVideoSegment.thumbnailKey ||
+        getThumbnailKey(firstVideoSegment.videoKey);
+      const exists = await storage.exists(thumbnailKey);
+      if (exists) {
+        thumbnailUrl = await storage.getPresignedUrl(thumbnailKey);
+      }
+    }
+  }
+
+  return { segment: firstVideoSegment ?? null, thumbnailUrl };
 }

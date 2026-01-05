@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { useRouterState } from "@tanstack/react-router";
 import { z } from "zod";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { AuthenticationError } from "~/use-cases/errors";
 import { getSegmentByIdUseCase } from "~/use-cases/segments";
 import { getAuthenticatedUser } from "~/utils/auth";
@@ -153,6 +154,7 @@ export function VideoPlayer({
   const [isClient, setIsClient] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const qualityRestoreTimeoutRef = useRef<number | null>(null);
+  const isUnmountingRef = useRef(false);
   const [selectedQuality, setSelectedQuality] = useState<string>("original");
   const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(
@@ -170,11 +172,19 @@ export function VideoPlayer({
   const getThumbnailUrl = useServerFn(getThumbnailUrlFn);
   const trackDownload = useServerFn(trackVideoDownloadFn);
 
-  const getVideoElement = () => {
+  // Track router navigation state to pause video during transitions
+  const isNavigating = useRouterState({
+    select: (state) => state.isLoading || state.isTransitioning,
+  });
+
+  // Ref to track if we should ignore play/pause events
+  const ignoreEventsRef = useRef(false);
+
+  const getVideoElement = useCallback(() => {
     const container = containerRef.current;
     if (!container) return null;
     return container.querySelector("video") as HTMLVideoElement | null;
-  };
+  }, []);
 
   // Ensure client-side only rendering for ReactPlayer
   useEffect(() => {
@@ -182,6 +192,33 @@ export function VideoPlayer({
       setIsClient(true);
     }
   }, []);
+
+  // Pause video and ignore events when router navigation starts
+  // This prevents play/pause loops during route transitions
+  useEffect(() => {
+    if (isNavigating) {
+      // Navigation started - pause video and ignore all events
+      ignoreEventsRef.current = true;
+      setPlaying(false);
+
+      // Also pause the underlying video element directly
+      const video = getVideoElement();
+      if (video) {
+        try {
+          video.pause();
+        } catch {
+          // Best-effort
+        }
+      }
+    } else {
+      // Navigation finished - allow events again after a brief delay
+      // The delay prevents race conditions during the final render
+      const timeoutId = window.setTimeout(() => {
+        ignoreEventsRef.current = false;
+      }, 100);
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [isNavigating, getVideoElement]);
 
   // Reset state when navigating to a different video segment
   useEffect(() => {
@@ -202,7 +239,13 @@ export function VideoPlayer({
   // media element internally; forcing a manual unload can leave it in a broken state
   // when navigating away and back (e.g. A → B → A).
   useEffect(() => {
+    // Reset unmounting flag on mount
+    isUnmountingRef.current = false;
+
     return () => {
+      // Set unmounting flag FIRST to prevent race conditions with onPlay/onPause handlers
+      isUnmountingRef.current = true;
+
       if (qualityRestoreTimeoutRef.current != null) {
         window.clearTimeout(qualityRestoreTimeoutRef.current);
         qualityRestoreTimeoutRef.current = null;
@@ -217,7 +260,7 @@ export function VideoPlayer({
         // Best-effort cleanup only
       }
     };
-  }, []);
+  }, [getVideoElement]);
 
   // Fetch thumbnail URL independently (never blocks video loading)
   // Only fetch if we don't already have an initial thumbnail
@@ -572,10 +615,16 @@ export function VideoPlayer({
           height="100%"
           onReady={() => setIsReady(true)}
           onPlay={() => {
+            // Ignore play events during navigation or unmount to prevent play/pause loops
+            if (ignoreEventsRef.current || isUnmountingRef.current) return;
             setPlaying(true);
             setHasError(false);
           }}
-          onPause={() => setPlaying(false)}
+          onPause={() => {
+            // Ignore pause events during navigation or unmount to prevent play/pause loops
+            if (ignoreEventsRef.current || isUnmountingRef.current) return;
+            setPlaying(false);
+          }}
           onRateChange={(e: React.SyntheticEvent<HTMLVideoElement>) => {
             const newRate = e.currentTarget.playbackRate;
             if (newRate !== playbackRate) {

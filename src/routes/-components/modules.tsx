@@ -10,6 +10,7 @@ import {
   Code,
   Brain,
   Rocket,
+  Loader2,
 } from "lucide-react";
 import { Stat } from "~/components/ui/stat";
 import { createServerFn } from "@tanstack/react-start";
@@ -18,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "~/components/ui/button";
 import { GlassPanel } from "~/components/ui/glass-panel";
 import { GridPattern } from "~/components/ui/background-patterns";
+import { getSegmentsFn } from "~/fn/segments";
 
 function formatDuration(durationInMinutes: number) {
   const hours = Math.floor(durationInMinutes / 60);
@@ -55,12 +57,35 @@ const getModuleIcon = (moduleId: string) => {
 };
 
 export function ModulesSection({
-  segments,
+  segments: initialSegments,
   isDisabled = false,
 }: {
-  segments: Segment[];
+  segments?: Segment[];
   isDisabled?: boolean;
 }) {
+  const { data: segments, isLoading: isLoadingSegments } = useQuery({
+    queryKey: ["segments"],
+    queryFn: () => getSegmentsFn(),
+    initialData: initialSegments,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+
+  const { data: moduleData, isLoading: isLoadingModules } = useQuery({
+    queryKey: ["modules"],
+    queryFn: getModulesFn,
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
+
+  if ((isLoadingSegments || isLoadingModules) && !segments) {
+    return (
+      <div className="w-full py-24 flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-cyan-500" />
+      </div>
+    );
+  }
+
+  if (!segments) return null;
+
   // Group segments by moduleId
   const modules = segments.reduce(
     (acc, segment) => {
@@ -76,11 +101,6 @@ export function ModulesSection({
   // Sort segments within each module by order
   Object.keys(modules).forEach((moduleId) => {
     modules[moduleId].sort((a, b) => a.order - b.order);
-  });
-
-  const { data: moduleData } = useQuery({
-    queryKey: ["modules"],
-    queryFn: getModulesFn,
   });
 
   const moduleEntries = Object.entries(modules);

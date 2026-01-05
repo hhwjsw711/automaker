@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useContinueSlug } from "~/hooks/use-continue-slug";
 import { createServerFn } from "@tanstack/react-start";
-import { VideoPlayer } from "~/routes/learn/-components/video-player";
 import { useQuery } from "@tanstack/react-query";
 import { Play, ShoppingCart } from "lucide-react";
 import { getStorage } from "~/utils/storage";
@@ -10,6 +9,7 @@ import { database } from "~/db";
 import { segments, modules } from "~/db/schema";
 import { eq } from "drizzle-orm";
 import { useAuth } from "~/hooks/use-auth";
+import { LazyVideoPlayer } from "./lazy-video-player";
 
 const getFirstVideoSegmentFn = createServerFn().handler(async () => {
   // Get segments ordered by module order, then segment order
@@ -165,10 +165,10 @@ export function HeroSection() {
                     {/* Video container with glass morphism effect */}
                     <div className="video-container">
                       <div className="video-wrapper aspect-video relative">
-                        <VideoPlayer
+                        <LazyVideoPlayer
                           segmentId={firstVideoSegment.id}
                           videoKey={firstVideoSegment.videoKey!}
-                          initialThumbnailUrl={thumbnailUrl}
+                          thumbnailUrl={thumbnailUrl}
                         />
                       </div>
 

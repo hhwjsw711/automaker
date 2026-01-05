@@ -5,13 +5,27 @@ import { z } from "zod";
 import {
   reorderSegmentsUseCase,
   editSegmentUseCase,
+  getSegmentsUseCase,
+  getFirstVideoSegmentUseCase,
 } from "~/use-cases/segments";
+
+export const getSegmentsFn = createServerFn()
+  .middleware([unauthenticatedMiddleware])
+  .handler(async () => {
+    return getSegmentsUseCase();
+  });
 
 export const getFirstSegmentFn = createServerFn()
   .middleware([unauthenticatedMiddleware])
   .handler(async () => {
     const segments = await getSegments();
     return segments[0] ?? null;
+  });
+
+export const getFirstVideoSegmentFn = createServerFn()
+  .middleware([unauthenticatedMiddleware])
+  .handler(async () => {
+    return getFirstVideoSegmentUseCase();
   });
 
 export const reorderSegmentsFn = createServerFn()
