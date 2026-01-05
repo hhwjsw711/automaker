@@ -487,11 +487,10 @@ export interface AppState {
   // Claude Agent SDK Settings
   autoLoadClaudeMd: boolean; // Auto-load CLAUDE.md files using SDK's settingSources option
   enableSandboxMode: boolean; // Enable sandbox mode for bash commands (may cause issues on some systems)
+  skipSandboxWarning: boolean; // Skip the sandbox environment warning dialog on startup
 
   // MCP Servers
   mcpServers: MCPServerConfig[]; // List of configured MCP servers for agent use
-  mcpAutoApproveTools: boolean; // Auto-approve MCP tool calls without permission prompts
-  mcpUnrestrictedTools: boolean; // Allow unrestricted tools when MCP servers are enabled
 
   // Prompt Customization
   promptCustomization: PromptCustomization; // Custom prompts for Auto Mode, Agent, Backlog Plan, Enhancement
@@ -775,8 +774,7 @@ export interface AppActions {
   // Claude Agent SDK Settings actions
   setAutoLoadClaudeMd: (enabled: boolean) => Promise<void>;
   setEnableSandboxMode: (enabled: boolean) => Promise<void>;
-  setMcpAutoApproveTools: (enabled: boolean) => Promise<void>;
-  setMcpUnrestrictedTools: (enabled: boolean) => Promise<void>;
+  setSkipSandboxWarning: (skip: boolean) => Promise<void>;
 
   // Prompt Customization actions
   setPromptCustomization: (customization: PromptCustomization) => Promise<void>;
@@ -975,10 +973,9 @@ const initialState: AppState = {
   enhancementModel: 'sonnet', // Default to sonnet for feature enhancement
   validationModel: 'opus', // Default to opus for GitHub issue validation
   autoLoadClaudeMd: false, // Default to disabled (user must opt-in)
-  enableSandboxMode: true, // Default to enabled for security (can be disabled if issues occur)
+  enableSandboxMode: false, // Default to disabled (can be enabled for additional security)
+  skipSandboxWarning: false, // Default to disabled (show sandbox warning dialog)
   mcpServers: [], // No MCP servers configured by default
-  mcpAutoApproveTools: true, // Default to enabled - bypass permission prompts for MCP tools
-  mcpUnrestrictedTools: true, // Default to enabled - don't filter allowedTools when MCP enabled
   promptCustomization: {}, // Empty by default - all prompts use built-in defaults
   aiProfiles: DEFAULT_AI_PROFILES,
   projectAnalysis: null,
@@ -1623,19 +1620,12 @@ export const useAppStore = create<AppState & AppActions>()(
         const { syncSettingsToServer } = await import('@/hooks/use-settings-migration');
         await syncSettingsToServer();
       },
-      setMcpAutoApproveTools: async (enabled) => {
-        set({ mcpAutoApproveTools: enabled });
+      setSkipSandboxWarning: async (skip) => {
+        set({ skipSandboxWarning: skip });
         // Sync to server settings file
         const { syncSettingsToServer } = await import('@/hooks/use-settings-migration');
         await syncSettingsToServer();
       },
-      setMcpUnrestrictedTools: async (enabled) => {
-        set({ mcpUnrestrictedTools: enabled });
-        // Sync to server settings file
-        const { syncSettingsToServer } = await import('@/hooks/use-settings-migration');
-        await syncSettingsToServer();
-      },
-
       // Prompt Customization actions
       setPromptCustomization: async (customization) => {
         set({ promptCustomization: customization });
@@ -2921,10 +2911,9 @@ export const useAppStore = create<AppState & AppActions>()(
           validationModel: state.validationModel,
           autoLoadClaudeMd: state.autoLoadClaudeMd,
           enableSandboxMode: state.enableSandboxMode,
+          skipSandboxWarning: state.skipSandboxWarning,
           // MCP settings
           mcpServers: state.mcpServers,
-          mcpAutoApproveTools: state.mcpAutoApproveTools,
-          mcpUnrestrictedTools: state.mcpUnrestrictedTools,
           // Prompt customization
           promptCustomization: state.promptCustomization,
           // Profiles and sessions

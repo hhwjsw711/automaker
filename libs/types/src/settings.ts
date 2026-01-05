@@ -351,16 +351,14 @@ export interface GlobalSettings {
   // Claude Agent SDK Settings
   /** Auto-load CLAUDE.md files using SDK's settingSources option */
   autoLoadClaudeMd?: boolean;
-  /** Enable sandbox mode for bash commands (default: true, disable if issues occur) */
+  /** Enable sandbox mode for bash commands (default: false, enable for additional security) */
   enableSandboxMode?: boolean;
+  /** Skip showing the sandbox risk warning dialog */
+  skipSandboxWarning?: boolean;
 
   // MCP Server Configuration
   /** List of configured MCP servers for agent use */
   mcpServers: MCPServerConfig[];
-  /** Auto-approve MCP tool calls without permission prompts (uses bypassPermissions mode) */
-  mcpAutoApproveTools?: boolean;
-  /** Allow unrestricted tools when MCP servers are enabled (don't filter allowedTools) */
-  mcpUnrestrictedTools?: boolean;
 
   // Prompt Customization
   /** Custom prompts for Auto Mode, Agent Runner, Backlog Planning, and Enhancements */
@@ -470,6 +468,13 @@ export interface ProjectSettings {
  * Default values and constants
  */
 
+/** Current version of the global settings schema */
+export const SETTINGS_VERSION = 2;
+/** Current version of the credentials schema */
+export const CREDENTIALS_VERSION = 1;
+/** Current version of the project settings schema */
+export const PROJECT_SETTINGS_VERSION = 1;
+
 /** Default keyboard shortcut bindings */
 export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
   board: 'K',
@@ -496,7 +501,7 @@ export const DEFAULT_KEYBOARD_SHORTCUTS: KeyboardShortcuts = {
 
 /** Default global settings used when no settings file exists */
 export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
-  version: 1,
+  version: SETTINGS_VERSION,
   theme: 'dark',
   sidebarOpen: true,
   chatHistoryOpen: false,
@@ -523,17 +528,14 @@ export const DEFAULT_GLOBAL_SETTINGS: GlobalSettings = {
   worktreePanelCollapsed: false,
   lastSelectedSessionByProject: {},
   autoLoadClaudeMd: false,
-  enableSandboxMode: true,
+  enableSandboxMode: false,
+  skipSandboxWarning: false,
   mcpServers: [],
-  // Default to true for autonomous workflow. Security is enforced when adding servers
-  // via the security warning dialog that explains the risks.
-  mcpAutoApproveTools: true,
-  mcpUnrestrictedTools: true,
 };
 
 /** Default credentials (empty strings - user must provide API keys) */
 export const DEFAULT_CREDENTIALS: Credentials = {
-  version: 1,
+  version: CREDENTIALS_VERSION,
   apiKeys: {
     anthropic: '',
     google: '',
@@ -543,12 +545,5 @@ export const DEFAULT_CREDENTIALS: Credentials = {
 
 /** Default project settings (empty - all settings are optional and fall back to global) */
 export const DEFAULT_PROJECT_SETTINGS: ProjectSettings = {
-  version: 1,
+  version: PROJECT_SETTINGS_VERSION,
 };
-
-/** Current version of the global settings schema */
-export const SETTINGS_VERSION = 1;
-/** Current version of the credentials schema */
-export const CREDENTIALS_VERSION = 1;
-/** Current version of the project settings schema */
-export const PROJECT_SETTINGS_VERSION = 1;

@@ -15,6 +15,32 @@ import type {
   ModelDefinition,
 } from './types.js';
 
+// Explicit allowlist of environment variables to pass to the SDK.
+// Only these vars are passed - nothing else from process.env leaks through.
+const ALLOWED_ENV_VARS = [
+  'ANTHROPIC_API_KEY',
+  'PATH',
+  'HOME',
+  'SHELL',
+  'TERM',
+  'USER',
+  'LANG',
+  'LC_ALL',
+];
+
+/**
+ * Build environment for the SDK with only explicitly allowed variables
+ */
+function buildEnv(): Record<string, string | undefined> {
+  const env: Record<string, string | undefined> = {};
+  for (const key of ALLOWED_ENV_VARS) {
+    if (process.env[key]) {
+      env[key] = process.env[key];
+    }
+  }
+  return env;
+}
+
 export class ClaudeProvider extends BaseProvider {
   getName(): string {
     return 'claude';
@@ -37,33 +63,27 @@ export class ClaudeProvider extends BaseProvider {
     } = options;
 
     // Build Claude SDK options
-    // MCP permission logic - determines how to handle tool permissions when MCP servers are configured.
-    // This logic mirrors buildMcpOptions() in sdk-options.ts but is applied here since
-    // the provider is the final point where SDK options are constructed.
+    // AUTONOMOUS MODE: Always bypass permissions for fully autonomous operation
     const hasMcpServers = options.mcpServers && Object.keys(options.mcpServers).length > 0;
-    // Default to true for autonomous workflow. Security is enforced when adding servers
-    // via the security warning dialog that explains the risks.
-    const mcpAutoApprove = options.mcpAutoApproveTools ?? true;
-    const mcpUnrestricted = options.mcpUnrestrictedTools ?? true;
     const defaultTools = ['Read', 'Write', 'Edit', 'Glob', 'Grep', 'Bash', 'WebSearch', 'WebFetch'];
 
-    // Determine permission mode based on settings
-    const shouldBypassPermissions = hasMcpServers && mcpAutoApprove;
-    // Determine if we should restrict tools (only when no MCP or unrestricted is disabled)
-    const shouldRestrictTools = !hasMcpServers || !mcpUnrestricted;
+    // AUTONOMOUS MODE: Always bypass permissions and allow unrestricted tools
+    // Only restrict tools when no MCP servers are configured
+    const shouldRestrictTools = !hasMcpServers;
 
     const sdkOptions: Options = {
       model,
       systemPrompt,
       maxTurns,
       cwd,
+      // Pass only explicitly allowed environment variables to SDK
+      env: buildEnv(),
       // Only restrict tools if explicitly set OR (no MCP / unrestricted disabled)
       ...(allowedTools && shouldRestrictTools && { allowedTools }),
       ...(!allowedTools && shouldRestrictTools && { allowedTools: defaultTools }),
-      // When MCP servers are configured and auto-approve is enabled, use bypassPermissions
-      permissionMode: shouldBypassPermissions ? 'bypassPermissions' : 'default',
-      // Required when using bypassPermissions mode
-      ...(shouldBypassPermissions && { allowDangerouslySkipPermissions: true }),
+      // AUTONOMOUS MODE: Always bypass permissions and allow dangerous operations
+      permissionMode: 'bypassPermissions',
+      allowDangerouslySkipPermissions: true,
       abortController,
       // Resume existing SDK session if we have a session ID
       ...(sdkSessionId && conversationHistory && conversationHistory.length > 0
