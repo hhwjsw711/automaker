@@ -1,5 +1,6 @@
 import { createRootRoute, Outlet, useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState, useCallback, useDeferredValue, useRef } from 'react';
+import { createLogger } from '@automaker/utils/logger';
 import { Sidebar } from '@/components/layout/sidebar';
 import {
   FileBrowserProvider,
@@ -17,11 +18,16 @@ import {
   verifySession,
   checkSandboxEnvironment,
   getServerUrlSync,
+  checkExternalServerMode,
+  isExternalServerMode,
 } from '@/lib/http-api-client';
 import { Toaster } from 'sonner';
 import { ThemeOption, themeOptions } from '@/config/theme-options';
 import { SandboxRiskDialog } from '@/components/dialogs/sandbox-risk-dialog';
 import { SandboxRejectionScreen } from '@/components/dialogs/sandbox-rejection-screen';
+import { LoadingState } from '@/components/ui/loading-state';
+
+const logger = createLogger('RootLayout');
 
 function RootLayoutContent() {
   const location = useLocation();
@@ -120,7 +126,7 @@ function RootLayoutContent() {
           setSandboxStatus('needs-confirmation');
         }
       } catch (error) {
-        console.error('[Sandbox] Failed to check environment:', error);
+        logger.error('Failed to check environment:', error);
         // On error, assume not containerized and show warning
         if (skipSandboxWarning) {
           setSandboxStatus('confirmed');
@@ -154,10 +160,10 @@ function RootLayoutContent() {
         if (electronAPI?.quit) {
           await electronAPI.quit();
         } else {
-          console.error('[Sandbox] quit() not available on electronAPI');
+          logger.error('quit() not available on electronAPI');
         }
       } catch (error) {
-        console.error('[Sandbox] Failed to quit app:', error);
+        logger.error('Failed to quit app:', error);
       }
     } else {
       // In web mode, show rejection screen
@@ -184,13 +190,16 @@ function RootLayoutContent() {
         // Initialize API key for Electron mode
         await initApiKey();
 
-        // In Electron mode, we're always authenticated via header
-        if (isElectronMode()) {
+        // Check if running in external server mode (Docker API)
+        const externalMode = await checkExternalServerMode();
+
+        // In Electron mode (but NOT external server mode), we're always authenticated via header
+        if (isElectronMode() && !externalMode) {
           useAuthStore.getState().setAuthState({ isAuthenticated: true, authChecked: true });
           return;
         }
 
-        // In web mode, verify the session cookie is still valid
+        // In web mode OR external server mode, verify the session cookie is still valid
         // by making a request to an authenticated endpoint
         const isValid = await verifySession();
 
@@ -202,7 +211,7 @@ function RootLayoutContent() {
         // Session is invalid or expired - treat as not authenticated
         useAuthStore.getState().setAuthState({ isAuthenticated: false, authChecked: true });
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
+        logger.error('Failed to initialize auth:', error);
         // On error, treat as not authenticated
         useAuthStore.getState().setAuthState({ isAuthenticated: false, authChecked: true });
       } finally {
@@ -231,17 +240,20 @@ function RootLayoutContent() {
     };
   }, []);
 
-  // Routing rules (web mode):
+  // Routing rules (web mode and external server mode):
   // - If not authenticated: force /login (even /setup is protected)
   // - If authenticated but setup incomplete: force /setup
   useEffect(() => {
     if (!setupHydrated) return;
 
+    // Check if we need session-based auth (web mode OR external server mode)
+    const needsSessionAuth = !isElectronMode() || isExternalServerMode() === true;
+
     // Wait for auth check to complete before enforcing any redirects
-    if (!isElectronMode() && !authChecked) return;
+    if (needsSessionAuth && !authChecked) return;
 
     // Unauthenticated -> force /login
-    if (!isElectronMode() && !isAuthenticated) {
+    if (needsSessionAuth && !isAuthenticated) {
       if (location.pathname !== '/login') {
         navigate({ to: '/login' });
       }
@@ -282,7 +294,7 @@ function RootLayoutContent() {
         });
         setIpcConnected(response.ok);
       } catch (error) {
-        console.error('IPC connection failed:', error);
+        logger.error('IPC connection failed:', error);
         setIpcConnected(false);
       }
     };
@@ -327,7 +339,7 @@ function RootLayoutContent() {
   if (sandboxStatus === 'pending') {
     return (
       <main className="flex h-screen items-center justify-center" data-testid="app-container">
-        <div className="text-muted-foreground">Checking environment...</div>
+        <LoadingState message="Checking environment..." />
       </main>
     );
   }
@@ -347,21 +359,24 @@ function RootLayoutContent() {
     );
   }
 
-  // Wait for auth check before rendering protected routes (web mode only)
-  if (!isElectronMode() && !authChecked) {
+  // Check if we need session-based auth (web mode OR external server mode)
+  const needsSessionAuth = !isElectronMode() || isExternalServerMode() === true;
+
+  // Wait for auth check before rendering protected routes (web mode and external server mode)
+  if (needsSessionAuth && !authChecked) {
     return (
       <main className="flex h-screen items-center justify-center" data-testid="app-container">
-        <div className="text-muted-foreground">Loading...</div>
+        <LoadingState message="Loading..." />
       </main>
     );
   }
 
-  // Redirect to login if not authenticated (web mode)
+  // Redirect to login if not authenticated (web mode and external server mode)
   // Show loading state while navigation to login is in progress
-  if (!isElectronMode() && !isAuthenticated) {
+  if (needsSessionAuth && !isAuthenticated) {
     return (
       <main className="flex h-screen items-center justify-center" data-testid="app-container">
-        <div className="text-muted-foreground">Redirecting to login...</div>
+        <LoadingState message="Redirecting to login..." />
       </main>
     );
   }
