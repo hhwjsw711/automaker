@@ -9,6 +9,7 @@ import { GlassPanel } from "~/components/ui/glass-panel";
 import { useAuth } from "~/hooks/use-auth";
 import { getNewsletterStatsFn } from "~/fn/newsletter";
 import { getFirstVideoSegmentFn } from "~/fn/segments";
+import { useState, useEffect } from "react";
 
 interface UnifiedHeroProps {
   isEarlyAccess: boolean;
@@ -25,6 +26,12 @@ export function UnifiedHero({
 }: UnifiedHeroProps) {
   const continueSlug = useContinueSlug();
   const user = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevent hydration mismatch by only applying auth-based conditionals after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const { data: firstVideoData } = useQuery({
     queryKey: ["first-video-segment"],
@@ -104,7 +111,7 @@ export function UnifiedHero({
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
-                  {!user?.isPremium && !user?.isAdmin && (
+                  {isMounted && !user?.isPremium && !user?.isAdmin && (
                     <Link
                       to="/purchase"
                       className={buttonVariants({
@@ -175,11 +182,26 @@ export function UnifiedHero({
                   >
                     <div className="video-wrapper aspect-video relative rounded-xl overflow-hidden">
                       {firstVideoSegment ? (
-                        <LazyVideoPlayer
-                          segmentId={firstVideoSegment.id}
-                          videoKey={firstVideoSegment.videoKey!}
-                          thumbnailUrl={thumbnailUrl}
-                        />
+                        <>
+                          {/* Server-rendered static thumbnail image - discoverable in initial HTML */}
+                          <img
+                            src="/hero-video-thumbnail.png"
+                            alt="Video thumbnail"
+                            className="absolute inset-0 w-full h-full object-cover z-0"
+                            fetchPriority="high"
+                            loading="eager"
+                            decoding="async"
+                          />
+                          {/* Video player overlay */}
+                          <div className="absolute inset-0 z-10">
+                            <LazyVideoPlayer
+                              segmentId={firstVideoSegment.id}
+                              videoKey={firstVideoSegment.videoKey!}
+                              thumbnailUrl="/hero-video-thumbnail.png"
+                              skipThumbnail={true}
+                            />
+                          </div>
+                        </>
                       ) : (
                         /* Placeholder that matches video dimensions to prevent layout shift */
                         <div className="w-full h-full flex items-center justify-center glass rounded-xl">

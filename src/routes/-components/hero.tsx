@@ -10,6 +10,7 @@ import { segments, modules } from "~/db/schema";
 import { eq } from "drizzle-orm";
 import { useAuth } from "~/hooks/use-auth";
 import { LazyVideoPlayer } from "./lazy-video-player";
+import { useState, useEffect } from "react";
 
 const getFirstVideoSegmentFn = createServerFn().handler(async () => {
   // Get segments ordered by module order, then segment order
@@ -52,6 +53,12 @@ const getFirstVideoSegmentFn = createServerFn().handler(async () => {
 export function HeroSection() {
   const continueSlug = useContinueSlug();
   const user = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevent hydration mismatch by only applying auth-based conditionals after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const {
     data: firstVideoData,
@@ -114,7 +121,7 @@ export function HeroSection() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  {!user?.isPremium && !user?.isAdmin && (
+                  {isMounted && !user?.isPremium && !user?.isAdmin && (
                     <Link
                       to="/purchase"
                       className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 dark:bg-[#22d3ee] px-6 py-2 text-xs font-black text-white dark:text-[#0b101a] shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:brightness-110 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)]"

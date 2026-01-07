@@ -13,6 +13,7 @@ interface LazyVideoPlayerProps {
   videoKey: string;
   thumbnailUrl?: string | null;
   onAutoComplete?: () => void;
+  skipThumbnail?: boolean; // Set to true when thumbnail is already rendered server-side
 }
 
 export function LazyVideoPlayer({
@@ -20,6 +21,7 @@ export function LazyVideoPlayer({
   videoKey,
   thumbnailUrl,
   onAutoComplete,
+  skipThumbnail = false,
 }: LazyVideoPlayerProps) {
   const [isActivated, setIsActivated] = useState(false);
 
@@ -47,16 +49,16 @@ export function LazyVideoPlayer({
   // Show thumbnail with play button overlay
   return (
     <div className="w-full h-full relative">
-      {thumbnailUrl ? (
+      {!skipThumbnail && thumbnailUrl ? (
         <img
           src={thumbnailUrl}
           alt="Video thumbnail"
           className="absolute inset-0 w-full h-full object-cover"
           fetchPriority="high"
         />
-      ) : (
+      ) : !skipThumbnail ? (
         <div className="absolute inset-0 bg-linear-to-br from-slate-800 to-slate-900" />
-      )}
+      ) : null}
 
       {/* Play button overlay */}
       <button

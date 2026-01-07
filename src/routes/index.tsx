@@ -11,13 +11,39 @@ import { ResearchSourcesSection } from "./-components/research-sources";
 import { InstructorSection } from "./-components/instructor-section";
 import { DiscordCommunitySection } from "./-components/discord-community-section";
 import { NewsletterSection } from "./-components/newsletter";
+import { getFirstVideoSegmentFn } from "~/fn/segments";
 
 export const Route = createFileRoute("/")({
   component: Home,
+  loader: async () => {
+    // Fetch video segment data (we need segmentId and videoKey)
+    // But use static thumbnail for landing page hero
+    const videoData = await getFirstVideoSegmentFn();
+    return { 
+      initialVideoData: videoData ? {
+        ...videoData,
+        thumbnailUrl: "/hero-video-thumbnail.png", // Use static thumbnail for landing page
+      } : null
+    };
+  },
+  head: () => {
+    // Preload the static hero thumbnail
+    return {
+      links: [
+        {
+          rel: "preload",
+          as: "image",
+          href: "/hero-video-thumbnail.png",
+          fetchPriority: "high" as const,
+        },
+      ],
+    };
+  },
 });
 
 function Home() {
   const rootData = useLoaderData({ from: "__root__" });
+  const routeData = Route.useLoaderData();
   const shouldShowEarlyAccess = rootData?.shouldShowEarlyAccess ?? false;
 
   // Ensure page starts at top on initial load (prevents scroll restoration from jumping to subscribe section)
@@ -39,7 +65,10 @@ function Home() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0b101a] text-slate-800 dark:text-slate-200">
       <div className="prism-bg" />
-      <UnifiedHero isEarlyAccess={shouldShowEarlyAccess} />
+      <UnifiedHero 
+        isEarlyAccess={shouldShowEarlyAccess} 
+        initialVideoData={routeData?.initialVideoData}
+      />
       {shouldShowEarlyAccess && <DiscordCommunitySection />}
       <FutureOfCodingSection />
       <StatsSection />

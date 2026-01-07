@@ -5,7 +5,7 @@ export function InstructorSection() {
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 hero-background-ai opacity-50"></div>
-      
+
       {/* Background Pattern */}
       <div className="absolute inset-0 z-0 opacity-[0.2]">
         <GridPattern
@@ -38,6 +38,7 @@ export function InstructorSection() {
                   src="/cody.png"
                   alt="Cody - Your Instructor"
                   className="size-64 rounded-xl object-cover"
+                  loading="lazy"
                 />
               </div>
             </div>

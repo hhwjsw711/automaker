@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Button, buttonVariants } from "~/components/ui/button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ShoppingCart, Check, ArrowRight } from "lucide-react";
 import { GlassPanel } from "~/components/ui/glass-panel";
 import { CircuitBoardPattern } from "~/components/ui/background-patterns";
@@ -12,6 +12,12 @@ export function PricingSection() {
   const cardRef = useRef<HTMLDivElement>(null);
   const user = useAuth();
   const continueSlug = useContinueSlug();
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Prevent hydration mismatch by only applying auth-based conditionals after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -114,7 +120,7 @@ export function PricingSection() {
                         </span>
                       </li>
                     </ul>
-                    {user?.isPremium || user?.isAdmin ? (
+                    {isMounted && (user?.isPremium || user?.isAdmin) ? (
                       <Link
                         to="/learn/$slug"
                         params={{ slug: continueSlug }}
