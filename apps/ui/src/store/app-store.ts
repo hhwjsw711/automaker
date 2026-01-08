@@ -81,9 +81,23 @@ export const THEME_STORAGE_KEY = 'automaker:theme';
  */
 export function getStoredTheme(): ThemeMode | null {
   const stored = getItem(THEME_STORAGE_KEY);
-  if (stored) {
-    return stored as ThemeMode;
+  if (stored) return stored as ThemeMode;
+
+  // Backwards compatibility: older versions stored theme inside the Zustand persist blob.
+  // We intentionally keep reading it as a fallback so users don't get a "default theme flash"
+  // on login/logged-out pages if THEME_STORAGE_KEY hasn't been written yet.
+  try {
+    const legacy = getItem('automaker-storage');
+    if (!legacy) return null;
+    const parsed = JSON.parse(legacy) as { state?: { theme?: unknown } } | { theme?: unknown };
+    const theme = (parsed as any)?.state?.theme ?? (parsed as any)?.theme;
+    if (typeof theme === 'string' && theme.length > 0) {
+      return theme as ThemeMode;
+    }
+  } catch {
+    // Ignore legacy parse errors
   }
+
   return null;
 }
 

@@ -95,6 +95,17 @@ export function waitForMigrationComplete(): Promise<void> {
 }
 
 /**
+ * Reset migration state when auth is lost (logout/session expired).
+ * This ensures that on re-login, the sync hook properly waits for
+ * fresh settings hydration before starting to sync.
+ */
+export function resetMigrationState(): void {
+  migrationCompleted = false;
+  migrationCompletePromise = null;
+  migrationCompleteResolve = null;
+}
+
+/**
  * Parse localStorage data into settings object
  */
 export function parseLocalStorageSettings(): Partial<GlobalSettings> | null {

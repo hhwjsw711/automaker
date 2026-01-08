@@ -104,4 +104,36 @@ test.describe('Settings startup sync race', () => {
     expect(settingsAfterHydration.projects?.length).toBeGreaterThan(0);
     expect(settingsAfterHydration.projects?.[0]?.path).toBe(FIXTURE_PROJECT_PATH);
   });
+
+  test('does not wipe projects during logout transition', async ({ page }) => {
+    // Ensure authenticated and app is loaded at least to welcome/board.
+    await authenticateForTests(page);
+    await page.goto('/');
+    await page
+      .locator('[data-testid="welcome-view"], [data-testid="board-view"]')
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 });
+
+    // Confirm settings.json currently has projects (precondition).
+    const beforeLogout = JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf-8')) as {
+      projects?: Array<unknown>;
+    };
+    expect(beforeLogout.projects?.length).toBeGreaterThan(0);
+
+    // Navigate to settings and click logout.
+    await page.goto('/settings');
+    await page.locator('[data-testid="logout-button"]').click();
+
+    // Ensure we landed on logged-out or login (either is acceptable).
+    await page
+      .locator('text=You’ve been logged out, text=Authentication Required')
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 });
+
+    // The server settings file should still have projects after logout.
+    const afterLogout = JSON.parse(fs.readFileSync(SETTINGS_PATH, 'utf-8')) as {
+      projects?: Array<unknown>;
+    };
+    expect(afterLogout.projects?.length).toBeGreaterThan(0);
+  });
 });

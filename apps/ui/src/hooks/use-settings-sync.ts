@@ -18,7 +18,7 @@ import { setItem } from '@/lib/storage';
 import { useAppStore, type ThemeMode, THEME_STORAGE_KEY } from '@/store/app-store';
 import { useSetupStore } from '@/store/setup-store';
 import { useAuthStore } from '@/store/auth-store';
-import { waitForMigrationComplete } from './use-settings-migration';
+import { waitForMigrationComplete, resetMigrationState } from './use-settings-migration';
 import type { GlobalSettings } from '@automaker/types';
 
 const logger = createLogger('SettingsSync');
@@ -98,9 +98,35 @@ export function useSettingsSync(): SettingsSyncState {
   const lastSyncedRef = useRef<string>('');
   const isInitializedRef = useRef(false);
 
+  // If auth is lost (logout / session expired), immediately stop syncing and
+  // reset initialization so we can safely re-init after the next login.
+  useEffect(() => {
+    if (!authChecked) return;
+
+    if (!isAuthenticated) {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+        syncTimeoutRef.current = null;
+      }
+      lastSyncedRef.current = '';
+      isInitializedRef.current = false;
+
+      // Reset migration state so next login properly waits for fresh hydration
+      resetMigrationState();
+
+      setState({ loaded: false, error: null, syncing: false });
+    }
+  }, [authChecked, isAuthenticated]);
+
   // Debounced sync function
   const syncToServer = useCallback(async () => {
     try {
+      // Never sync when not authenticated (prevents overwriting server settings during logout/login transitions)
+      const auth = useAuthStore.getState();
+      if (!auth.authChecked || !auth.isAuthenticated) {
+        return;
+      }
+
       setState((s) => ({ ...s, syncing: true }));
       const api = getHttpApiClient();
       const appState = useAppStore.getState();
@@ -215,7 +241,7 @@ export function useSettingsSync(): SettingsSyncState {
 
   // Subscribe to store changes and sync to server
   useEffect(() => {
-    if (!state.loaded) return;
+    if (!state.loaded || !authChecked || !isAuthenticated) return;
 
     // Subscribe to app store changes
     const unsubscribeApp = useAppStore.subscribe((newState, prevState) => {
@@ -272,11 +298,11 @@ export function useSettingsSync(): SettingsSyncState {
         clearTimeout(syncTimeoutRef.current);
       }
     };
-  }, [state.loaded, scheduleSyncToServer, syncNow]);
+  }, [state.loaded, authChecked, isAuthenticated, scheduleSyncToServer, syncNow]);
 
   // Best-effort flush on tab close / backgrounding
   useEffect(() => {
-    if (!state.loaded) return;
+    if (!state.loaded || !authChecked || !isAuthenticated) return;
 
     const handleBeforeUnload = () => {
       // Fire-and-forget; may not complete in all browsers, but helps in Electron/webview
@@ -296,7 +322,7 @@ export function useSettingsSync(): SettingsSyncState {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [state.loaded, syncNow]);
+  }, [state.loaded, authChecked, isAuthenticated, syncNow]);
 
   return state;
 }

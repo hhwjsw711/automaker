@@ -266,25 +266,80 @@ export class SettingsService {
     const settingsPath = getGlobalSettingsPath(this.dataDir);
 
     const current = await this.getGlobalSettings();
+
+    // Guard against destructive "empty array/object" overwrites.
+    // During auth transitions, the UI can briefly have default/empty state and accidentally
+    // sync it, wiping persisted settings (especially `projects`).
+    const sanitizedUpdates: Partial<GlobalSettings> = { ...updates };
+    let attemptedProjectWipe = false;
+
+    const ignoreEmptyArrayOverwrite = <K extends keyof GlobalSettings>(key: K): void => {
+      const nextVal = sanitizedUpdates[key] as unknown;
+      const curVal = current[key] as unknown;
+      if (
+        Array.isArray(nextVal) &&
+        nextVal.length === 0 &&
+        Array.isArray(curVal) &&
+        curVal.length > 0
+      ) {
+        delete sanitizedUpdates[key];
+      }
+    };
+
+    const currentProjectsLen = Array.isArray(current.projects) ? current.projects.length : 0;
+    if (
+      Array.isArray(sanitizedUpdates.projects) &&
+      sanitizedUpdates.projects.length === 0 &&
+      currentProjectsLen > 0
+    ) {
+      attemptedProjectWipe = true;
+      delete sanitizedUpdates.projects;
+    }
+
+    ignoreEmptyArrayOverwrite('trashedProjects');
+    ignoreEmptyArrayOverwrite('projectHistory');
+    ignoreEmptyArrayOverwrite('recentFolders');
+    ignoreEmptyArrayOverwrite('aiProfiles');
+    ignoreEmptyArrayOverwrite('mcpServers');
+    ignoreEmptyArrayOverwrite('enabledCursorModels');
+    ignoreEmptyArrayOverwrite('enabledCodexModels');
+
+    // Empty object overwrite guard
+    if (
+      sanitizedUpdates.lastSelectedSessionByProject &&
+      typeof sanitizedUpdates.lastSelectedSessionByProject === 'object' &&
+      !Array.isArray(sanitizedUpdates.lastSelectedSessionByProject) &&
+      Object.keys(sanitizedUpdates.lastSelectedSessionByProject).length === 0 &&
+      current.lastSelectedSessionByProject &&
+      Object.keys(current.lastSelectedSessionByProject).length > 0
+    ) {
+      delete sanitizedUpdates.lastSelectedSessionByProject;
+    }
+
+    // If a request attempted to wipe projects, also ignore theme changes in that same request.
+    if (attemptedProjectWipe) {
+      delete sanitizedUpdates.theme;
+    }
+
     const updated: GlobalSettings = {
       ...current,
-      ...updates,
+      ...sanitizedUpdates,
       version: SETTINGS_VERSION,
     };
 
     // Deep merge keyboard shortcuts if provided
-    if (updates.keyboardShortcuts) {
+    if (sanitizedUpdates.keyboardShortcuts) {
       updated.keyboardShortcuts = {
         ...current.keyboardShortcuts,
-        ...updates.keyboardShortcuts,
+        ...sanitizedUpdates.keyboardShortcuts,
       };
     }
 
     // Deep merge phaseModels if provided
-    if (updates.phaseModels) {
+    if (sanitizedUpdates.phaseModels) {
       updated.phaseModels = {
         ...current.phaseModels,
-        ...updates.phaseModels,
+        ...sanitizedUpdates.phaseModels,
       };
     }
 
