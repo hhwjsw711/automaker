@@ -104,7 +104,11 @@ test.describe('Open Project', () => {
           json.settings.projects = [testProject, ...existingProjects];
         }
       }
-      await route.fulfill({ response, json });
+      await route.fulfill({
+        status: response.status(),
+        headers: response.headers(),
+        json,
+      });
     });
 
     // Now navigate to the app
