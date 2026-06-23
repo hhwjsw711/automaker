@@ -57,6 +57,14 @@ export function isR2Available(): boolean {
 export function getStorage(modeOverride?: StorageType): { storage: IStorage; type: StorageType } {
   const env = process.env.NODE_ENV;
 
+  // Test mode uses mock storage regardless of NODE_ENV
+  if (process.env.IS_TEST === "true") {
+    if (!mockStorage) {
+      mockStorage = new MockStorage();
+    }
+    return { storage: mockStorage, type: "mock" };
+  }
+
   // Production always uses R2
   if (env !== "development" && env !== "test") {
     if (!r2Storage) {

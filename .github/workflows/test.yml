@@ -48,7 +48,7 @@ jobs:
           echo "IS_TEST=true" >> $GITHUB_ENV
           echo "PORT=3001" >> $GITHUB_ENV
           echo "HOST_NAME=http://localhost:3001" >> $GITHUB_ENV
-          echo "NODE_ENV=test" >> $GITHUB_ENV
+          echo "NODE_ENV=production" >> $GITHUB_ENV
 
       - name: Build application
         run: npm run build
