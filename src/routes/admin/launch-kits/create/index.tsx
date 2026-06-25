@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { getAllTagsFn } from "~/fn/launch-kits";
 import { assertIsAdminFn } from "~/fn/auth";
 import { PageHeader } from "../../-components/page-header";
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/admin/launch-kits/create/")({
 });
 
 function CreateLaunchKitPage() {
+  const { t } = useTranslation();
   const { form, isLoading, formError, onSubmit, handleTagToggle } =
     useCreateLaunchKit();
 
@@ -30,16 +32,16 @@ function CreateLaunchKitPage() {
           className="flex items-center gap-1 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Launch Kits
+          {t("admin_pages.launchKitsAdmin.backToKits")}
         </Link>
         <span>/</span>
-        <span className="text-foreground">Create New</span>
+        <span className="text-foreground">{t("admin_pages.launchKitsAdmin.createNew")}</span>
       </div>
 
       <PageHeader
-        title="Create Launch Kit"
-        highlightedWord="Create"
-        description="Add a new launch kit to help developers get started quickly"
+        title={t("admin_pages.launchKitsAdmin.createKit")}
+        highlightedWord={t("admin_pages.launchKitsAdmin.createHighlighted")}
+        description={t("admin_pages.launchKitsAdmin.createKitDesc")}
       />
 
       <LaunchKitForm
@@ -48,7 +50,7 @@ function CreateLaunchKitPage() {
         formError={formError}
         onSubmit={onSubmit}
         onTagToggle={handleTagToggle}
-        submitLabel="Create Launch Kit"
+        submitLabel={t("admin_pages.launchKitsAdmin.createKit")}
         mode="create"
       />
     </div>

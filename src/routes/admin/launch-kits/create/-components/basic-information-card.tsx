@@ -1,4 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
@@ -26,10 +27,11 @@ interface BasicInformationCardProps {
 }
 
 export function BasicInformationCard({ form, isLoading }: BasicInformationCardProps) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Basic Information</CardTitle>
+        <CardTitle>{t("admin_pages.launchKitsAdmin.basicInfo")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FormField
@@ -37,10 +39,10 @@ export function BasicInformationCard({ form, isLoading }: BasicInformationCardPr
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>{t("admin_pages.launchKitsAdmin.name")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="React + TypeScript Starter"
+                  placeholder={t("admin_pages.launchKitsAdmin.namePlaceholder")}
                   disabled={isLoading}
                   {...field}
                 />
@@ -55,10 +57,10 @@ export function BasicInformationCard({ form, isLoading }: BasicInformationCardPr
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{t("admin_pages.launchKitsAdmin.descriptionLabel")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="A modern React starter template with TypeScript, Tailwind CSS, and more..."
+                  placeholder={t("admin_pages.launchKitsAdmin.descriptionPlaceholder")}
                   disabled={isLoading}
                   rows={3}
                   {...field}
@@ -74,10 +76,10 @@ export function BasicInformationCard({ form, isLoading }: BasicInformationCardPr
           name="longDescription"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Long Description (Optional)</FormLabel>
+              <FormLabel>{t("admin_pages.launchKitsAdmin.longDescription")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Detailed description with features, setup instructions, etc..."
+                  placeholder={t("admin_pages.launchKitsAdmin.longDescriptionPlaceholder")}
                   disabled={isLoading}
                   rows={5}
                   {...field}

@@ -29,6 +29,7 @@ import {
 import { StatsCard } from "~/components/stats-card";
 import { AppCard } from "~/components/app-card";
 import { Page } from "./-components/page";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/analytics")({
   loader: ({ context }) => {
@@ -121,6 +122,7 @@ function TableRowSkeleton() {
 }
 
 function AdminAnalytics() {
+  const { t } = useTranslation();
   const { data: analytics, isLoading } = useQuery(analyticsQuery);
   const { data: blogAnalytics, isLoading: blogLoading } =
     useQuery(blogAnalyticsQuery);
@@ -133,9 +135,9 @@ function AdminAnalytics() {
   return (
     <Page>
       <PageHeader
-        title="Course Analytics"
-        highlightedWord="Analytics"
-        description="Comprehensive insights into user engagement, course performance, and revenue metrics"
+        title={t("admin_pages.analytics.pageTitle")}
+        highlightedWord={t("admin_pages.analytics.highlightedWord")}
+        description={t("admin_pages.analytics.pageDescription")}
       />
 
       {/* Key Metrics Overview */}
@@ -144,9 +146,9 @@ function AdminAnalytics() {
           icon={Users}
           iconColor="text-blue-500 dark:text-blue-400"
           iconBgColor="bg-blue-500/10 dark:bg-blue-400/20"
-          title="Total Users"
+          title={t("admin_pages.analytics.totalUsers")}
           value={isLoading ? null : analytics?.userStats.totalUsers}
-          description="All registered users"
+          description={t("admin_pages.analytics.allRegisteredUsers")}
           hoverColor="group-hover:text-blue-600 dark:group-hover:text-blue-400"
         />
 
@@ -154,12 +156,12 @@ function AdminAnalytics() {
           icon={Award}
           iconColor="text-theme-500 dark:text-theme-400"
           iconBgColor="bg-theme-500/10 dark:bg-theme-400/20"
-          title="Premium Members"
+          title={t("admin_pages.analytics.premiumMembers")}
           value={isLoading ? null : analytics?.userStats.premiumUsers}
           description={
             isLoading
               ? null
-              : `${analytics?.userStats.conversionRate}% conversion rate`
+              : t("admin_pages.analytics.conversionRate", { rate: analytics?.userStats.conversionRate })
           }
           hoverColor="group-hover:text-theme-600 dark:group-hover:text-theme-400"
         />
@@ -168,13 +170,13 @@ function AdminAnalytics() {
           icon={DollarSign}
           iconColor="text-green-500 dark:text-green-400"
           iconBgColor="bg-green-500/10 dark:bg-green-400/20"
-          title="Total Revenue"
+          title={t("admin_pages.analytics.totalRevenue")}
           value={
             isLoading
               ? null
               : `$${((analytics?.overallStats.totalRevenue || 0) / 100).toLocaleString()}`
           }
-          description="From affiliate referrals"
+          description={t("admin_pages.analytics.fromAffiliates")}
           hoverColor="group-hover:text-green-600 dark:group-hover:text-green-400"
         />
 
@@ -182,11 +184,11 @@ function AdminAnalytics() {
           icon={Activity}
           iconColor="text-purple-500 dark:text-purple-400"
           iconBgColor="bg-purple-500/10 dark:bg-purple-400/20"
-          title="Avg Progress"
+          title={t("admin_pages.analytics.avgProgress")}
           value={
             isLoading ? null : analytics?.overallStats.averageProgressPerUser
           }
-          description="Segments per user"
+          description={t("admin_pages.analytics.segmentsPerUser")}
           hoverColor="group-hover:text-purple-600 dark:group-hover:text-purple-400"
         />
       </div>
@@ -197,8 +199,8 @@ function AdminAnalytics() {
         <AppCard
           icon={TrendingUp}
           iconColor="theme"
-          title="Top Performing Segments"
-          description="Segments with highest completion rates"
+          title={t("admin_pages.analytics.topPerformingSegments")}
+          description={t("admin_pages.analytics.segmentsCompletionDesc")}
         >
           <div className="space-y-4">
             {isLoading ? (
@@ -207,11 +209,10 @@ function AdminAnalytics() {
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <TrendingUp className="h-12 w-12 text-muted-foreground/50 mb-4" />
                 <h3 className="font-medium text-muted-foreground mb-2">
-                  No segments completed yet
+                  {t("admin_pages.analytics.noSegments")}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Top performing segments will appear here once users start
-                  completing them.
+                  {t("admin_pages.analytics.noSegmentsDesc")}
                 </p>
               </div>
             ) : (
@@ -244,7 +245,7 @@ function AdminAnalytics() {
                       {segment.completedCount}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      completions
+                      {t("admin_pages.analytics.completions")}
                     </div>
                   </div>
                 </div>
@@ -257,8 +258,8 @@ function AdminAnalytics() {
         <AppCard
           icon={MessageSquare}
           iconColor="orange"
-          title="Most Discussed Segments"
-          description="Segments generating the most engagement"
+          title={t("admin_pages.analytics.mostDiscussedSegments")}
+          description={t("admin_pages.analytics.mostDiscussedDesc")}
         >
           <div className="space-y-4">
             {isLoading
@@ -292,7 +293,7 @@ function AdminAnalytics() {
                         {segment.commentCount}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        comments
+                        {t("admin_pages.analytics.comments")}
                       </div>
                     </div>
                   </div>
@@ -307,10 +308,10 @@ function AdminAnalytics() {
           <div className="p-6 border-b border-border/50">
             <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
               <FileText className="h-6 w-6 text-theme-500" />
-              Blog Analytics
+              {t("admin_pages.analytics.blogAnalytics")}
             </h2>
             <p className="text-muted-foreground">
-              Performance metrics for your blog posts
+              {t("admin_pages.analytics.blogAnalyticsDesc")}
             </p>
           </div>
           <div className="p-6">
@@ -324,7 +325,7 @@ function AdminAnalytics() {
                     blogAnalytics?.totalPosts || 0
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">Total Posts</div>
+                <div className="text-sm text-muted-foreground">{t("admin_pages.analytics.totalPosts")}</div>
               </div>
 
               {/* Published Posts */}
@@ -336,7 +337,7 @@ function AdminAnalytics() {
                     blogAnalytics?.publishedPosts || 0
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">Published</div>
+                <div className="text-sm text-muted-foreground">{t("admin_pages.analytics.published")}</div>
               </div>
 
               {/* Total Views */}
@@ -348,7 +349,7 @@ function AdminAnalytics() {
                     blogAnalytics?.totalViews || 0
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground">Total Views</div>
+                <div className="text-sm text-muted-foreground">{t("admin_pages.analytics.totalViews")}</div>
               </div>
 
               {/* Avg Views per Post */}
@@ -364,7 +365,7 @@ function AdminAnalytics() {
                   )}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  Avg Views/Post
+                  {t("admin_pages.analytics.avgViewsPerPost")}
                 </div>
               </div>
             </div>
@@ -375,7 +376,7 @@ function AdminAnalytics() {
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Eye className="h-5 w-5 text-blue-500" />
-                    Most Viewed Posts
+                    {t("admin_pages.analytics.mostViewedPosts")}
                   </h3>
                   <div className="space-y-3">
                     {blogAnalytics.mostViewedPosts
@@ -406,7 +407,7 @@ function AdminAnalytics() {
                               {post.viewCount}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              views
+                              {t("admin_pages.analytics.views")}
                             </div>
                           </div>
                         </div>
@@ -441,7 +442,7 @@ function AdminAnalytics() {
                     : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                 }`}
               >
-                All Modules
+                {t("admin_pages.analytics.allModules")}
               </button>
               {analytics?.moduleAnalytics.map((module) => (
                 <button
@@ -465,23 +466,25 @@ function AdminAnalytics() {
       <div className="module-card">
         <div className="p-6 border-b border-border/50">
           <h2 className="text-2xl font-semibold mb-2">
-            {selectedModule ? "Module" : "All"} Segment Analytics
+            {selectedModule
+              ? t("admin_pages.analytics.moduleSegmentAnalytics")
+              : t("admin_pages.analytics.allSegmentAnalytics")}
           </h2>
           <p className="text-muted-foreground">
-            Detailed performance metrics for each segment
+            {t("admin_pages.analytics.segmentAnalyticsDesc")}
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/30">
               <tr>
-                <th className="text-left p-4 font-semibold">Segment</th>
-                <th className="text-left p-4 font-semibold">Module</th>
-                <th className="text-center p-4 font-semibold">Type</th>
-                <th className="text-center p-4 font-semibold">Completion</th>
-                <th className="text-center p-4 font-semibold">Comments</th>
-                <th className="text-center p-4 font-semibold">Length</th>
-                <th className="text-center p-4 font-semibold">Actions</th>
+                <th className="text-left p-4 font-semibold">{t("admin_pages.analytics.segment")}</th>
+                <th className="text-left p-4 font-semibold">{t("admin_pages.analytics.module")}</th>
+                <th className="text-center p-4 font-semibold">{t("admin_pages.analytics.type")}</th>
+                <th className="text-center p-4 font-semibold">{t("admin_pages.analytics.completion")}</th>
+                <th className="text-center p-4 font-semibold">{t("admin_pages.analytics.commentsHeader")}</th>
+                <th className="text-center p-4 font-semibold">{t("admin_pages.analytics.length")}</th>
+                <th className="text-center p-4 font-semibold">{t("admin_pages.analytics.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -506,7 +509,7 @@ function AdminAnalytics() {
                             </Link>
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Order: {segment.order}
+                            {t("admin_pages.analytics.order", { order: segment.order })}
                           </div>
                         </div>
                       </td>
@@ -520,7 +523,7 @@ function AdminAnalytics() {
                           variant={segment.isPremium ? "default" : "secondary"}
                           className={segment.isPremium ? "bg-theme-500" : ""}
                         >
-                          {segment.isPremium ? "Premium" : "Free"}
+                          {segment.isPremium ? t("admin_pages.analytics.premium") : t("admin_pages.analytics.free")}
                         </Badge>
                       </td>
                       <td className="p-4 text-center">
@@ -551,7 +554,7 @@ function AdminAnalytics() {
                         <div className="flex items-center justify-center gap-1">
                           <Clock className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm">
-                            {segment.length || "N/A"}
+                            {segment.length || t("admin_pages.analytics.notAvailable")}
                           </span>
                         </div>
                       </td>
@@ -562,7 +565,7 @@ function AdminAnalytics() {
                           className="inline-flex items-center gap-1 text-sm text-theme-600 dark:text-theme-400 hover:text-theme-700 dark:hover:text-theme-300"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
-                          View
+                          {t("admin_pages.analytics.view")}
                         </Link>
                       </td>
                     </tr>

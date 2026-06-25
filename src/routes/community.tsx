@@ -91,7 +91,7 @@ function CommunityPage() {
           <div className="text-center mb-16">
             <ScrollAnimation direction="up" delay={0}>
               <h2 className="text-4xl font-bold mb-6">
-                Why Join Our <span className="text-theme-400">{t("community.whyJoin")}</span>?
+                <span className="text-theme-400">{t("community.whyJoin")}</span>
               </h2>
               <p className="text-description text-lg max-w-3xl mx-auto">
                 {t("community.whyJoinDesc")}
@@ -176,7 +176,7 @@ function CommunityPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-12 text-center">
           <ScrollAnimation direction="up" delay={0}>
             <h2 className="text-5xl font-bold mb-8">
-              Ready to Join the <span className="text-theme-400">{t("community.ctaHeading")}</span>?
+              <span className="text-theme-400">{t("community.ctaHeading")}</span>
             </h2>
             <p className="text-description text-xl mb-12 max-w-3xl mx-auto">
               {t("community.ctaDesc")}

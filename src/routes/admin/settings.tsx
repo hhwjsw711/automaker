@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { PageHeader } from "~/routes/admin/-components/page-header";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/admin/settings")({
   },
 });
 
-function useToggleFlag(flagKey: FlagKey) {
+function useToggleFlag(flagKey: FlagKey, t: ReturnType<typeof useTranslation>["t"]) {
   const queryClient = useQueryClient();
   const flagConfig = DISPLAYED_FLAGS.find((f) => f.key === flagKey);
 
@@ -52,10 +53,10 @@ function useToggleFlag(flagKey: FlagKey) {
     mutationFn: FLAG_TOGGLE_FNS[flagKey],
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["allFeatureFlags"] });
-      toast.success(`${flagConfig?.title ?? "Feature"} updated successfully`);
+      toast.success(t("admin_pages.settingsAdmin.updatedSuccessfully", { feature: flagConfig?.title ?? "Feature" }));
     },
     onError: (error) => {
-      toast.error(`Failed to update ${flagConfig?.title ?? "feature"}`);
+      toast.error(t("admin_pages.settingsAdmin.failedUpdate", { feature: flagConfig?.title ?? "feature" }));
       console.error(`Failed to update ${flagKey}:`, error);
     },
   });
@@ -74,6 +75,7 @@ function FeatureFlagCardWrapper({
   onConfigureTargeting,
   featureStates,
   flagConfigs,
+  t,
 }: {
   flag: (typeof DISPLAYED_FLAGS)[number];
   state: { enabled: boolean; targeting: unknown } | undefined;
@@ -81,8 +83,9 @@ function FeatureFlagCardWrapper({
   onConfigureTargeting: () => void;
   featureStates: Record<string, boolean | undefined>;
   flagConfigs: Record<string, { title: string }>;
+  t: ReturnType<typeof useTranslation>["t"];
 }) {
-  const { toggle, isPending } = useToggleFlag(flag.key);
+  const { toggle, isPending } = useToggleFlag(flag.key, t);
 
   return (
     <FeatureFlagCard
@@ -104,6 +107,7 @@ function FeatureFlagCardWrapper({
 }
 
 function SettingsPage() {
+  const { t } = useTranslation();
   const [targetingDialog, setTargetingDialog] = useState<{
     open: boolean;
     flagKey: FlagKey | null;
@@ -133,9 +137,9 @@ function SettingsPage() {
   return (
     <Page>
       <PageHeader
-        title="App Settings"
-        description="Manage application settings and feature flags"
-        highlightedWord="Settings"
+        title={t("admin_pages.settingsAdmin.title")}
+        description={t("admin_pages.settingsAdmin.description")}
+        highlightedWord={t("admin_pages.settingsAdmin.highlighted")}
       />
 
       {/* Feature Flags Section */}
@@ -151,6 +155,7 @@ function SettingsPage() {
             onConfigureTargeting={() => openTargetingDialog(flag.key, flag.title)}
             featureStates={featureStatesRecord}
             flagConfigs={flagConfigsRecord}
+            t={t}
           />
         ))}
       </div>

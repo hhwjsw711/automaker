@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,26 +21,25 @@ export function DeleteLaunchKitDialog({
   onOpenChange,
   onConfirm,
 }: DeleteLaunchKitDialogProps) {
+  const { t } = useTranslation();
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent animation="slide-right">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Launch Kit</AlertDialogTitle>
+          <AlertDialogTitle>{t("admin_pages.launchKitsAdmin.deleteKit")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this launch kit? This action
-            cannot be undone and will permanently remove the launch kit from
-            the system.
+            {t("admin_pages.launchKitsAdmin.deleteKitDesc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("admin_pages.launchKitsAdmin.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Delete
+            {t("admin_pages.launchKitsAdmin.deleteBtn")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

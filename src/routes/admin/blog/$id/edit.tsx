@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { getBlogPostByIdFn } from "~/fn/blog";
 import { queryOptions } from "@tanstack/react-query";
 import { PageHeader } from "../../-components/page-header";
@@ -34,6 +35,7 @@ const blogPostQuery = (id: number) =>
 
 function EditBlogPost() {
   const { id } = Route.useParams();
+  const { t } = useTranslation();
   const { data: blogPost, isLoading } = useQuery(blogPostQuery(parseInt(id)));
 
   if (isLoading) {
@@ -56,20 +58,20 @@ function EditBlogPost() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/blog">Blog</Link>
+              <Link to="/admin/blog">{t("admin_pages.blogAdmin.blog")}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Edit Post</BreadcrumbPage>
+            <BreadcrumbPage>{t("admin_pages.blogAdmin.editPost")}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       <PageHeader
-        title="Edit Blog Post"
-        highlightedWord="Edit"
-        description="Update your blog post content and settings"
+        title={t("admin_pages.blogAdmin.editBlogPostTitle")}
+        highlightedWord={t("admin_pages.blogAdmin.edit")}
+        description={t("admin_pages.blogAdmin.editBlogPostDescription")}
       />
       
       <BlogPostForm blogPost={blogPost} />

@@ -59,7 +59,7 @@ function NewsPage() {
     if (diffInSeconds < 2592000)
       return `${Math.floor(diffInSeconds / 86400)}${t("news.daysAgo")}`;
 
-    return past.toLocaleDateString("en-US", {
+    return past.toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -126,7 +126,7 @@ function NewsPage() {
       <Page>
         <PageHeader
           title={t("news.title")}
-          highlightedWord={t("news.highlight")}
+          highlightedWord={t("news.highlighted")}
           description={t("news.description")}
         />
         
@@ -156,8 +156,8 @@ function NewsPage() {
   return (
     <Page>
       <PageHeader
-        title="AI News"
-        highlightedWord="News"
+        title={t("news.title")}
+        highlightedWord={t("news.highlighted")}
           description={t("news.description")}
         actions={
           isAdmin ? (

@@ -29,8 +29,9 @@ import {
 import { toast } from "sonner";
 import { queryOptions } from "@tanstack/react-query";
 import { assertIsAdminFn } from "~/fn/auth";
+import { useTranslation } from "react-i18next";
 
-const POLLING_INTERVAL = 5000; // Poll every 5 seconds
+const POLLING_INTERVAL = 5000;
 
 export const Route = createFileRoute("/admin/vectorization")({
   beforeLoad: () => assertIsAdminFn(),
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/admin/vectorization")({
 const vectorizationQuery = queryOptions({
   queryKey: ["admin", "vectorization", "status"],
   queryFn: () => getVectorizationStatusFn(),
-  refetchInterval: POLLING_INTERVAL, // Poll for job status updates
+  refetchInterval: POLLING_INTERVAL,
 });
 
 type SegmentStatus = Awaited<
@@ -48,6 +49,7 @@ type SegmentStatus = Awaited<
 >["segments"][number];
 
 function AdminVectorization() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery(vectorizationQuery);
 
@@ -56,10 +58,10 @@ function AdminVectorization() {
     onSuccess: (result) => {
       if (result.jobsQueued > 0) {
         toast.success(
-          `Queued ${result.jobsQueued} segment${result.jobsQueued !== 1 ? "s" : ""} for vectorization`
+          t("admin_pages.vectorization.toast.jobsQueued", { count: result.jobsQueued })
         );
       } else {
-        toast.info("No segments need vectorization");
+        toast.info(t("admin_pages.vectorization.toast.noSegmentsNeedVectorization"));
       }
       queryClient.invalidateQueries({
         queryKey: ["admin", "vectorization"],
@@ -69,7 +71,7 @@ function AdminVectorization() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to queue vectorization jobs"
+          : t("admin_pages.vectorization.toast.failedToQueue")
       );
     },
   });
@@ -78,9 +80,9 @@ function AdminVectorization() {
     mutationFn: queueVectorizeSegmentFn,
     onSuccess: (result) => {
       if (result.job) {
-        toast.success("Vectorization job queued");
+        toast.success(t("admin_pages.vectorization.toast.vectorizationJobQueued"));
       } else {
-        toast.info("Vectorization job already in progress");
+        toast.info(t("admin_pages.vectorization.toast.vectorizationJobInProgress"));
       }
       queryClient.invalidateQueries({
         queryKey: ["admin", "vectorization"],
@@ -90,7 +92,7 @@ function AdminVectorization() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to queue vectorization job"
+          : t("admin_pages.vectorization.toast.failedToQueueJob")
       );
     },
   });
@@ -99,9 +101,9 @@ function AdminVectorization() {
     mutationFn: cancelVectorizeSegmentFn,
     onSuccess: (result) => {
       if (result.cancelledCount > 0) {
-        toast.success("Vectorization job cancelled");
+        toast.success(t("admin_pages.vectorization.toast.jobCancelled"));
       } else {
-        toast.info("No active job to cancel");
+        toast.info(t("admin_pages.vectorization.toast.noActiveJobToCancel"));
       }
       queryClient.invalidateQueries({
         queryKey: ["admin", "vectorization"],
@@ -111,7 +113,7 @@ function AdminVectorization() {
       toast.error(
         error instanceof Error
           ? error.message
-          : "Failed to cancel vectorization job"
+          : t("admin_pages.vectorization.toast.failedToCancel")
       );
     },
   });
@@ -128,7 +130,6 @@ function AdminVectorization() {
     cancelSegmentMutation.mutate({ data: { segmentId } });
   };
 
-  // Check if any segments have active jobs
   const hasActiveJobs = data?.segments.some((s) => s.activeVectorizeJob);
 
   if (isLoading) {
@@ -145,7 +146,7 @@ function AdminVectorization() {
     return (
       <Page>
         <div className="text-center text-muted-foreground">
-          Failed to load vectorization status
+          {t("admin_pages.vectorization.failedToLoad")}
         </div>
       </Page>
     );
@@ -153,7 +154,6 @@ function AdminVectorization() {
 
   const { segments, modules, stats } = data;
 
-  // Group segments by module
   const segmentsByModule = new Map<
     number,
     { module: (typeof modules)[number]; segments: SegmentStatus[] }
@@ -176,15 +176,14 @@ function AdminVectorization() {
     }
   });
 
-  // Count active jobs
   const activeJobCount = segments.filter((s) => s.activeVectorizeJob).length;
 
   return (
     <Page>
       <PageHeader
-        title="Transcript Vectorization"
-        highlightedWord="Vectorization"
-        description="Generate vector embeddings for transcript search. Embeddings enable semantic search across all course content."
+        title={t("admin_pages.vectorization.title")}
+        highlightedWord={t("admin_pages.vectorization.highlightedWord")}
+        description={t("admin_pages.vectorization.description")}
         actions={
           <Button
             onClick={handleVectorizeAll}
@@ -196,40 +195,37 @@ function AdminVectorization() {
             {queueAllMutation.isPending ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Queueing...
+                {t("admin_pages.vectorization.queueing")}
               </>
             ) : (
               <>
                 <Play className="h-4 w-4" />
-                Vectorize All
+                {t("admin_pages.vectorization.vectorizeAll")}
               </>
             )}
           </Button>
         }
       />
 
-      {/* Active Jobs Banner */}
       {hasActiveJobs && (
         <div className="mb-6 p-4 rounded-lg border border-blue-500/20 bg-blue-500/10 flex items-center gap-3">
           <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
           <div>
             <p className="font-medium text-blue-600 dark:text-blue-400">
-              {activeJobCount} vectorization job{activeJobCount !== 1 ? "s" : ""}{" "}
-              in progress
+              {t("admin_pages.vectorization.jobsInProgress", { count: activeJobCount })}
             </p>
             <p className="text-sm text-muted-foreground">
-              Status updates automatically every 5 seconds
+              {t("admin_pages.vectorization.statusAutoUpdate")}
             </p>
           </div>
         </div>
       )}
 
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Segments
+              {t("admin_pages.vectorization.stats.totalSegments")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -239,7 +235,7 @@ function AdminVectorization() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              With Transcripts
+              {t("admin_pages.vectorization.stats.withTranscripts")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -249,7 +245,7 @@ function AdminVectorization() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Vectorized
+              {t("admin_pages.vectorization.stats.vectorized")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -261,7 +257,7 @@ function AdminVectorization() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Needs Vectorization
+              {t("admin_pages.vectorization.stats.needsVectorization")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -273,7 +269,7 @@ function AdminVectorization() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Chunks
+              {t("admin_pages.vectorization.stats.totalChunks")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -282,7 +278,6 @@ function AdminVectorization() {
         </Card>
       </div>
 
-      {/* Segments List */}
       <div className="space-y-6">
         {Array.from(segmentsByModule.values())
           .filter(({ segments }) => segments.length > 0)
@@ -292,14 +287,16 @@ function AdminVectorization() {
               <CardHeader>
                 <CardTitle>{module.title}</CardTitle>
                 <CardDescription>
-                  {moduleSegments.length} segment
-                  {moduleSegments.length !== 1 ? "s" : ""} •{" "}
-                  {moduleSegments.filter((s) => s.isVectorized).length}{" "}
-                  vectorized
+                  {t("admin_pages.vectorization.moduleSegments", {
+                    segmentCount: moduleSegments.length,
+                    vectorizedCount: moduleSegments.filter((s) => s.isVectorized).length,
+                  })}
                   {moduleSegments.some((s) => s.activeVectorizeJob) && (
                     <span className="ml-2 text-blue-500">
-                      • {moduleSegments.filter((s) => s.activeVectorizeJob).length}{" "}
-                      processing
+                      {" "}
+                      {t("admin_pages.vectorization.moduleProcessing", {
+                        processingCount: moduleSegments.filter((s) => s.activeVectorizeJob).length,
+                      })}
                     </span>
                   )}
                 </CardDescription>
@@ -348,6 +345,7 @@ function SegmentRow({
   isQueueing,
   isCancelling,
 }: SegmentRowProps) {
+  const { t } = useTranslation();
   const isProcessing = segment.activeVectorizeJob;
 
   return (
@@ -360,29 +358,29 @@ function SegmentRow({
           {segment.hasTranscript ? (
             <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
               <FileText className="h-3 w-3" />
-              <span>Has Transcript</span>
+              <span>{t("admin_pages.vectorization.hasTranscript")}</span>
             </div>
           ) : (
             <div className="flex items-center gap-1 text-muted-foreground">
               <FileText className="h-3 w-3" />
-              <span>No Transcript</span>
+              <span>{t("admin_pages.vectorization.noTranscript")}</span>
             </div>
           )}
 
           {isProcessing ? (
             <div className="flex items-center gap-1 text-blue-500">
               <Loader2 className="h-3 w-3 animate-spin" />
-              <span>Vectorizing...</span>
+              <span>{t("admin_pages.vectorization.vectorizing")}</span>
             </div>
           ) : segment.isVectorized ? (
             <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
               <Database className="h-3 w-3" />
-              <span>{segment.chunkCount} chunks</span>
+              <span>{t("admin_pages.vectorization.chunks", { count: segment.chunkCount })}</span>
             </div>
           ) : segment.hasTranscript ? (
             <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400">
               <AlertCircle className="h-3 w-3" />
-              <span>Not Vectorized</span>
+              <span>{t("admin_pages.vectorization.notVectorized")}</span>
             </div>
           ) : null}
         </div>
@@ -392,14 +390,14 @@ function SegmentRow({
           <>
             <Badge variant="outline" className="flex items-center gap-1">
               <Loader2 className="h-3 w-3 animate-spin" />
-              Processing
+              {t("admin_pages.vectorization.processing")}
             </Badge>
             <Button
               onClick={onCancel}
               disabled={isCancelling}
               size="sm"
               variant="ghost"
-              title="Cancel vectorization"
+              title={t("admin_pages.vectorization.cancelVectorization")}
               className="text-destructive hover:text-destructive hover:bg-destructive/10"
             >
               {isCancelling ? (
@@ -419,12 +417,12 @@ function SegmentRow({
             {isQueueing ? (
               <>
                 <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                Queueing...
+                {t("admin_pages.vectorization.queueing")}
               </>
             ) : (
               <>
                 <Play className="h-3 w-3 mr-2" />
-                Vectorize
+                {t("admin_pages.vectorization.vectorize")}
               </>
             )}
           </Button>
@@ -432,14 +430,14 @@ function SegmentRow({
           <>
             <Badge variant="outline" className="flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3" />
-              Complete
+              {t("admin_pages.vectorization.complete")}
             </Badge>
             <Button
               onClick={onVectorize}
               disabled={isQueueing}
               size="sm"
               variant="ghost"
-              title="Re-run vectorization"
+              title={t("admin_pages.vectorization.reRunVectorization")}
             >
               {isQueueing ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -450,7 +448,7 @@ function SegmentRow({
           </>
         ) : (
           <Badge variant="secondary" className="flex items-center gap-1">
-            No Transcript
+            {t("admin_pages.vectorization.noTranscript")}
           </Badge>
         )}
       </div>

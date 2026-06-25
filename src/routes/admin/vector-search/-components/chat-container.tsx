@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { MessageSquare, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { ChatMessage } from "./chat-message";
 import type { ConversationMessage } from "~/hooks/use-rag-chat";
 
@@ -9,14 +10,15 @@ interface ChatContainerProps {
   onSelectPrompt: (prompt: string) => void;
 }
 
-const EXAMPLE_PROMPTS = [
-  "What topics are covered in this course?",
-  "How do I get started with the first module?",
-  "Can you explain the main concepts?",
-  "What prerequisites do I need?",
+const EXAMPLE_PROMPT_KEYS = [
+  "admin_pages.vectorSearch.prompts.topicsCovered",
+  "admin_pages.vectorSearch.prompts.gettingStarted",
+  "admin_pages.vectorSearch.prompts.explainConcepts",
+  "admin_pages.vectorSearch.prompts.prerequisites",
 ];
 
 export function ChatContainer({ messages, isLoading, onSelectPrompt }: ChatContainerProps) {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,20 +31,18 @@ export function ChatContainer({ messages, isLoading, onSelectPrompt }: ChatConta
     return (
       <div className="flex h-[500px] flex-col items-center justify-center text-center p-8">
         <MessageSquare className="h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Course Assistant</h3>
+        <h3 className="text-lg font-semibold mb-2">{t("admin_pages.vectorSearch.courseAssistant")}</h3>
         <p className="text-sm text-muted-foreground max-w-md mb-6">
-          Ask questions about the course content. I'll search through video
-          transcripts to find relevant information and help answer your
-          questions.
+          {t("admin_pages.vectorSearch.emptyStateDescription")}
         </p>
         <div className="flex flex-wrap gap-2 justify-center">
-          {EXAMPLE_PROMPTS.map((prompt) => (
+          {EXAMPLE_PROMPT_KEYS.map((key) => (
             <button
-              key={prompt}
+              key={key}
               className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground transition-colors"
-              onClick={() => onSelectPrompt(prompt)}
+              onClick={() => onSelectPrompt(t(key))}
             >
-              {prompt}
+              {t(key)}
             </button>
           ))}
         </div>
@@ -65,7 +65,7 @@ export function ChatContainer({ messages, isLoading, onSelectPrompt }: ChatConta
           </div>
           <div className="flex items-center rounded-lg bg-muted px-4 py-3">
             <span className="text-sm text-muted-foreground">
-              Searching transcripts and generating response...
+              {t("admin_pages.vectorSearch.searchingTranscripts")}
             </span>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { assertIsAdminFn } from "~/fn/auth";
 import {
   getNewsEntriesWithTagsFn,
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/admin/news/")({
 });
 
 function AdminNewsPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const formatDate = (date: Date | string) => {
@@ -117,9 +119,9 @@ function AdminNewsPage() {
     return (
       <Page>
         <PageHeader
-          title="News Management"
-          highlightedWord="News"
-          description="Manage AI news entries, YouTube videos, and blog posts"
+          title={t("admin_pages.newsAdmin.newsManagement")}
+          highlightedWord={t("admin_pages.newsAdmin.news")}
+          description={t("admin_pages.newsAdmin.newsManagementDescription")}
         />
         <div className="grid gap-6">
           {[...Array(3)].map((_, i) => (
@@ -142,21 +144,21 @@ function AdminNewsPage() {
   return (
     <Page>
       <PageHeader
-        title="News Management"
-        highlightedWord="News"
-        description="Manage AI news entries, YouTube videos, and blog posts"
+        title={t("admin_pages.newsAdmin.newsManagement")}
+        highlightedWord={t("admin_pages.newsAdmin.news")}
+        description={t("admin_pages.newsAdmin.newsManagementDescription")}
         actions={
           <div className="flex items-end gap-2 self-end">
             <Button variant="outline" asChild>
               <Link to="/news">
                 <Eye className="h-4 w-4 mr-2" />
-                View News Page
+                {t("admin_pages.newsAdmin.viewNewsPage")}
               </Link>
             </Button>
             <Button asChild className="self-end">
               <Link to="/admin/news/new">
                 <Plus className="h-4 w-4 mr-2" />
-                Add News Entry
+                {t("admin_pages.newsAdmin.addNewsEntry")}
               </Link>
             </Button>
           </div>
@@ -165,7 +167,7 @@ function AdminNewsPage() {
 
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <Badge variant="outline">{newsEntries?.length || 0} entries</Badge>
+          <Badge variant="outline">{newsEntries?.length || 0} {t("admin_pages.newsAdmin.entries")}</Badge>
         </div>
       </div>
 
@@ -184,7 +186,7 @@ function AdminNewsPage() {
                       className={getTypeColor(entry.type)}
                     >
                       {getTypeIcon(entry.type)}
-                      <span className="ml-1 capitalize">{entry.type}</span>
+                      <span className="ml-1 capitalize">{t(`admin_pages.newsAdmin.type${entry.type.charAt(0).toUpperCase()}${entry.type.slice(1)}`)}</span>
                     </Badge>
 
                     {!entry.isPublished && (
@@ -193,7 +195,7 @@ function AdminNewsPage() {
                         className="bg-yellow-500/10 text-yellow-600 dark:text-yellow-400"
                       >
                         <EyeOff className="h-3 w-3 mr-1" />
-                        Draft
+                        {t("admin_pages.newsAdmin.draft")}
                       </Badge>
                     )}
 
@@ -203,7 +205,7 @@ function AdminNewsPage() {
                         className="bg-green-500/10 text-green-600 dark:text-green-400"
                       >
                         <Eye className="h-3 w-3 mr-1" />
-                        Published
+                        {t("admin_pages.newsAdmin.published")}
                       </Badge>
                     )}
                   </div>
@@ -235,7 +237,7 @@ function AdminNewsPage() {
                       rel="noopener noreferrer"
                     >
                       <ExternalLink className="h-4 w-4 mr-1" />
-                      Open External Link
+                      {t("admin_pages.newsAdmin.openExternalLink")}
                     </a>
                   </Button>
 
@@ -247,19 +249,18 @@ function AdminNewsPage() {
                     </AlertDialogTrigger>
                     <AlertDialogContent animation="slide-right">
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete News Entry</AlertDialogTitle>
+                        <AlertDialogTitle>{t("admin_pages.newsAdmin.deleteNewsEntry")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete "{entry.title}"? This
-                          action cannot be undone.
+                          {t("admin_pages.newsAdmin.deleteNewsEntryConfirmation", { title: entry.title })}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t("admin_pages.newsAdmin.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteEntryMutation.mutate(entry.id)}
                           variant="destructive"
                         >
-                          Delete
+                          {t("admin_pages.newsAdmin.delete")}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -273,10 +274,10 @@ function AdminNewsPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    <span>Published {formatDate(entry.publishedAt)}</span>
+                    <span>{t("admin_pages.newsAdmin.publishedAt")} {formatDate(entry.publishedAt)}</span>
                   </div>
 
-                  {entry.authorName && <span>by {entry.authorName}</span>}
+                  {entry.authorName && <span>{t("admin_pages.newsAdmin.by")} {entry.authorName}</span>}
                 </div>
 
                 {entry.tags && entry.tags.length > 0 && (
@@ -306,16 +307,15 @@ function AdminNewsPage() {
             <CardContent>
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                No news entries yet
+                {t("admin_pages.newsAdmin.noNewsEntries")}
               </h3>
               <p className="text-muted-foreground mb-4">
-                Get started by adding your first AI news entry, YouTube video,
-                or blog post.
+                {t("admin_pages.newsAdmin.noNewsEntriesDescription")}
               </p>
               <Button asChild>
                 <Link to="/admin/news/new">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add First Entry
+                  {t("admin_pages.newsAdmin.addFirstEntry")}
                 </Link>
               </Button>
             </CardContent>

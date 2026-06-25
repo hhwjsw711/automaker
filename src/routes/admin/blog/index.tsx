@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getBlogPostsFn, deleteBlogPostFn } from "~/fn/blog";
 import {
   Plus,
@@ -48,6 +49,7 @@ const blogPostsQuery = queryOptions({
 });
 
 function AdminBlog() {
+  const { t } = useTranslation();
   const { data: blogPosts, isLoading } = useQuery(blogPostsQuery);
   const [filter, setFilter] = useState<"all" | "published" | "draft">("all");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -87,14 +89,14 @@ function AdminBlog() {
     <TooltipProvider>
       <Page>
         <PageHeader
-          title="Blog Management"
-          highlightedWord="Blog"
-          description="Create and manage blog posts for your website"
+          title={t("admin_pages.blogAdmin.blogManagement")}
+          highlightedWord={t("admin_pages.blogAdmin.blog")}
+          description={t("admin_pages.blogAdmin.blogManagementDescription")}
           actions={
             <Link to="/admin/blog/new">
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                New Post
+                {t("admin_pages.blogAdmin.newPost")}
               </Button>
             </Link>
           }
@@ -110,9 +112,9 @@ function AdminBlog() {
             className="mb-6"
           >
             <TabsList>
-              <TabsTrigger value="all">All Posts</TabsTrigger>
-              <TabsTrigger value="published">Published</TabsTrigger>
-              <TabsTrigger value="draft">Drafts</TabsTrigger>
+              <TabsTrigger value="all">{t("admin_pages.blogAdmin.allPosts")}</TabsTrigger>
+              <TabsTrigger value="published">{t("admin_pages.blogAdmin.published")}</TabsTrigger>
+              <TabsTrigger value="draft">{t("admin_pages.blogAdmin.drafts")}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -120,8 +122,8 @@ function AdminBlog() {
         <AppCard
           icon={FileText}
           iconColor="blue"
-          title="Blog Posts"
-          description="Manage all your blog posts"
+          title={t("admin_pages.blogAdmin.blogPosts")}
+          description={t("admin_pages.blogAdmin.manageAllBlogPosts")}
         >
           {isLoading ? (
             <div className="space-y-4">
@@ -154,7 +156,7 @@ function AdminBlog() {
                         variant={post.isPublished ? "default" : "secondary"}
                         className={post.isPublished ? "bg-green-500" : ""}
                       >
-                        {post.isPublished ? "Published" : "Draft"}
+                        {post.isPublished ? t("admin_pages.blogAdmin.published") : t("admin_pages.blogAdmin.draft")}
                       </Badge>
                     </div>
                     {post.excerpt && (
@@ -164,10 +166,10 @@ function AdminBlog() {
                     )}
                     <div className="text-xs text-muted-foreground">
                       {post.isPublished && post.publishedAt
-                        ? `Published ${new Date(post.publishedAt).toLocaleDateString()}`
-                        : `Created ${new Date(post.createdAt).toLocaleDateString()}`}
+                        ? `${t("admin_pages.blogAdmin.publishedAt")} ${new Date(post.publishedAt).toLocaleDateString()}`
+                        : `${t("admin_pages.blogAdmin.createdAt")} ${new Date(post.createdAt).toLocaleDateString()}`}
                       {post.author?.displayName &&
-                        ` by ${post.author.displayName}`}
+                        ` ${t("admin_pages.blogAdmin.by")} ${post.author.displayName}`}
                     </div>
                   </div>
 
@@ -182,7 +184,7 @@ function AdminBlog() {
                           </Link>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>View published post</p>
+                          <p>{t("admin_pages.blogAdmin.viewPublishedPost")}</p>
                         </TooltipContent>
                       </Tooltip>
                     )}
@@ -198,7 +200,7 @@ function AdminBlog() {
                         </Link>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Edit post</p>
+                        <p>{t("admin_pages.blogAdmin.editPost")}</p>
                       </TooltipContent>
                     </Tooltip>
                     <Tooltip>
@@ -218,7 +220,7 @@ function AdminBlog() {
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Delete post</p>
+                        <p>{t("admin_pages.blogAdmin.deletePost")}</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -228,15 +230,15 @@ function AdminBlog() {
           ) : (
             <div className="text-center py-12">
               <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                No blog posts yet
+                {t("admin_pages.blogAdmin.noBlogPostsYet")}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Create your first blog post to get started.
+                {t("admin_pages.blogAdmin.createFirstBlogPost")}
               </p>
               <Link to="/admin/blog/new">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Blog Post
+                  {t("admin_pages.blogAdmin.createBlogPost")}
                 </Button>
               </Link>
             </div>
@@ -246,23 +248,21 @@ function AdminBlog() {
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete Blog Post</AlertDialogTitle>
+              <AlertDialogTitle>{t("admin_pages.blogAdmin.deleteBlogPost")}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete "{postToDelete?.title}"? This
-                action cannot be undone and will permanently remove the blog
-                post from the system.
+                {t("admin_pages.blogAdmin.deleteConfirmation", { title: postToDelete?.title })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
-                Cancel
+                {t("admin_pages.blogAdmin.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleConfirmDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 disabled={deleteMutation.isPending}
               >
-                {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                {deleteMutation.isPending ? t("admin_pages.blogAdmin.deleting") : t("admin_pages.blogAdmin.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

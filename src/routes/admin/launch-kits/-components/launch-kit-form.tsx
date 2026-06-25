@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import { ArrowLeft, Save } from "lucide-react";
@@ -38,6 +39,7 @@ export function LaunchKitForm({
   submitLabel,
   mode,
 }: LaunchKitFormProps) {
+  const { t } = useTranslation();
   const {
     tags,
     refetchTags,
@@ -77,7 +79,7 @@ export function LaunchKitForm({
             <Button variant="outline" asChild disabled={isLoading}>
               <Link to="/admin/launch-kits">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Cancel
+                {t("admin_pages.launchKitsAdmin.cancel")}
               </Link>
             </Button>
 
@@ -90,7 +92,7 @@ export function LaunchKitForm({
               {isLoading ? (
                 <>
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  {mode === "create" ? "Creating..." : "Updating..."}
+                  {mode === "create" ? t("admin_pages.launchKitsAdmin.creating") : t("admin_pages.launchKitsAdmin.updating")}
                 </>
               ) : (
                 <>

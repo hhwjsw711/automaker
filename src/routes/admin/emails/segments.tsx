@@ -13,6 +13,7 @@ import {
 import { SegmentSelector } from "./-components/segment-selector";
 import { SegmentNotificationPanel } from "./-components/segment-notification-panel";
 import { TestEmailDialog } from "./-components/test-email-dialog";
+import { useTranslation } from "react-i18next";
 
 const recentSegmentsQueryOptions = queryOptions({
   queryKey: ["admin", "segments", "recent"],
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/admin/emails/segments")({
 });
 
 function SegmentNotificationsPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedSegmentIds, setSelectedSegmentIds] = useState<number[]>([]);
   const [notificationType, setNotificationType] = useState<"new" | "updated">(
@@ -58,7 +60,6 @@ function SegmentNotificationsPage() {
     emailBatchesQueryOptions
   );
 
-  // Auto-refresh email batches to update progress bars
   useEffect(() => {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({ queryKey: ["admin", "emailBatches"] });
@@ -76,19 +77,19 @@ function SegmentNotificationsPage() {
       queryClient.invalidateQueries({ queryKey: ["admin", "emailBatches"] });
       setSelectedSegmentIds([]);
       if (result.warning) {
-        toast.warning("Email batch created", {
+        toast.warning(t("admin_pages.emailAdmin.toast.emailBatchCreated"), {
           description: result.warning,
         });
       } else {
-        toast.success("Email batch started!", {
-          description: "Notifications are being sent to all subscribers.",
+        toast.success(t("admin_pages.emailAdmin.toast.emailBatchStarted"), {
+          description: t("admin_pages.emailAdmin.toast.notificationsSending"),
         });
       }
     },
     onError: (error) => {
-      toast.error("Failed to send notifications", {
+      toast.error(t("admin_pages.emailAdmin.toast.failedToSendNotifications"), {
         description:
-          error instanceof Error ? error.message : "An error occurred",
+          error instanceof Error ? error.message : t("admin_pages.emailAdmin.toast.anErrorOccurred"),
       });
     },
   });
@@ -101,14 +102,14 @@ function SegmentNotificationsPage() {
     }) => sendTestSegmentNotificationFn({ data }),
     onSuccess: () => {
       setTestEmailOpen(false);
-      toast.success("Test email sent!", {
-        description: "Check your inbox for the test email.",
+      toast.success(t("admin_pages.emailAdmin.toast.testEmailSent"), {
+        description: t("admin_pages.emailAdmin.toast.checkInbox"),
       });
     },
     onError: (error) => {
-      toast.error("Failed to send test email", {
+      toast.error(t("admin_pages.emailAdmin.toast.failedToSendTest"), {
         description:
-          error instanceof Error ? error.message : "An error occurred",
+          error instanceof Error ? error.message : t("admin_pages.emailAdmin.toast.anErrorOccurred"),
       });
     },
   });
@@ -122,8 +123,8 @@ function SegmentNotificationsPage() {
 
   const handleTestEmail = (data: { email: string }) => {
     if (selectedSegmentIds.length === 0) {
-      toast.error("No segments selected", {
-        description: "Please select at least one segment before sending a test email.",
+      toast.error(t("admin_pages.emailAdmin.toast.noSegmentsSelected"), {
+        description: t("admin_pages.emailAdmin.toast.selectAtLeastOneSegment"),
       });
       return;
     }
@@ -138,7 +139,6 @@ function SegmentNotificationsPage() {
   return (
     <>
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* Segment Selector (Left - 3 columns) */}
         <div
           className="lg:col-span-3"
         >
@@ -150,7 +150,6 @@ function SegmentNotificationsPage() {
           />
         </div>
 
-        {/* Notification Panel (Right - 2 columns) */}
         <div
           className="lg:col-span-2"
         >

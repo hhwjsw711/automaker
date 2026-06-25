@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
@@ -86,6 +87,7 @@ export function SegmentNotificationPanel({
   isLoadingBatches,
   onTestEmail,
 }: SegmentNotificationPanelProps) {
+  const { t } = useTranslation();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showRecipientsModal, setShowRecipientsModal] = useState(false);
 
@@ -107,7 +109,7 @@ export function SegmentNotificationPanel({
         <div className="p-6 border-b border-border/50">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-theme-500" />
-            Notification Type
+            {t("admin_pages.emailAdmin.notificationType")}
           </h3>
         </div>
         <div className="p-6 space-y-3">
@@ -133,9 +135,9 @@ export function SegmentNotificationPanel({
                 )}
               </div>
               <div>
-                <span className="font-medium">New Video</span>
+                <span className="font-medium">{t("admin_pages.emailAdmin.newVideo")}</span>
                 <p className="text-sm text-muted-foreground">
-                  Announce new content to subscribers
+                  {t("admin_pages.emailAdmin.newVideoDescription")}
                 </p>
               </div>
             </div>
@@ -162,9 +164,9 @@ export function SegmentNotificationPanel({
                 )}
               </div>
               <div>
-                <span className="font-medium">Updated Video</span>
+                <span className="font-medium">{t("admin_pages.emailAdmin.updatedVideo")}</span>
                 <p className="text-sm text-muted-foreground">
-                  Notify about improvements to existing content
+                  {t("admin_pages.emailAdmin.updatedVideoDescription")}
                 </p>
               </div>
             </div>
@@ -177,13 +179,13 @@ export function SegmentNotificationPanel({
         <div className="p-6 border-b border-border/50">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Users className="h-5 w-5 text-theme-500" />
-            Recipients
+            {t("admin_pages.emailAdmin.recipients")}
           </h3>
         </div>
         <div className="p-6 space-y-6">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              Eligible subscribers
+              {t("admin_pages.emailAdmin.eligibleSubscribers")}
             </span>
             {isLoadingRecipients ? (
               <div className="h-8 w-16 bg-muted/50 rounded animate-pulse" />
@@ -192,7 +194,7 @@ export function SegmentNotificationPanel({
                 type="button"
                 onClick={() => setShowRecipientsModal(true)}
                 className="text-2xl font-bold text-theme-600 hover:text-theme-500 hover:underline underline-offset-2 transition-colors cursor-pointer"
-                title="Click to view all recipients"
+                title={t("admin_pages.emailAdmin.viewAllRecipientsTooltip")}
               >
                 {recipientCount ?? 0}
               </button>
@@ -200,9 +202,7 @@ export function SegmentNotificationPanel({
           </div>
 
           <div className="text-sm text-muted-foreground bg-muted/30 rounded-lg p-3">
-            This will send to all users who have opted in to course updates,
-            including registered users, early access list members, and newsletter
-            subscribers who haven&apos;t unsubscribed.
+            {t("admin_pages.emailAdmin.sendToAllOptedIn")}
           </div>
 
           <div className="flex gap-2">
@@ -220,12 +220,12 @@ export function SegmentNotificationPanel({
               {isSending ? (
                 <>
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Sending...
+                  {t("admin_pages.emailAdmin.sending")}
                 </>
               ) : (
                 <>
                   <Send className="h-5 w-5 mr-2" />
-                  Send to {recipientCount ?? 0}
+                  {t("admin_pages.emailAdmin.sendTo", { count: recipientCount ?? 0 })}
                 </>
               )}
             </Button>
@@ -234,7 +234,7 @@ export function SegmentNotificationPanel({
               disabled={selectedCount === 0}
               variant="outline"
               size="lg"
-              title="Send test email"
+              title={t("admin_pages.emailAdmin.sendTestEmail")}
             >
               <FlaskConical className="h-5 w-5" />
             </Button>
@@ -242,7 +242,7 @@ export function SegmentNotificationPanel({
 
           {selectedCount === 0 && (
             <p className="text-sm text-amber-600 text-center">
-              Select at least one segment to send notifications
+              {t("admin_pages.emailAdmin.selectAtLeastOneSegment")}
             </p>
           )}
         </div>
@@ -253,7 +253,7 @@ export function SegmentNotificationPanel({
         <div className="p-6 border-b border-border/50">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <RefreshCw className="h-5 w-5 text-theme-500" />
-            Recent Batches
+            {t("admin_pages.emailAdmin.recentBatches")}
           </h3>
         </div>
         <div className="p-6">
@@ -300,7 +300,7 @@ export function SegmentNotificationPanel({
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>Progress</span>
+                      <span>{t("admin_pages.emailAdmin.progress")}</span>
                       <span>
                         {batch.sentCount}/{batch.recipientCount}
                       </span>
@@ -317,7 +317,7 @@ export function SegmentNotificationPanel({
                   {batch.failedCount > 0 && (
                     <p className="text-xs text-red-500 mt-2 flex items-center gap-1">
                       <XCircle className="h-3 w-3" />
-                      {batch.failedCount} failed
+                      {batch.failedCount} {t("admin_pages.emailAdmin.failed")}
                     </p>
                   )}
                 </div>
@@ -325,7 +325,7 @@ export function SegmentNotificationPanel({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No recent batches
+              {t("admin_pages.emailAdmin.noRecentBatches")}
             </p>
           )}
         </div>
@@ -337,37 +337,35 @@ export function SegmentNotificationPanel({
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-semibold flex items-center gap-2">
               <Send className="h-5 w-5 text-theme-500" />
-              Confirm Send
+              {t("admin_pages.emailAdmin.confirmSend")}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="text-base space-y-2">
-                <p>You are about to send email notifications:</p>
+                <p>{t("admin_pages.emailAdmin.aboutToSendNotifications")}</p>
                 <ul className="list-disc list-inside text-sm space-y-1 mt-2">
                   <li>
-                    <strong>{selectedCount}</strong> segment
-                    {selectedCount > 1 ? "s" : ""} selected
+                    <strong>{selectedCount}</strong> {t("admin_pages.emailAdmin.segmentsSelected", { count: selectedCount })}
                   </li>
                   <li>
-                    <strong>{recipientCount}</strong> recipient
-                    {(recipientCount ?? 0) > 1 ? "s" : ""}
+                    <strong>{recipientCount}</strong> {t("admin_pages.emailAdmin.recipientsCountLabel", { count: recipientCount ?? 0 })}
                   </li>
                   <li>
-                    Type:{" "}
+                    {t("admin_pages.emailAdmin.type")}:{" "}
                     <strong>
-                      {notificationType === "new" ? "New Video" : "Updated Video"}
+                      {notificationType === "new" ? t("admin_pages.emailAdmin.newVideo") : t("admin_pages.emailAdmin.updatedVideo")}
                     </strong>
                   </li>
                 </ul>
                 <p className="mt-3 text-muted-foreground">
-                  This action cannot be undone. Emails will be sent immediately.
+                  {t("admin_pages.emailAdmin.actionCannotBeUndone")}
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3">
-            <AlertDialogCancel className="flex-1">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1">{t("admin_pages.emailAdmin.cancel")}</AlertDialogCancel>
             <Button onClick={handleConfirmSend} className="flex-1 btn-gradient">
-              Send Emails
+              {t("admin_pages.emailAdmin.sendEmails")}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

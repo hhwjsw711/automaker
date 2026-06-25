@@ -32,6 +32,7 @@ import {
 } from "~/fn/video-processing-jobs";
 import { toast } from "sonner";
 import { queryOptions } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/video-processing")({
   component: AdminVideoProcessing,
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/admin/video-processing")({
 const segmentsQuery = queryOptions({
   queryKey: ["admin", "video-processing", "segments"],
   queryFn: () => getSegmentsWithProcessingStatusFn(),
-  refetchInterval: 5000, // Refetch every 5 seconds to show real-time updates
+  refetchInterval: 5000,
 });
 
 type SegmentWithStatus = Awaited<
@@ -48,6 +49,7 @@ type SegmentWithStatus = Awaited<
 >["segments"][number];
 
 function AdminVideoProcessing() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery(segmentsQuery);
   const [processingSegments, setProcessingSegments] = useState<Set<number>>(
@@ -58,7 +60,7 @@ function AdminVideoProcessing() {
     mutationFn: queueMissingJobsForAllSegmentsFn,
     onSuccess: (result) => {
       toast.success(
-        `Queued ${result.jobsQueued} job${result.jobsQueued !== 1 ? "s" : ""} for processing`
+        t("admin_pages.videoProcessing.toast.jobsQueuedForProcessing", { count: result.jobsQueued })
       );
       queryClient.invalidateQueries({
         queryKey: ["admin", "video-processing"],
@@ -66,7 +68,7 @@ function AdminVideoProcessing() {
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : "Failed to queue jobs"
+        error instanceof Error ? error.message : t("admin_pages.videoProcessing.toast.failedToQueue")
       );
     },
   });
@@ -75,7 +77,7 @@ function AdminVideoProcessing() {
     mutationFn: queueAllJobsForSegmentFn,
     onSuccess: (result) => {
       toast.success(
-        `Queued ${result.jobs.length} job${result.jobs.length !== 1 ? "s" : ""} for segment`
+        t("admin_pages.videoProcessing.toast.jobsQueuedForSegment", { count: result.jobs.length })
       );
       queryClient.invalidateQueries({
         queryKey: ["admin", "video-processing"],
@@ -88,7 +90,7 @@ function AdminVideoProcessing() {
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : "Failed to queue jobs"
+        error instanceof Error ? error.message : t("admin_pages.videoProcessing.toast.failedToQueue")
       );
       setProcessingSegments((prev) => {
         const next = new Set(prev);
@@ -102,7 +104,7 @@ function AdminVideoProcessing() {
     mutationFn: queueMissingSummaryJobsFn,
     onSuccess: (result) => {
       toast.success(
-        `Queued ${result.jobsQueued} summary job${result.jobsQueued !== 1 ? "s" : ""} for processing`
+        t("admin_pages.videoProcessing.toast.summaryJobsQueued", { count: result.jobsQueued })
       );
       queryClient.invalidateQueries({
         queryKey: ["admin", "video-processing"],
@@ -110,7 +112,7 @@ function AdminVideoProcessing() {
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : "Failed to queue summary jobs"
+        error instanceof Error ? error.message : t("admin_pages.videoProcessing.toast.failedToQueueSummary")
       );
     },
   });
@@ -142,7 +144,7 @@ function AdminVideoProcessing() {
     return (
       <Page>
         <div className="text-center text-muted-foreground">
-          Failed to load segments
+          {t("admin_pages.videoProcessing.failedToLoad")}
         </div>
       </Page>
     );
@@ -150,7 +152,6 @@ function AdminVideoProcessing() {
 
   const { segments, modules } = data;
 
-  // Group segments by module
   const segmentsByModule = new Map<
     number,
     { module: (typeof modules)[number]; segments: SegmentWithStatus[] }
@@ -170,7 +171,6 @@ function AdminVideoProcessing() {
     }
   });
 
-  // Calculate statistics
   const totalSegments = segments.length;
   const segmentsWithVideo = segments.filter((s) => s.hasVideo).length;
   const segmentsNeedingTranscript = segments.filter(
@@ -185,20 +185,13 @@ function AdminVideoProcessing() {
   const segmentsNeedingSummary = segments.filter(
     (s) => s.needsSummary && !s.activeSummaryJob
   ).length;
-  const activeJobs = segments.filter(
-    (s) =>
-      s.activeTranscriptJob ||
-      s.activeTranscodeJob ||
-      s.activeThumbnailJob ||
-      s.activeSummaryJob
-  ).length;
 
   return (
     <Page>
       <PageHeader
-        title="Video Processing"
-        highlightedWord="Processing"
-        description="Manage video transcript generation and transcoding for all course segments. Jobs are processed sequentially to prevent system overload."
+        title={t("admin_pages.videoProcessing.title")}
+        highlightedWord={t("admin_pages.videoProcessing.highlightedWord")}
+        description={t("admin_pages.videoProcessing.description")}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -212,12 +205,12 @@ function AdminVideoProcessing() {
               {queueSummariesMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Queueing...
+                  {t("admin_pages.videoProcessing.queueing")}
                 </>
               ) : (
                 <>
                   <BookOpen className="h-4 w-4" />
-                  Generate Summaries
+                  {t("admin_pages.videoProcessing.generateSummaries")}
                 </>
               )}
             </Button>
@@ -234,12 +227,12 @@ function AdminVideoProcessing() {
               {queueAllMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Queueing...
+                  {t("admin_pages.videoProcessing.queueing")}
                 </>
               ) : (
                 <>
                   <Play className="h-4 w-4" />
-                  Process All Missing
+                  {t("admin_pages.videoProcessing.processAllMissing")}
                 </>
               )}
             </Button>
@@ -247,12 +240,11 @@ function AdminVideoProcessing() {
         }
       />
 
-      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Segments
+              {t("admin_pages.videoProcessing.stats.totalSegments")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -262,7 +254,7 @@ function AdminVideoProcessing() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Segments with Video
+              {t("admin_pages.videoProcessing.stats.segmentsWithVideo")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -272,7 +264,7 @@ function AdminVideoProcessing() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Need Transcript
+              {t("admin_pages.videoProcessing.stats.needTranscript")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -284,7 +276,7 @@ function AdminVideoProcessing() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Need Transcode
+              {t("admin_pages.videoProcessing.stats.needTranscode")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -294,7 +286,7 @@ function AdminVideoProcessing() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Need Thumbnail
+              {t("admin_pages.videoProcessing.stats.needThumbnail")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -304,7 +296,7 @@ function AdminVideoProcessing() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Need Summary
+              {t("admin_pages.videoProcessing.stats.needSummary")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -313,7 +305,6 @@ function AdminVideoProcessing() {
         </Card>
       </div>
 
-      {/* Segments List */}
       <div className="space-y-6">
         {Array.from(segmentsByModule.values())
           .sort((a, b) => a.module.order - b.module.order)
@@ -322,8 +313,7 @@ function AdminVideoProcessing() {
               <CardHeader>
                 <CardTitle>{module.title}</CardTitle>
                 <CardDescription>
-                  {moduleSegments.length} segment
-                  {moduleSegments.length !== 1 ? "s" : ""}
+                  {t("admin_pages.videoProcessing.segments", { count: moduleSegments.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -354,6 +344,7 @@ interface SegmentRowProps {
 }
 
 function SegmentRow({ segment, onProcess, isProcessing }: SegmentRowProps) {
+  const { t } = useTranslation();
   const needsProcessing =
     (segment.needsTranscript && !segment.activeTranscriptJob) ||
     (segment.needsTranscode && !segment.activeTranscodeJob) ||
@@ -367,48 +358,48 @@ function SegmentRow({ segment, onProcess, isProcessing }: SegmentRowProps) {
           <h3 className="font-medium">{segment.title}</h3>
           {segment.isPremium && (
             <Badge variant="secondary" className="text-xs">
-              Premium
+              {t("admin_pages.videoProcessing.premium")}
             </Badge>
           )}
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <StatusBadge
             icon={Video}
-            label="Video"
+            label={t("admin_pages.videoProcessing.status.video")}
             has={segment.hasVideo}
             active={false}
           />
           <StatusBadge
             icon={FileText}
-            label="Transcript"
+            label={t("admin_pages.videoProcessing.status.transcript")}
             has={segment.hasTranscript}
             active={segment.activeTranscriptJob}
             needs={segment.needsTranscript}
           />
           <StatusBadge
             icon={Video}
-            label="720p"
+            label={t("admin_pages.videoProcessing.status.720p")}
             has={segment.has720p}
             active={segment.activeTranscodeJob}
             needs={segment.needsTranscode}
           />
           <StatusBadge
             icon={Video}
-            label="480p"
+            label={t("admin_pages.videoProcessing.status.480p")}
             has={segment.has480p}
             active={segment.activeTranscodeJob}
             needs={segment.needsTranscode}
           />
           <StatusBadge
             icon={Image}
-            label="Thumb"
+            label={t("admin_pages.videoProcessing.status.thumb")}
             has={segment.hasThumbnail}
             active={segment.activeThumbnailJob}
             needs={segment.needsThumbnail}
           />
           <StatusBadge
             icon={BookOpen}
-            label="Summary"
+            label={t("admin_pages.videoProcessing.status.summary")}
             has={segment.hasSummary}
             active={segment.activeSummaryJob}
             needs={segment.needsSummary}
@@ -426,12 +417,12 @@ function SegmentRow({ segment, onProcess, isProcessing }: SegmentRowProps) {
             {isProcessing ? (
               <>
                 <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                Queueing...
+                {t("admin_pages.videoProcessing.queueing")}
               </>
             ) : (
               <>
                 <Play className="h-3 w-3 mr-2" />
-                Process
+                {t("admin_pages.videoProcessing.process")}
               </>
             )}
           </Button>
@@ -441,12 +432,12 @@ function SegmentRow({ segment, onProcess, isProcessing }: SegmentRowProps) {
           segment.activeSummaryJob ? (
           <Badge variant="secondary" className="flex items-center gap-1">
             <Loader2 className="h-3 w-3 animate-spin" />
-            Processing
+            {t("admin_pages.videoProcessing.processing")}
           </Badge>
         ) : (
           <Badge variant="outline" className="flex items-center gap-1">
             <CheckCircle2 className="h-3 w-3" />
-            Complete
+            {t("admin_pages.videoProcessing.complete")}
           </Badge>
         )}
       </div>

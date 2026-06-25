@@ -392,7 +392,7 @@ function LaunchKitDetailPage() {
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2 text-sm">
                         <span className="font-medium">
-                          {comment.user?.displayName || "Anonymous"}
+                          {comment.user?.displayName || t("launchKits.anonymous")}
                         </span>
                         <span className="text-muted-foreground">
                           {new Date(comment.createdAt).toLocaleDateString()}

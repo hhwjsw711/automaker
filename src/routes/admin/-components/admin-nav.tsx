@@ -20,6 +20,7 @@ import {
   Search,
 } from "lucide-react";
 import { useFeatureFlag } from "~/components/feature-flag";
+import { useTranslation } from "react-i18next";
 
 interface NavigationItem {
   name: string;
@@ -38,7 +39,7 @@ interface NavigationItem {
 const navigation: NavigationItem[] = [
   // Dashboard
   {
-    name: "Dashboard",
+    name: "admin_pages.nav.dashboard",
     href: "/admin/analytics",
     icon: Home,
     category: "dashboard",
@@ -46,38 +47,38 @@ const navigation: NavigationItem[] = [
 
   // Content Management
   {
-    name: "Comments",
+    name: "admin_pages.nav.comments",
     href: "/admin/comments",
     icon: MessageSquare,
     category: "content",
   },
   {
-    name: "Video Processing",
+    name: "admin_pages.nav.videoProcessing",
     href: "/admin/video-processing",
     icon: Video,
     category: "content",
   },
   {
-    name: "Vectorization",
+    name: "admin_pages.nav.vectorization",
     href: "/admin/vectorization",
     icon: Database,
     category: "content",
   },
   {
-    name: "Vector Search",
+    name: "admin_pages.nav.vectorSearch",
     href: "/admin/vector-search",
     icon: Search,
     category: "content",
   },
   {
-    name: "Blog",
+    name: "admin_pages.nav.blog",
     href: "/admin/blog",
     icon: FileText,
     category: "content",
     featureKey: "blog",
   },
   {
-    name: "News",
+    name: "admin_pages.nav.news",
     href: "/admin/news",
     icon: Newspaper,
     category: "content",
@@ -86,13 +87,13 @@ const navigation: NavigationItem[] = [
 
   // User Management
   {
-    name: "Users",
+    name: "admin_pages.nav.users",
     href: "/admin/users",
     icon: Users,
     category: "users",
   },
   {
-    name: "Affiliates",
+    name: "admin_pages.nav.affiliates",
     href: "/admin/affiliates",
     icon: UserCheck,
     category: "users",
@@ -101,20 +102,20 @@ const navigation: NavigationItem[] = [
 
   // Business
   {
-    name: "Launch Kits",
+    name: "admin_pages.nav.launchKits",
     href: "/admin/launch-kits",
     icon: Rocket,
     category: "business",
     featureKey: "launchKits",
   },
   {
-    name: "Conversions",
+    name: "admin_pages.nav.conversions",
     href: "/admin/conversions",
     icon: Target,
     category: "business",
   },
   {
-    name: "UTM Analytics",
+    name: "admin_pages.nav.utmAnalytics",
     href: "/admin/utm-analytics",
     icon: TrendingUp,
     category: "business",
@@ -122,7 +123,7 @@ const navigation: NavigationItem[] = [
 
   // Communications
   {
-    name: "Emails",
+    name: "admin_pages.nav.emails",
     href: "/admin/emails",
     icon: Mail,
     category: "communications",
@@ -130,7 +131,7 @@ const navigation: NavigationItem[] = [
 
   // System
   {
-    name: "Settings",
+    name: "admin_pages.nav.settings",
     href: "/admin/settings",
     icon: Settings,
     category: "system",
@@ -138,12 +139,12 @@ const navigation: NavigationItem[] = [
 ];
 
 const CATEGORY_LABELS: Record<NavigationItem["category"], string> = {
-  dashboard: "Dashboard",
-  content: "Content Management",
-  users: "User Management",
-  business: "Business",
-  communications: "Communications",
-  system: "System",
+  dashboard: "admin_pages.nav.catDashboard",
+  content: "admin_pages.nav.catContent",
+  users: "admin_pages.nav.catUsers",
+  business: "admin_pages.nav.catBusiness",
+  communications: "admin_pages.nav.catCommunications",
+  system: "admin_pages.nav.catSystem",
 };
 
 interface AdminNavProps {
@@ -164,6 +165,7 @@ function getGroupedNavigationItems() {
 }
 
 export function AdminNav({ onItemClick }: AdminNavProps = {}) {
+  const { t } = useTranslation();
   const location = useLocation();
 
   const { isEnabled: launchKitsEnabled } = useFeatureFlag("LAUNCH_KITS_FEATURE");
@@ -201,7 +203,7 @@ export function AdminNav({ onItemClick }: AdminNavProps = {}) {
             className="flex items-center px-4 py-3 text-sm font-medium rounded-lg group relative bg-theme-500/10 hover:bg-theme-500/20 border border-theme-500/30 text-theme-600 dark:text-theme-400 hover:text-theme-700 dark:hover:text-theme-300"
           >
             <ExternalLink className="mr-3 h-4 w-4 text-theme-500 group-hover:text-theme-600 dark:group-hover:text-theme-400" />
-            <span className="relative z-10 font-semibold">View Site</span>
+            <span className="relative z-10 font-semibold">{t("admin_pages.nav.viewSite")}</span>
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-theme-500/60">
               →
             </div>
@@ -214,10 +216,10 @@ export function AdminNav({ onItemClick }: AdminNavProps = {}) {
           onClick={onItemClick}
           className="block mb-8 group"
         >
-          <h2 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2 cursor-pointer group-hover:text-theme-500">
-            <div className="w-2 h-2 rounded-full bg-theme-500"></div>
-            Admin Panel
-          </h2>
+            <h2 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2 cursor-pointer group-hover:text-theme-500">
+              <div className="w-2 h-2 rounded-full bg-theme-500"></div>
+              {t("admin_pages.nav.adminPanel")}
+            </h2>
           <div className="h-px bg-gradient-to-r from-theme-500/20 via-theme-400/30 to-transparent"></div>
         </Link>
 
@@ -274,12 +276,12 @@ export function AdminNav({ onItemClick }: AdminNavProps = {}) {
                             isDisabled && "opacity-60"
                           )}
                         >
-                          {item.name}
+                          {t(item.name)}
                         </span>
                         {isDisabled && (
                           <div className="flex items-center gap-1 ml-auto">
                             <span className="text-xs text-muted-foreground/50 font-normal">
-                              Disabled
+                              {t("admin_pages.nav.disabled")}
                             </span>
                             <AlertCircle className="h-3 w-3 text-muted-foreground/50" />
                           </div>
@@ -293,7 +295,7 @@ export function AdminNav({ onItemClick }: AdminNavProps = {}) {
               return (
                 <div key={category}>
                   <h3 className="text-xs font-medium text-muted-foreground mb-3 px-2 uppercase tracking-wider">
-                    {CATEGORY_LABELS[category as NavigationItem["category"]]}
+                    {t(CATEGORY_LABELS[category as NavigationItem["category"]])}
                   </h3>
                   <ul className="space-y-1">
                     {items.map((item) => {
@@ -343,12 +345,12 @@ export function AdminNav({ onItemClick }: AdminNavProps = {}) {
                                 isDisabled && "opacity-60"
                               )}
                             >
-                              {item.name}
+                              {t(item.name)}
                             </span>
                             {isDisabled && (
                               <div className="flex items-center gap-1 ml-auto">
                                 <span className="text-xs text-muted-foreground/50 font-normal">
-                                  Disabled
+                                  {t("admin_pages.nav.disabled")}
                                 </span>
                                 <AlertCircle className="h-3 w-3 text-muted-foreground/50" />
                               </div>
@@ -372,7 +374,7 @@ export function AdminNav({ onItemClick }: AdminNavProps = {}) {
             className="flex items-center px-4 py-3 text-sm font-medium rounded-lg group relative text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
             <LogOut className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-red-500" />
-            <span className="relative z-10">Sign Out</span>
+            <span className="relative z-10">{t("admin_pages.nav.signOut")}</span>
           </a>
         </div>
       </div>

@@ -13,6 +13,7 @@ import { getUsersForEmailingFn } from "~/fn/emails";
 import { useQuery } from "@tanstack/react-query";
 import { assertIsAdminFn } from "~/fn/auth";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 
 const usersForEmailingQueryOptions = queryOptions({
   queryKey: ["admin", "usersForEmailing"],
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/admin/emails")({
 });
 
 function EmailsLayout() {
+  const { t } = useTranslation();
   const { data: usersForEmailing, isLoading: usersLoading } = useQuery(
     usersForEmailingQueryOptions
   );
@@ -59,50 +61,50 @@ function EmailsLayout() {
     if (path.includes("/waitlist")) return "waitlist";
     if (path.includes("/history")) return "history";
     if (path.includes("/analytics")) return "analytics";
-    return "compose"; // default
+    return "compose";
   };
 
   return (
     <Page>
       <PageHeader
-        title="Email Composer"
-        highlightedWord="Composer"
-        description="Send bulk emails to your course participants and manage email campaigns"
+        title={t("admin_pages.emailAdmin.title")}
+        highlightedWord={t("admin_pages.emailAdmin.highlightedWord")}
+        description={t("admin_pages.emailAdmin.description")}
         actions={
           <HeaderStats columns={5}>
             <HeaderStatCard
               icon={Users}
               iconColor="blue"
               value={getRecipientCount("all")}
-              label="Total"
+              label={t("admin_pages.emailAdmin.stats.total")}
               loading={usersLoading}
             />
             <HeaderStatCard
               icon={CheckCircle}
               iconColor="theme"
               value={getRecipientCount("premium")}
-              label="Premium"
+              label={t("admin_pages.emailAdmin.stats.premium")}
               loading={usersLoading}
             />
             <HeaderStatCard
               icon={Mail}
               iconColor="green"
               value={getRecipientCount("free")}
-              label="Free"
+              label={t("admin_pages.emailAdmin.stats.free")}
               loading={usersLoading}
             />
             <HeaderStatCard
               icon={Mail}
               iconColor="purple"
               value={getRecipientCount("newsletter")}
-              label="Newsletter"
+              label={t("admin_pages.emailAdmin.stats.newsletter")}
               loading={usersLoading}
             />
             <HeaderStatCard
               icon={Clock}
               iconColor="orange"
               value={getRecipientCount("waitlist")}
-              label="Waitlist"
+              label={t("admin_pages.emailAdmin.stats.waitlist")}
               loading={usersLoading}
             />
           </HeaderStats>
@@ -119,7 +121,7 @@ function EmailsLayout() {
                   className="flex items-center gap-2 w-full"
                 >
                   <BarChart3 className="h-4 w-4" />
-                  Analytics
+                  {t("admin_pages.emailAdmin.tabs.analytics")}
                 </TabsTrigger>
               </Link>
               <Link to="/admin/emails/compose">
@@ -128,7 +130,7 @@ function EmailsLayout() {
                   className="flex items-center gap-2 w-full"
                 >
                   <Send className="h-4 w-4" />
-                  Compose
+                  {t("admin_pages.emailAdmin.tabs.compose")}
                 </TabsTrigger>
               </Link>
               <Link to="/admin/emails/segments">
@@ -137,7 +139,7 @@ function EmailsLayout() {
                   className="flex items-center gap-2 w-full"
                 >
                   <Video className="h-4 w-4" />
-                  Segments
+                  {t("admin_pages.emailAdmin.tabs.segments")}
                 </TabsTrigger>
               </Link>
               <Link to="/admin/emails/waitlist">
@@ -146,7 +148,7 @@ function EmailsLayout() {
                   className="flex items-center gap-2 w-full"
                 >
                   <Mail className="h-4 w-4" />
-                  Waitlist
+                  {t("admin_pages.emailAdmin.tabs.waitlist")}
                 </TabsTrigger>
               </Link>
               <Link to="/admin/emails/history">
@@ -155,7 +157,7 @@ function EmailsLayout() {
                   className="flex items-center gap-2 w-full"
                 >
                   <Clock className="h-4 w-4" />
-                  History
+                  {t("admin_pages.emailAdmin.tabs.history")}
                 </TabsTrigger>
               </Link>
             </TabsList>

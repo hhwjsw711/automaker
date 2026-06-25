@@ -1,136 +1,88 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/refund-policy")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { t } = useTranslation();
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl pb-16">
       <article className="prose prose-slate">
-        <h1>Refund Policy</h1>
+        <h1>{t("refund_policy.heading")}</h1>
         <p className="text-sm text-muted-foreground">
-          Last updated: January 2025
+          {t("refund_policy.lastUpdated")}
         </p>
 
-        <h2>No Refund Policy</h2>
-        <p>
-          All sales are final. We do not provide refunds for any purchases made
-          through our Service. By completing a purchase, You acknowledge and
-          agree that You will not be entitled to a refund for any reason,
-          including but not limited to dissatisfaction with the Service, change
-          of mind, or any other circumstance.
-        </p>
+        <h2>{t("refund_policy.noRefund.heading")}</h2>
+        <p>{t("refund_policy.noRefund.p1")}</p>
 
-        <h2>Why We Don't Offer Refunds</h2>
-        <p>
-          Online courses present unique challenges when it comes to refunds.
-          Unlike physical products that can be returned, digital educational
-          content cannot be "unused" once accessed. Unfortunately, refund
-          policies for online courses are frequently abused, which creates
-          significant problems for both course creators and legitimate students.
-        </p>
+        <h2>{t("refund_policy.whyNo.heading")}</h2>
+        <p>{t("refund_policy.whyNo.p1")}</p>
 
-        <h3>Common Abuse Scenarios</h3>
-        <p>
-          We have found that refund policies for online courses are often
-          exploited in ways that harm the learning community:
-        </p>
+        <h3>{t("refund_policy.whyNo.abuseHeading")}</h3>
+        <p>{t("refund_policy.whyNo.abuseIntro")}</p>
 
         <ul>
           <li>
-            <strong>Content Consumption and Return:</strong> Some individuals
-            purchase courses, consume all the content, complete the material,
-            and then request refunds. This essentially allows them to access
-            premium educational content for free while we bear the costs of
-            content creation, hosting, and support.
+            <strong>{t("refund_policy.whyNo.abuse1Title")}</strong>{" "}
+            {t("refund_policy.whyNo.abuse1")}
           </li>
           <li>
-            <strong>Unauthorized Sharing:</strong> Refund abuse enables people
-            to purchase courses, share access credentials or downloaded
-            materials with others, and then request refunds, effectively
-            distributing our content without proper compensation.
+            <strong>{t("refund_policy.whyNo.abuse2Title")}</strong>{" "}
+            {t("refund_policy.whyNo.abuse2")}
           </li>
           <li>
-            <strong>Fraudulent Claims:</strong> We've encountered cases where
-            individuals make false claims about course quality or technical
-            issues solely to obtain refunds after they've already benefited from
-            the content.
+            <strong>{t("refund_policy.whyNo.abuse3Title")}</strong>{" "}
+            {t("refund_policy.whyNo.abuse3")}
           </li>
           <li>
-            <strong>Competitive Intelligence:</strong> Some competitors purchase
-            courses to analyze our teaching methods and content structure, then
-            request refunds, using our intellectual property without fair
-            compensation.
+            <strong>{t("refund_policy.whyNo.abuse4Title")}</strong>{" "}
+            {t("refund_policy.whyNo.abuse4")}
           </li>
         </ul>
 
-        <h3>Impact on Course Quality</h3>
-        <p>When refund abuse occurs, it directly impacts our ability to:</p>
+        <h3>{t("refund_policy.whyNo.impactHeading")}</h3>
+        <p>{t("refund_policy.whyNo.impactIntro")}</p>
+
+        <ul>
+          <li>{t("refund_policy.whyNo.impact1")}</li>
+          <li>{t("refund_policy.whyNo.impact2")}</li>
+          <li>{t("refund_policy.whyNo.impact3")}</li>
+          <li>{t("refund_policy.whyNo.impact4")}</li>
+        </ul>
+
+        <h2>{t("refund_policy.whatWeOffer.heading")}</h2>
+        <p>{t("refund_policy.whatWeOffer.p1")}</p>
 
         <ul>
           <li>
-            Invest in creating high-quality educational content and keeping it
-            up-to-date
+            <strong>{t("refund_policy.whatWeOffer.offer1Title")}</strong>{" "}
+            {t("refund_policy.whatWeOffer.offer1")}
           </li>
           <li>
-            Provide ongoing support and improvements to the course materials
+            <strong>{t("refund_policy.whatWeOffer.offer2Title")}</strong>{" "}
+            {t("refund_policy.whatWeOffer.offer2")}
           </li>
           <li>
-            Maintain fair pricing for all students who value and respect the
-            educational content
+            <strong>{t("refund_policy.whatWeOffer.offer3Title")}</strong>{" "}
+            {t("refund_policy.whatWeOffer.offer3")}
           </li>
           <li>
-            Support the instructors and team members who work hard to deliver
-            valuable learning experiences
+            <strong>{t("refund_policy.whatWeOffer.offer4Title")}</strong>{" "}
+            {t("refund_policy.whatWeOffer.offer4")}
           </li>
         </ul>
 
-        <h2>What We Offer Instead</h2>
-        <p>
-          While we cannot offer refunds, we are committed to ensuring you get
-          value from your purchase:
-        </p>
+        <h2>{t("refund_policy.informedDecision.heading")}</h2>
+        <p>{t("refund_policy.informedDecision.p1")}</p>
 
-        <ul>
-          <li>
-            <strong>Lifetime Access:</strong> Once you purchase the course, you
-            have lifetime access to all current and future content updates at no
-            additional cost.
-          </li>
-          <li>
-            <strong>Quality Content:</strong> We work diligently to provide
-            comprehensive, well-structured educational materials that deliver
-            real value.
-          </li>
-          <li>
-            <strong>Ongoing Support:</strong> We maintain active community
-            channels and support systems to help you succeed with the course
-            material.
-          </li>
-          <li>
-            <strong>Free Previews:</strong> We provide free previews and
-            detailed course descriptions so you can make an informed decision
-            before purchasing.
-          </li>
-        </ul>
-
-        <h2>Making an Informed Decision</h2>
+        <h2>{t("refund_policy.contact.heading")}</h2>
+        <p>{t("refund_policy.contact.p1")}</p>
         <p>
-          We encourage you to review all available course information, including
-          course descriptions, preview content, and student testimonials, before
-          making your purchase. If you have any questions about the course
-          content or structure, please contact us before purchasing so we can
-          help ensure the course is right for you.
-        </p>
-
-        <h2>Contact Us</h2>
-        <p>
-          If you have any questions about this Refund Policy, You can contact
-          us:
-        </p>
-        <p>
-          By email:{" "}
+          {t("refund_policy.contact.p2")}{" "}
           <a href="mailto:hhwjsw711@gmail.com">hhwjsw711@gmail.com</a>
         </p>
       </article>

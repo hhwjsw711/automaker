@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { 
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/admin/conversions/events")({
 });
 
 function EventsPage() {
+  const { t } = useTranslation();
   const currentDate = new Date();
   const [selectedDate, setSelectedDate] = useState({
     year: currentDate.getFullYear(),
@@ -65,9 +67,9 @@ function EventsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold mb-2">Event Type Analytics</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("admin_pages.conversionsAdmin.eventTypeAnalytics")}</h3>
           <p className="text-muted-foreground text-sm">
-            Analytics events for {formatMonthYear(selectedDate.year, selectedDate.month)}
+            {t("admin_pages.conversionsAdmin.analyticsEventsFor", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
           </p>
         </div>
         
@@ -99,10 +101,10 @@ function EventsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-theme-500" />
-              Event Type Counts
+              {t("admin_pages.conversionsAdmin.eventTypeCounts")}
             </CardTitle>
             <p className="text-muted-foreground">
-              Breakdown of different analytics events tracked across sessions
+              {t("admin_pages.conversionsAdmin.breakdownEvents")}
             </p>
           </CardHeader>
           <CardContent>
@@ -131,7 +133,7 @@ function EventsPage() {
                       <div className="font-semibold text-theme-600 dark:text-theme-400">
                         {event.count}
                       </div>
-                      <div className="text-sm text-muted-foreground">events</div>
+                      <div className="text-sm text-muted-foreground">{t("admin_pages.conversionsAdmin.events_lowercase")}</div>
                     </div>
                   </div>
                 ))}
@@ -139,9 +141,9 @@ function EventsPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <BarChart3 className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="font-medium text-muted-foreground mb-2">No events tracked yet</h3>
+                <h3 className="font-medium text-muted-foreground mb-2">{t("admin_pages.conversionsAdmin.noEventsTracked")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  No analytics events found for {formatMonthYear(selectedDate.year, selectedDate.month)}
+                  {t("admin_pages.conversionsAdmin.noAnalyticsEvents", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
                 </p>
               </div>
             )}

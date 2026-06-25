@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getAllUsersWithProfilesFn } from "~/fn/users";
 import { assertIsAdminFn } from "~/fn/auth";
 import { Users, Crown, User, UserCheck, Mail, Search } from "lucide-react";
@@ -32,6 +33,7 @@ const usersQuery = queryOptions({
 });
 
 function AdminUsers() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"all" | "premium" | "free">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const { data: users = [], isLoading } = useQuery(usersQuery);
@@ -87,12 +89,11 @@ function AdminUsers() {
   return (
     <Page>
       <PageHeader
-        title="User Management"
-        highlightedWord="Management"
+        title={t("admin_pages.usersAdmin.userManagement")}
+        highlightedWord={t("admin_pages.usersAdmin.management")}
         description={
           <span>
-            View and manage all users in the system. Monitor user activity and
-            premium status.
+            {t("admin_pages.usersAdmin.userManagementDescription")}
           </span>
         }
         actions={
@@ -101,14 +102,14 @@ function AdminUsers() {
               icon={Users}
               iconColor="blue"
               value={users.length}
-              label="Total"
+              label={t("admin_pages.usersAdmin.total")}
               loading={isLoading}
             />
             <HeaderStatCard
               icon={Crown}
               iconColor="yellow"
               value={premiumCount}
-              label="Premium"
+              label={t("admin_pages.usersAdmin.premium")}
               subValue={`${conversionRate}%`}
               loading={isLoading}
             />
@@ -116,7 +117,7 @@ function AdminUsers() {
               icon={User}
               iconColor="green"
               value={freeCount}
-              label="Free"
+              label={t("admin_pages.usersAdmin.free")}
               subValue={`${freeRate}%`}
               loading={isLoading}
             />
@@ -130,7 +131,7 @@ function AdminUsers() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search by email..."
+            placeholder={t("admin_pages.usersAdmin.searchByEmail")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -145,17 +146,17 @@ function AdminUsers() {
             <TabsList>
               <TabsTrigger value="all" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                All Users
+                {t("admin_pages.usersAdmin.allUsers")}
                 <Badge variant="secondary">{users.length}</Badge>
               </TabsTrigger>
               <TabsTrigger value="premium" className="flex items-center gap-2">
                 <Crown className="h-4 w-4" />
-                Premium
+                {t("admin_pages.usersAdmin.premium")}
                 <Badge variant="secondary">{premiumCount}</Badge>
               </TabsTrigger>
               <TabsTrigger value="free" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
-                Free
+                {t("admin_pages.usersAdmin.free")}
                 <Badge variant="secondary">{freeCount}</Badge>
               </TabsTrigger>
             </TabsList>
@@ -170,11 +171,11 @@ function AdminUsers() {
                 <div className="rounded-full bg-muted p-6 mb-4">
                   <User className="h-10 w-10 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">No users found</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("admin_pages.usersAdmin.noUsersFound")}</h3>
                 <p className="text-sm text-muted-foreground">
                   {searchQuery.trim()
-                    ? `No users found matching "${searchQuery}"`
-                    : "No users match the selected filter criteria."}
+                    ? t("admin_pages.usersAdmin.noUsersMatchingSearch", { query: searchQuery })
+                    : t("admin_pages.usersAdmin.noUsersMatchFilter")}
                 </p>
               </div>
             ) : (
@@ -197,7 +198,7 @@ function AdminUsers() {
                                 alt={
                                   user.profile?.displayName ||
                                   user.email ||
-                                  "User"
+                                  t("admin_pages.usersAdmin.user")
                                 }
                               />
                               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
@@ -209,10 +210,10 @@ function AdminUsers() {
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <div className="font-semibold text-base truncate">
-                                {user.profile?.displayName || "No name"}
+                                {user.profile?.displayName || t("admin_pages.usersAdmin.noName")}
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                ID: {user.id}
+                                {t("admin_pages.usersAdmin.id")}: {user.id}
                               </div>
                             </div>
                           </div>
@@ -237,19 +238,19 @@ function AdminUsers() {
                             {user.isPremium ? (
                               <>
                                 <Crown className="h-3 w-3 mr-1" />
-                                Premium
+                                {t("admin_pages.usersAdmin.premium")}
                               </>
                             ) : (
                               <>
                                 <User className="h-3 w-3 mr-1" />
-                                Free
+                                {t("admin_pages.usersAdmin.free")}
                               </>
                             )}
                           </Badge>
                           {user.isAdmin && (
                             <Badge variant="destructive" className="text-xs">
                               <UserCheck className="h-3 w-3 mr-1" />
-                              Admin
+                              {t("admin_pages.usersAdmin.admin")}
                             </Badge>
                           )}
                         </div>

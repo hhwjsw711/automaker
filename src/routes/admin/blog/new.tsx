@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { BlogPostForm } from "./-components/blog-post-form";
 import {
   Breadcrumb,
@@ -16,26 +17,28 @@ export const Route = createFileRoute("/admin/blog/new")({
 });
 
 function NewBlogPost() {
+  const { t } = useTranslation();
+
   return (
     <Page>
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/blog">Blog</Link>
+              <Link to="/admin/blog">{t("admin_pages.blogAdmin.blog")}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Create Post</BreadcrumbPage>
+            <BreadcrumbPage>{t("admin_pages.blogAdmin.createPost")}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       <PageHeader
-        title="Create Blog Post"
-        highlightedWord="Create"
-        description="Write a new blog post for your website"
+        title={t("admin_pages.blogAdmin.createBlogPostTitle")}
+        highlightedWord={t("admin_pages.blogAdmin.create")}
+        description={t("admin_pages.blogAdmin.createBlogPostDescription")}
       />
       
       <BlogPostForm />

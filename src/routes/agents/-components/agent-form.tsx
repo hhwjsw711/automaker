@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import {
   Form,
   FormControl,
@@ -28,7 +29,6 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Switch } from "~/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import {
   Loader2,
   FileText,
@@ -39,23 +39,26 @@ import {
   Edit,
   LucideIcon,
 } from "lucide-react";
-import { MarkdownRenderer } from "~/components/markdown-renderer";
 
-export const agentFormSchema = z.object({
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters"),
-  description: z
-    .string()
-    .min(10, "Description must be at least 10 characters")
-    .max(500, "Description must be less than 500 characters"),
-  type: z.enum(["agent", "command", "hook"]),
-  content: z.string().min(10, "Content must be at least 10 characters"),
-  isPublic: z.boolean().optional().default(true),
-});
+function createAgentFormSchema(t: (key: string) => string) {
+  return z.object({
+    name: z
+      .string()
+      .min(2, t("agentForm.validation.nameMin"))
+      .max(100, t("agentForm.validation.nameMax")),
+    description: z
+      .string()
+      .min(10, t("agentForm.validation.descriptionMin"))
+      .max(500, t("agentForm.validation.descriptionMax")),
+    type: z.enum(["agent", "command", "hook"]),
+    content: z.string().min(10, t("agentForm.validation.contentMin")),
+    isPublic: z.boolean().optional().default(true),
+  });
+}
 
-export type AgentFormValues = z.infer<typeof agentFormSchema>;
+type AgentFormValues = z.infer<ReturnType<typeof createAgentFormSchema>>;
+
+export type { AgentFormValues };
 
 interface AgentFormProps {
   headerTitle?: string;
@@ -78,12 +81,16 @@ export function AgentForm({
   onSubmit,
   isSubmitting,
 }: AgentFormProps) {
-  const form = useForm<AgentFormValues>({
-    resolver: zodResolver(agentFormSchema),
+  const { t } = useTranslation();
+  const schema = createAgentFormSchema(t);
+  type SchemaType = z.infer<typeof schema>;
+
+  const form = useForm<SchemaType>({
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       name: defaultValues?.name || "",
       description: defaultValues?.description || "",
-      type: defaultValues?.type || "agent",
+      type: (defaultValues?.type as "agent" | "command" | "hook") || "agent",
       content: defaultValues?.content || "",
       isPublic: defaultValues?.isPublic ?? true,
     },
@@ -108,13 +115,13 @@ export function AgentForm({
   const getTypeDescription = (type: string) => {
     switch (type) {
       case "agent":
-        return "Complete AI assistant with specific instructions and behaviors";
+        return t("agentForm.typeAgentDesc");
       case "command":
-        return "Specific command or script for development tasks";
+        return t("agentForm.typeCommandDesc");
       case "hook":
-        return "Integration point for extending Claude Code functionality";
+        return t("agentForm.typeHookDesc");
       default:
-        return "Select a type for your agent";
+        return t("agentForm.typeSelectDesc");
     }
   };
 
@@ -140,12 +147,10 @@ export function AgentForm({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5 text-theme-500" />
-                    Agent Content
+                    {t("agentForm.agentContent")}
                   </CardTitle>
                   <CardDescription>
-                    Write the main content for your agent in Markdown. This will
-                    be shown to users as the agent's documentation and
-                    instructions.
+                    {t("agentForm.agentContentDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -154,16 +159,16 @@ export function AgentForm({
                     name="content"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Markdown Content</FormLabel>
+                        <FormLabel>{t("agentForm.markdownContent")}</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="# My Agent&#10;&#10;Description of what this agent does...&#10;&#10;## Instructions&#10;&#10;1. Step one&#10;2. Step two"
+                            placeholder={t("agentForm.markdownPlaceholder")}
                             className="min-h-[400px] font-mono text-sm"
                             {...field}
                           />
                         </FormControl>
                         <FormDescription>
-                          Write your agent instructions in Markdown.
+                          {t("agentForm.writeInstructions")}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -179,12 +184,10 @@ export function AgentForm({
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Edit className="h-5 w-5 text-orange-500" />
-                    Basic Information
+                    {t("agentForm.basicInformation")}
                   </CardTitle>
                   <CardDescription>
-                    Provide basic information about your agent. This will be
-                    shown to users as the agent's documentation and
-                    instructions.
+                    {t("agentForm.basicInfoDesc")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -193,10 +196,10 @@ export function AgentForm({
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Agent Name</FormLabel>
+                        <FormLabel>{t("agentForm.agentName")}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g., React Testing Assistant"
+                            placeholder={t("agentForm.agentNamePlaceholder")}
                             {...field}
                           />
                         </FormControl>
@@ -210,17 +213,16 @@ export function AgentForm({
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Description</FormLabel>
+                        <FormLabel>{t("agentForm.description")}</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Brief description of what this agent does..."
+                            placeholder={t("agentForm.descriptionPlaceholder")}
                             rows={3}
                             {...field}
                           />
                         </FormControl>
                         <FormDescription>
-                          A clear, concise description to help others understand
-                          your agent
+                          {t("agentForm.descriptionHelp")}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -232,33 +234,33 @@ export function AgentForm({
                     name="type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Agent Type</FormLabel>
+                        <FormLabel>{t("agentForm.agentType")}</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select agent type" />
+                              <SelectValue placeholder={t("agentForm.selectType")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="agent">
                               <div className="flex items-center gap-2">
                                 <Bot className="h-4 w-4" />
-                                Agent
+                                {t("agentForm.typeAgent")}
                               </div>
                             </SelectItem>
                             <SelectItem value="command">
                               <div className="flex items-center gap-2">
                                 <Code className="h-4 w-4" />
-                                Command
+                                {t("agentForm.typeCommand")}
                               </div>
                             </SelectItem>
                             <SelectItem value="hook">
                               <div className="flex items-center gap-2">
                                 <Zap className="h-4 w-4" />
-                                Hook
+                                {t("agentForm.typeHook")}
                               </div>
                             </SelectItem>
                           </SelectContent>
@@ -278,10 +280,10 @@ export function AgentForm({
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel className="text-base">
-                            Public Agent
+                            {t("agentForm.publicAgent")}
                           </FormLabel>
                           <FormDescription>
-                            Make this agent visible to everyone
+                            {t("agentForm.publicAgentDesc")}
                           </FormDescription>
                         </div>
                         <FormControl>

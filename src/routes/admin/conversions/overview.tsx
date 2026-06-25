@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { Button } from "~/components/ui/button";
@@ -75,6 +76,16 @@ export const Route = createFileRoute("/admin/conversions/overview")({
 });
 
 function OverviewPage() {
+  const { t } = useTranslation();
+
+  const DATA_SERIES_LABELS = {
+    pageViews: t("admin_pages.conversionsAdmin.pageViews"),
+    googleAdsPageViews: t("admin_pages.conversionsAdmin.googleAdsClicks"),
+    purchaseIntent: t("admin_pages.conversionsAdmin.purchaseIntent"),
+    purchaseCompleted: t("admin_pages.conversionsAdmin.purchases"),
+    googleAdsPurchases: t("admin_pages.conversionsAdmin.googleAdsPurchases"),
+  };
+
   // State for month navigation
   const currentDate = new Date();
   const [selectedDate, setSelectedDate] = useState({
@@ -152,11 +163,10 @@ function OverviewPage() {
         <div>
           <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
             <TrendingUp className="h-6 w-6 text-theme-500" />
-            Conversion Overview
+            {t("admin_pages.conversionsAdmin.conversionOverview")}
           </h2>
           <p className="text-muted-foreground">
-            Track page views, purchase intent, and purchase completions over
-            time
+            {t("admin_pages.conversionsAdmin.conversionOverviewDesc")}
           </p>
         </div>
 
@@ -186,7 +196,7 @@ function OverviewPage() {
 
       {/* Charts Section */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Conversion Trends</h3>
+        <h3 className="text-lg font-semibold mb-4">{t("admin_pages.conversionsAdmin.conversionTrends")}</h3>
         {dailyLoading ? (
           <div className="flex items-center justify-center h-96">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-theme-500"></div>
@@ -196,7 +206,7 @@ function OverviewPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Conversion Analytics Over Time
+                {t("admin_pages.conversionsAdmin.conversionOverTime")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -224,7 +234,7 @@ function OverviewPage() {
                         }}
                       >
                         <Icon className="h-4 w-4" />
-                        {series.label}
+                        {DATA_SERIES_LABELS[key]}
                       </TabsTrigger>
                     );
                   })}
@@ -235,11 +245,11 @@ function OverviewPage() {
                 <TabsList className="mb-4">
                   <TabsTrigger value="line" className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4" />
-                    Line Chart
+                    {t("admin_pages.conversionsAdmin.lineChart")}
                   </TabsTrigger>
                   <TabsTrigger value="bar" className="flex items-center gap-2">
                     <BarChart3 className="h-4 w-4" />
-                    Bar Chart
+                    {t("admin_pages.conversionsAdmin.barChart")}
                   </TabsTrigger>
                 </TabsList>
 
@@ -277,7 +287,7 @@ function OverviewPage() {
                                           style={{ color: entry.color }}
                                           className="text-sm"
                                         >
-                                          {series?.label || entry.dataKey}:{" "}
+                                          {DATA_SERIES_LABELS[seriesKey] || entry.dataKey}:{" "}
                                           {entry.value}
                                         </p>
                                       );
@@ -298,7 +308,7 @@ function OverviewPage() {
                               fill: DATA_SERIES[selectedMetric].color,
                               r: 4,
                             }}
-                            name={DATA_SERIES[selectedMetric].label}
+                            name={DATA_SERIES_LABELS[selectedMetric]}
                             strokeDasharray={
                               selectedMetric === "googleAdsPurchases"
                                 ? "5 5"
@@ -345,7 +355,7 @@ function OverviewPage() {
                                           style={{ color: entry.color }}
                                           className="text-sm"
                                         >
-                                          {series?.label || entry.dataKey}:{" "}
+                                          {DATA_SERIES_LABELS[seriesKey] || entry.dataKey}:{" "}
                                           {entry.value}
                                         </p>
                                       );
@@ -360,7 +370,7 @@ function OverviewPage() {
                           <Bar
                             dataKey={selectedMetric}
                             fill={DATA_SERIES[selectedMetric].color}
-                            name={DATA_SERIES[selectedMetric].label}
+                            name={DATA_SERIES_LABELS[selectedMetric]}
                           />
                         </LazyBarChart>
                       </LazyResponsiveContainer>
@@ -374,11 +384,9 @@ function OverviewPage() {
           <Card>
             <CardContent className="text-center text-muted-foreground py-12">
               <BarChart3 className="h-16 w-16 mx-auto mb-6 opacity-30" />
-              <p className="text-lg">No conversion data available</p>
+              <p className="text-lg">{t("admin_pages.conversionsAdmin.noConversionData")}</p>
               <p className="text-sm">
-                No conversion data found for{" "}
-                {formatMonthYear(selectedDate.year, selectedDate.month)}. Charts
-                will appear here once you have conversion tracking data.
+                {t("admin_pages.conversionsAdmin.noConversionDataDesc", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
               </p>
             </CardContent>
           </Card>

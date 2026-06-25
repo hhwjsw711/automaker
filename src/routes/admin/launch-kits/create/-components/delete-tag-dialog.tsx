@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,24 +17,25 @@ interface DeleteTagDialogProps {
 }
 
 export function DeleteTagDialog({ open, onOpenChange, onConfirm }: DeleteTagDialogProps) {
+  const { t } = useTranslation();
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Tag</AlertDialogTitle>
+          <AlertDialogTitle>{t("admin_pages.launchKitsAdmin.deleteTag")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete this tag? This action cannot be undone and will remove the tag from all launch kits.
+            {t("admin_pages.launchKitsAdmin.deleteTagDialogDesc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("admin_pages.launchKitsAdmin.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction 
             onClick={onConfirm}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Delete
+            {t("admin_pages.launchKitsAdmin.deleteBtn")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

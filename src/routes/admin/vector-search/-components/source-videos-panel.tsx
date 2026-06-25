@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Video, BookOpen, ExternalLink } from "lucide-react";
 import {
   Card,
@@ -15,20 +16,22 @@ interface SourceVideosPanelProps {
 }
 
 export function SourceVideosPanel({ sources }: SourceVideosPanelProps) {
+  const { t } = useTranslation();
+
   if (sources.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Source Videos</CardTitle>
+          <CardTitle className="text-base">{t("admin_pages.vectorSearch.sourceVideos")}</CardTitle>
           <CardDescription>
-            Relevant videos will appear here as you chat
+            {t("admin_pages.vectorSearch.relevantVideosAppearHere")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Video className="h-8 w-8 text-muted-foreground mb-2" />
             <p className="text-sm text-muted-foreground">
-              Ask a question to see related videos
+              {t("admin_pages.vectorSearch.askToSeeRelatedVideos")}
             </p>
           </div>
         </CardContent>
@@ -39,10 +42,9 @@ export function SourceVideosPanel({ sources }: SourceVideosPanelProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Source Videos</CardTitle>
+        <CardTitle className="text-base">{t("admin_pages.vectorSearch.sourceVideos")}</CardTitle>
         <CardDescription>
-          {sources.length} video{sources.length !== 1 ? "s" : ""} found relevant
-          to your question
+          {t("admin_pages.vectorSearch.videosFoundRelevant", { count: sources.length })}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -85,7 +87,7 @@ export function SourceVideosPanel({ sources }: SourceVideosPanelProps) {
               params={{ slug: source.segmentSlug }}
               className="inline-flex items-center gap-1 text-xs text-theme-500 hover:text-theme-600 hover:underline"
             >
-              Go to video
+              {t("admin_pages.vectorSearch.goToVideo")}
               <ExternalLink className="h-3 w-3" />
             </Link>
           </div>

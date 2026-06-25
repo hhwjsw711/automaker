@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { assertIsAdminFn } from "~/fn/auth";
 import { NewsEntryForm } from "../../-components/news-entry-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/admin/news/$id/edit")({
 
 function EditNewsEntry() {
   const { id } = Route.useParams();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -43,20 +45,20 @@ function EditNewsEntry() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/admin/news">News</Link>
+                <Link to="/admin/news">{t("admin_pages.newsAdmin.news")}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Edit Entry</BreadcrumbPage>
+              <BreadcrumbPage>{t("admin_pages.newsAdmin.editEntry")}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <PageHeader
-          title="Edit News Entry"
-          highlightedWord="News"
-          description="Update the news entry details"
+          title={t("admin_pages.newsAdmin.editNewsEntryTitle")}
+          highlightedWord={t("admin_pages.newsAdmin.news")}
+          description={t("admin_pages.newsAdmin.editNewsEntryDescription")}
         />
 
         <div className="animate-pulse">
@@ -75,20 +77,20 @@ function EditNewsEntry() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/admin/news">News</Link>
+                <Link to="/admin/news">{t("admin_pages.newsAdmin.news")}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Edit Entry</BreadcrumbPage>
+              <BreadcrumbPage>{t("admin_pages.newsAdmin.editEntry")}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <PageHeader
-          title="Entry Not Found"
-          highlightedWord="Not Found"
-          description="The news entry you're looking for doesn't exist"
+          title={t("admin_pages.newsAdmin.entryNotFound")}
+          highlightedWord={t("admin_pages.newsAdmin.notFound")}
+          description={t("admin_pages.newsAdmin.entryNotFoundDescription")}
         />
       </Page>
     );
@@ -100,20 +102,20 @@ function EditNewsEntry() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/news">News</Link>
+              <Link to="/admin/news">{t("admin_pages.newsAdmin.news")}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Edit Entry</BreadcrumbPage>
+            <BreadcrumbPage>{t("admin_pages.newsAdmin.editEntry")}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       <PageHeader
-        title="Edit News Entry"
-        highlightedWord="News"
-        description="Update the news entry details"
+        title={t("admin_pages.newsAdmin.editNewsEntryTitle")}
+        highlightedWord={t("admin_pages.newsAdmin.news")}
+        description={t("admin_pages.newsAdmin.editNewsEntryDescription")}
       />
 
       <div className="max-w-2xl">

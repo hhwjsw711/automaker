@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { getAllTagsFn, deleteTagFn } from "~/fn/launch-kits";
@@ -6,6 +7,7 @@ import { UseFormReturn } from "react-hook-form";
 import { CreateLaunchKitForm } from "./basic-information-card";
 
 export function useTags(form: UseFormReturn<CreateLaunchKitForm>) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [deleteTagId, setDeleteTagId] = useState<number | null>(null);
 
@@ -19,10 +21,10 @@ export function useTags(form: UseFormReturn<CreateLaunchKitForm>) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       refetchTags();
-      toast.success("Tag deleted successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.tagDeleted"));
     },
     onError: (error: any) => {
-      toast.error(error?.message || "Failed to delete tag");
+      toast.error(error?.message || t("admin_pages.launchKitsAdmin.deleteFailed"));
     },
   });
 

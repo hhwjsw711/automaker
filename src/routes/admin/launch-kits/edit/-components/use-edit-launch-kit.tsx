@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,6 +24,7 @@ const editLaunchKitSchema = z.object({
 export type EditLaunchKitForm = z.infer<typeof editLaunchKitSchema>;
 
 export function useEditLaunchKit(launchKit?: any) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
@@ -63,16 +65,16 @@ export function useEditLaunchKit(launchKit?: any) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "launch-kits"] });
       queryClient.invalidateQueries({ queryKey: ["launch-kits"] });
-      queryClient.invalidateQueries({ queryKey: ["launch-kit-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "launch-kit-stats"] });
       queryClient.invalidateQueries({
         queryKey: ["admin", "launch-kit", launchKit?.id.toString()],
       });
-      toast.success("Launch kit updated successfully!");
+      toast.success(t("admin_pages.launchKitsAdmin.kitUpdated"));
       navigate({ to: "/admin/launch-kits" });
     },
     onError: (error: any) => {
-      setFormError(error?.message || "Failed to update launch kit");
-      toast.error("Failed to update launch kit");
+      setFormError(error?.message || t("admin_pages.launchKitsAdmin.kitUpdateFailed"));
+      toast.error(t("admin_pages.launchKitsAdmin.kitUpdateFailed"));
     },
     onSettled: () => {
       setIsLoading(false);

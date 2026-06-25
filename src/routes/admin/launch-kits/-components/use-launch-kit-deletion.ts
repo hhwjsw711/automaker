@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteLaunchKitFn } from "~/fn/launch-kits";
 import { toast } from "sonner";
 
 export function useLaunchKitDeletion() {
+  const { t } = useTranslation();
   const [deleteLaunchKitId, setDeleteLaunchKitId] = useState<number | null>(
     null
   );
@@ -16,11 +18,11 @@ export function useLaunchKitDeletion() {
       queryClient.invalidateQueries({
         queryKey: ["admin", "launch-kit-stats"],
       });
-      toast.success("Launch kit deleted successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.kitDeleted"));
       setDeleteLaunchKitId(null);
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete launch kit");
+      toast.error(error.message || t("admin_pages.launchKitsAdmin.deleteFailed"));
     },
   });
 

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   LazyBarChart,
   LazyAreaChart,
@@ -48,6 +49,8 @@ export function EmailAnalytics({
   setAnalyticsDate,
   setAnalyticsType,
 }: EmailAnalyticsProps) {
+  const { t } = useTranslation();
+
   // Month navigation functions
   const goToPreviousMonth = () => {
     setAnalyticsDate((prev) => {
@@ -104,7 +107,7 @@ export function EmailAnalytics({
                   .toLocaleString()}
               </div>
               <p className="text-sm text-blue-600/80 dark:text-blue-400/80">
-                Total Signups
+                {t("admin_pages.emailAdmin.totalSignups")}
               </p>
             </div>
 
@@ -120,7 +123,7 @@ export function EmailAnalytics({
                   : "0"}
               </div>
               <p className="text-sm text-green-600/80 dark:text-green-400/80">
-                Daily Average
+                {t("admin_pages.emailAdmin.dailyAverage")}
               </p>
             </div>
 
@@ -136,7 +139,7 @@ export function EmailAnalytics({
                   : "0"}
               </div>
               <p className="text-sm text-purple-600/80 dark:text-purple-400/80">
-                Peak Day
+                {t("admin_pages.emailAdmin.peakDay")}
               </p>
             </div>
           </div>
@@ -149,7 +152,7 @@ export function EmailAnalytics({
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Signup Trend Over Time
+                    {t("admin_pages.emailAdmin.signupTrend")}
                   </h3>
                   <LazyChartContainer height={320}>
                     <div className="h-80 w-full">
@@ -178,7 +181,7 @@ export function EmailAnalytics({
                                       {data.formattedDate}
                                     </p>
                                     <p className="text-theme-600 dark:text-theme-400">
-                                      Signups: {payload[0].value}
+                                      {t("admin_pages.emailAdmin.signups")}: {payload[0].value}
                                     </p>
                                   </div>
                                 );
@@ -223,7 +226,7 @@ export function EmailAnalytics({
                 <div>
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
-                    Daily Signup Volume
+                    {t("admin_pages.emailAdmin.dailySignupVolume")}
                   </h3>
                   <LazyChartContainer height={320}>
                     <div className="h-80 w-full">
@@ -252,7 +255,7 @@ export function EmailAnalytics({
                                       {data.formattedDate}
                                     </p>
                                     <p className="text-theme-600 dark:text-theme-400">
-                                      Signups: {payload[0].value}
+                                      {t("admin_pages.emailAdmin.signups")}: {payload[0].value}
                                     </p>
                                   </div>
                                 );
@@ -274,10 +277,12 @@ export function EmailAnalytics({
             ) : (
               <div className="text-center text-muted-foreground py-12">
                 <BarChart3 className="h-16 w-16 mx-auto mb-6 opacity-30" />
-                <p className="text-lg">No signup data available</p>
+                <p className="text-lg">{t("admin_pages.emailAdmin.noSignupData")}</p>
                 <p className="text-sm">
-                  No {analyticsType} signups found for{" "}
-                  {formatMonthYear(analyticsDate.year, analyticsDate.month)}
+                  {t("admin_pages.emailAdmin.noSignupsFound", {
+                    type: analyticsType,
+                    month: formatMonthYear(analyticsDate.year, analyticsDate.month),
+                  })}
                 </p>
               </div>
             )}
@@ -306,6 +311,8 @@ export function EmailAnalyticsHeader({
   setAnalyticsDate,
   setAnalyticsType,
 }: EmailAnalyticsHeaderProps) {
+  const { t } = useTranslation();
+
   const goToPreviousMonth = () => {
     setAnalyticsDate((prev) => {
       if (prev.month === 1) {
@@ -337,10 +344,10 @@ export function EmailAnalyticsHeader({
         <div>
           <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
             <BarChart3 className="h-6 w-6 text-theme-500" />
-            Email Signup Analytics
+            {t("admin_pages.emailAdmin.emailSignupAnalytics")}
           </h2>
           <p className="text-muted-foreground">
-            Track email signups over time with detailed charts
+            {t("admin_pages.emailAdmin.trackEmailSignups")}
           </p>
         </div>
 
@@ -356,8 +363,8 @@ export function EmailAnalyticsHeader({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="waitlist">Waitlist</SelectItem>
-              <SelectItem value="newsletter">Newsletter</SelectItem>
+              <SelectItem value="waitlist">{t("admin_pages.emailAdmin.waitlist")}</SelectItem>
+              <SelectItem value="newsletter">{t("admin_pages.emailAdmin.newsletter")}</SelectItem>
             </SelectContent>
           </Select>
 

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Progress } from "~/components/ui/progress";
 import { Badge } from "~/components/ui/badge";
 import {
@@ -87,15 +88,17 @@ export function EmailHistory({
   emailBatches,
   emailBatchesLoading,
 }: EmailHistoryProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="module-card">
       <div className="p-6 border-b border-border/50">
         <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
           <Clock className="h-6 w-6 text-theme-500" />
-          Recent Email Batches
+          {t("admin_pages.emailAdmin.recentEmailBatches")}
         </h2>
         <p className="text-muted-foreground">
-          Track the status of your recent email campaigns
+          {t("admin_pages.emailAdmin.trackEmailCampaigns")}
         </p>
       </div>
       <div className="p-6">
@@ -139,14 +142,14 @@ export function EmailHistory({
                   <div className="grid grid-cols-2 gap-6 mb-4">
                     <div className="space-y-1">
                       <div className="text-sm text-muted-foreground">
-                        Recipients
+                        {t("admin_pages.emailAdmin.recipients")}
                       </div>
                       <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
                         {batch.recipientCount}
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="text-sm text-muted-foreground">Sent</div>
+                      <div className="text-sm text-muted-foreground">{t("admin_pages.emailAdmin.sent")}</div>
                       <div className="text-xl font-bold text-green-600 dark:text-green-400">
                         {batch.sentCount}
                       </div>
@@ -155,7 +158,7 @@ export function EmailHistory({
 
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Progress</span>
+                      <span className="text-muted-foreground">{t("admin_pages.emailAdmin.progress")}</span>
                       <span className="font-medium">
                         {batch.sentCount} / {batch.recipientCount}
                       </span>
@@ -173,7 +176,7 @@ export function EmailHistory({
                   {batch.failedCount > 0 && (
                     <div className="mt-4 flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
                       <XCircle className="h-4 w-4" />
-                      {batch.failedCount} failed deliveries
+                      {batch.failedCount} {t("admin_pages.emailAdmin.failedDeliveries")}
                     </div>
                   )}
                 </div>
@@ -182,8 +185,8 @@ export function EmailHistory({
           ) : (
             <div className="text-center text-muted-foreground py-12">
               <Mail className="h-16 w-16 mx-auto mb-6 opacity-30" />
-              <p className="text-lg">No email batches yet</p>
-              <p className="text-sm">Your sent emails will appear here</p>
+              <p className="text-lg">{t("admin_pages.emailAdmin.noEmailBatches")}</p>
+              <p className="text-sm">{t("admin_pages.emailAdmin.sentEmailsAppearHere")}</p>
             </div>
           )}
         </div>

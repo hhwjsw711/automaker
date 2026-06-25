@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { LucideIcon } from "lucide-react";
 import { Settings2 } from "lucide-react";
 import {
@@ -12,12 +13,6 @@ import { Switch } from "~/components/ui/switch";
 import { Badge } from "~/components/ui/badge";
 import { TARGET_MODES, type TargetMode, type FlagKey } from "~/config";
 
-const TARGET_MODE_LABELS: Record<TargetMode, string> = {
-  [TARGET_MODES.ALL]: "All Users",
-  [TARGET_MODES.PREMIUM]: "Premium Only",
-  [TARGET_MODES.NON_PREMIUM]: "Non-Premium Only",
-  [TARGET_MODES.CUSTOM]: "Custom",
-};
 
 interface FeatureFlagCardProps {
   icon: LucideIcon;
@@ -50,6 +45,7 @@ export function FeatureFlagCard({
   featureStates,
   flagConfigs,
 }: FeatureFlagCardProps) {
+  const { t } = useTranslation();
   const disabledDependencies = dependsOn?.filter(dep => !featureStates[dep]) ?? [];
   const isDisabledByDependency = disabledDependencies.length > 0;
 
@@ -65,9 +61,12 @@ export function FeatureFlagCard({
             <Badge variant="invert" className="text-xs w-full justify-center">
               {targeting
                 ? targeting.targetMode === TARGET_MODES.CUSTOM
-                  ? `${targeting.users.length} ${targeting.users.length === 1 ? "user" : "users"}`
-                  : TARGET_MODE_LABELS[targeting.targetMode]
-                : "All Users"}
+                  ? `${targeting.users.length} ${targeting.users.length === 1 ? t("admin_pages.settingsAdmin.user_singular") : t("admin_pages.settingsAdmin.user_plural")}`
+                  : targeting.targetMode === TARGET_MODES.ALL ? t("admin_pages.settingsAdmin.everyone")
+                  : targeting.targetMode === TARGET_MODES.PREMIUM ? t("admin_pages.settingsAdmin.premiumOnly")
+                  : targeting.targetMode === TARGET_MODES.NON_PREMIUM ? t("admin_pages.settingsAdmin.nonPremiumOnly")
+                  : t("admin_pages.settingsAdmin.customUsers")
+                : t("admin_pages.settingsAdmin.everyone")}
             </Badge>
           </div>
         </CardTitle>
@@ -77,14 +76,14 @@ export function FeatureFlagCard({
       </CardHeader>
       <CardContent className="flex-1">
         <fieldset className={`text-xs border rounded-md px-3 py-2 min-w-0 overflow-hidden ${isDisabledByDependency ? "border-destructive text-destructive" : "border-border"}`}>
-          <legend className="px-1 text-muted-foreground">Requirements</legend>
+          <legend className="px-1 text-muted-foreground">{t("admin_pages.settingsAdmin.requirements")}</legend>
           <div className="overflow-hidden text-center">
             {!dependsOn || dependsOn.length === 0 ? (
-              <span>All met</span>
+              <span>{t("admin_pages.settingsAdmin.allMet")}</span>
             ) : (
               <div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
                 <span className={`${isDisabledByDependency ? "opacity-0" : "opacity-100"}`}>
-                  All met
+                  {t("admin_pages.settingsAdmin.allMet")}
                 </span>
                 <span className={`inline-flex gap-1 justify-center ${isDisabledByDependency ? "opacity-100" : "opacity-0"}`}>
                   {dependsOn?.map((dep, i) => {
@@ -112,7 +111,7 @@ export function FeatureFlagCard({
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
           >
             <Settings2 className="h-4 w-4" />
-            Config
+            {t("admin_pages.settingsAdmin.config")}
           </button>
           <Switch
             id={switchId}

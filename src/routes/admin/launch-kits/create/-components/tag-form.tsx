@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -62,6 +63,7 @@ export function TagForm({
   tag,
   preSelectedCategoryId,
 }: TagFormProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
@@ -89,10 +91,10 @@ export function TagForm({
       setFormData((prev) => ({ ...prev, categoryId: newCategory.id }));
       setShowNewCategoryInput(false);
       setNewCategoryName("");
-      toast.success("Category created successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.categoryCreated"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to create category");
+      toast.error(error.message || t("admin_pages.launchKitsAdmin.categoryCreateFailed"));
     },
   });
 
@@ -115,7 +117,7 @@ export function TagForm({
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       queryClient.invalidateQueries({ queryKey: ["launch-kit-tags"] });
       toast.success(
-        tag ? "Tag updated successfully" : "Tag created successfully"
+        tag ? t("admin_pages.launchKitsAdmin.tagUpdated") : t("admin_pages.launchKitsAdmin.tagCreated")
       );
       onSuccess();
       if (!tag) {
@@ -128,7 +130,7 @@ export function TagForm({
     },
     onError: (error: any) => {
       toast.error(
-        error.message || `Failed to ${tag ? "update" : "create"} tag`
+        error.message || t("admin_pages.launchKitsAdmin.tagUpdateFailed")
       );
     },
     onSettled: () => {
@@ -165,50 +167,40 @@ export function TagForm({
   // Update form data when preSelectedCategoryId changes
   useEffect(() => {
     if (preSelectedCategoryId !== undefined && categories.length > 0) {
-      console.log("Setting categoryId to:", preSelectedCategoryId);
       setFormData((prev) => ({ ...prev, categoryId: preSelectedCategoryId }));
     }
   }, [preSelectedCategoryId, categories]);
 
-  // Debug logging
-  useEffect(() => {
-    console.log("TagForm state:", {
-      preSelectedCategoryId,
-      formData,
-      categories: categories.length,
-    });
-  }, [preSelectedCategoryId, formData, categories]);
-
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>{tag ? "Edit Tag" : "Create New Tag"}</DialogTitle>
+        <DialogTitle>{tag ? t("admin_pages.launchKitsAdmin.editTag") : t("admin_pages.launchKitsAdmin.createNewTag")}</DialogTitle>
         <DialogDescription>
           {tag
-            ? "Update the tag details"
-            : "Create a new tag to categorize launch kits"}
+            ? t("admin_pages.launchKitsAdmin.updateTagDetails")
+            : t("admin_pages.launchKitsAdmin.createTagDetails")}
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="tag-name">Name *</Label>
+          <Label htmlFor="tag-name">{t("admin_pages.launchKitsAdmin.tagNameRequired")}</Label>
           <Input
             data-testid="tag-name-input"
             value={formData.name}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, name: e.target.value }))
             }
-            placeholder="e.g., React, TypeScript, Docker"
+            placeholder={t("admin_pages.launchKitsAdmin.tagNamePlaceholder")}
             required
             minLength={2}
             maxLength={30}
             disabled={isSubmitting}
           />
-          <p className="text-xs text-muted-foreground mt-1">2-30 characters</p>
+          <p className="text-xs text-muted-foreground mt-1">{t("admin_pages.launchKitsAdmin.tagLength")}</p>
         </div>
 
         <div>
-          <Label htmlFor="tag-color">Color</Label>
+          <Label htmlFor="tag-color">{t("admin_pages.launchKitsAdmin.color")}</Label>
           <div className="flex items-center gap-2">
             <Input
               id="tag-color"
@@ -245,7 +237,7 @@ export function TagForm({
               size="icon"
               onClick={handleRandomizeColor}
               disabled={isSubmitting}
-              aria-label="Randomize color"
+              aria-label={t("admin_pages.launchKitsAdmin.randomizeColor")}
             >
               <Shuffle className="h-4 w-4" />
             </Button>
@@ -253,11 +245,11 @@ export function TagForm({
         </div>
 
         <div>
-          <Label htmlFor="tag-category">Category</Label>
+          <Label htmlFor="tag-category">{t("admin_pages.launchKitsAdmin.category")}</Label>
           {showNewCategoryInput ? (
             <div className="flex items-center gap-2">
               <Input
-                placeholder="Enter category name"
+                placeholder={t("admin_pages.launchKitsAdmin.enterCategoryName")}
                 data-testid="new-category-input"
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
@@ -275,7 +267,7 @@ export function TagForm({
                   !newCategoryName.trim()
                 }
               >
-                Add Category
+                {t("admin_pages.launchKitsAdmin.addCategory")}
               </Button>
               <Button
                 type="button"
@@ -290,7 +282,7 @@ export function TagForm({
                 }}
                 disabled={isSubmitting || createCategoryMutation.isPending}
               >
-                Cancel
+                {t("admin_pages.launchKitsAdmin.cancel")}
               </Button>
             </div>
           ) : (
@@ -307,7 +299,7 @@ export function TagForm({
                 disabled={isSubmitting || categoriesLoading}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder={t("admin_pages.launchKitsAdmin.selectCategory")} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category: any) => (
@@ -331,7 +323,7 @@ export function TagForm({
                   setShowNewCategoryInput(true);
                 }}
                 disabled={isSubmitting}
-                title="Create new category"
+                title={t("admin_pages.launchKitsAdmin.createNewCategory")}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -341,10 +333,10 @@ export function TagForm({
 
         <DialogFooter>
           <DialogTrigger asChild>
-            <Button type="button" variant="outline" disabled={isSubmitting}>
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
+              <Button type="button" variant="outline" disabled={isSubmitting}>
+                <X className="mr-2 h-4 w-4" />
+                {t("admin_pages.launchKitsAdmin.cancel")}
+              </Button>
           </DialogTrigger>
           <Button
             data-testid="create-tag-button"
@@ -354,12 +346,12 @@ export function TagForm({
             {isSubmitting ? (
               <>
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                {tag ? "Updating..." : "Creating..."}
+                {tag ? t("admin_pages.launchKitsAdmin.updating") : t("admin_pages.launchKitsAdmin.creating")}
               </>
             ) : (
               <>
                 <Check className="mr-2 h-4 w-4" />
-                {tag ? "Update Tag" : "Create Tag"}
+                {tag ? t("admin_pages.launchKitsAdmin.updateTag") : t("admin_pages.launchKitsAdmin.createTag")}
               </>
             )}
           </Button>

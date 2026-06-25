@@ -52,6 +52,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { PageHeader } from "./-components/page-header";
 import { Page } from "./-components/page";
+import { useTranslation } from "react-i18next";
 
 // Skeleton components
 function CountSkeleton() {
@@ -104,6 +105,7 @@ export const Route = createFileRoute("/admin/affiliates")({
 });
 
 function AdminAffiliates() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [payoutAffiliateId, setPayoutAffiliateId] = useState<number | null>(
     null
@@ -120,7 +122,7 @@ function AdminAffiliates() {
     resolver: zodResolver(payoutSchema),
     defaultValues: {
       amount: 0,
-      paymentMethod: "PayPal",
+      paymentMethod: t("admin_pages.affiliates_admin.paypal"),
       transactionId: "",
       notes: "",
     },
@@ -130,13 +132,13 @@ function AdminAffiliates() {
     mutationFn: adminToggleAffiliateStatusFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "affiliates"] });
-      toast.success("Status Updated", {
-        description: "Affiliate status has been updated successfully.",
+      toast.success(t("admin_pages.affiliates_admin.statusUpdated"), {
+        description: t("admin_pages.affiliates_admin.statusUpdatedDesc"),
       });
     },
     onError: (error) => {
-      toast.error("Update Failed", {
-        description: error.message || "Failed to update affiliate status.",
+      toast.error(t("admin_pages.affiliates_admin.updateFailed"), {
+        description: error.message || t("admin_pages.affiliates_admin.updateFailedDesc"),
       });
     },
   });
@@ -145,15 +147,15 @@ function AdminAffiliates() {
     mutationFn: adminRecordPayoutFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "affiliates"] });
-      toast.success("Payout Recorded", {
-        description: "The payout has been recorded successfully.",
+      toast.success(t("admin_pages.affiliates_admin.payoutRecorded"), {
+        description: t("admin_pages.affiliates_admin.payoutRecordedDesc"),
       });
       setPayoutAffiliateId(null);
       form.reset();
     },
     onError: (error) => {
-      toast.error("Payout Failed", {
-        description: error.message || "Failed to record payout.",
+      toast.error(t("admin_pages.affiliates_admin.payoutFailed"), {
+        description: error.message || t("admin_pages.affiliates_admin.payoutFailedDesc"),
       });
     },
   });
@@ -170,7 +172,7 @@ function AdminAffiliates() {
   const openPayoutDialog = (affiliate: any) => {
     setPayoutAffiliateId(affiliate.id);
     setPayoutAffiliateName(
-      affiliate.userName || affiliate.userEmail || "Unknown"
+      affiliate.userName || affiliate.userEmail || t("admin_pages.affiliates_admin.unknown")
     );
     setPayoutUnpaidBalance(affiliate.unpaidBalance);
     form.setValue("amount", affiliate.unpaidBalance / 100); // Convert cents to dollars
@@ -198,7 +200,7 @@ function AdminAffiliates() {
   };
 
   const formatDate = (date: Date | string | null) => {
-    if (!date) return "Never";
+    if (!date) return t("admin_pages.affiliates_admin.never");
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -208,8 +210,8 @@ function AdminAffiliates() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied!", {
-      description: "Link copied to clipboard.",
+    toast.success(t("admin_pages.affiliates_admin.copied"), {
+      description: t("admin_pages.affiliates_admin.copiedDesc"),
     });
   };
 
@@ -227,9 +229,9 @@ function AdminAffiliates() {
   return (
     <Page>
       <PageHeader
-        title="Affiliate Management"
-        highlightedWord="Management"
-        description="Manage affiliate accounts, view earnings, and process payouts"
+        title={t("admin_pages.affiliates_admin.pageTitle")}
+        highlightedWord={t("admin_pages.affiliates_admin.highlightedWord")}
+        description={t("admin_pages.affiliates_admin.pageDescription")}
       />
 
       {/* Stats Overview */}
@@ -243,7 +245,7 @@ function AdminAffiliates() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Total Unpaid
+                {t("admin_pages.affiliates_admin.totalUnpaid")}
               </div>
               <div className="w-10 h-10 rounded-full bg-orange-500/10 dark:bg-orange-400/20 flex items-center justify-center group-hover:bg-orange-500/20 dark:group-hover:bg-orange-400/30">
                 <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400" />
@@ -256,7 +258,7 @@ function AdminAffiliates() {
                 formatCurrency(totals.totalUnpaid)
               )}
             </div>
-            <p className="text-sm text-muted-foreground">Pending payouts</p>
+            <p className="text-sm text-muted-foreground">{t("admin_pages.affiliates_admin.pendingPayouts")}</p>
           </div>
         </div>
 
@@ -267,7 +269,7 @@ function AdminAffiliates() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Total Paid
+                {t("admin_pages.affiliates_admin.totalPaid")}
               </div>
               <div className="w-10 h-10 rounded-full bg-green-500/10 dark:bg-green-400/20 flex items-center justify-center group-hover:bg-green-500/20 dark:group-hover:bg-green-400/30">
                 <CheckCircle className="h-5 w-5 text-green-500 dark:text-green-400" />
@@ -276,7 +278,7 @@ function AdminAffiliates() {
             <div className="text-3xl font-bold text-foreground mb-2 group-hover:text-green-600 dark:group-hover:text-green-400">
               {isLoading ? <CountSkeleton /> : formatCurrency(totals.totalPaid)}
             </div>
-            <p className="text-sm text-muted-foreground">Lifetime payouts</p>
+            <p className="text-sm text-muted-foreground">{t("admin_pages.affiliates_admin.lifetimePayouts")}</p>
           </div>
         </div>
 
@@ -287,7 +289,7 @@ function AdminAffiliates() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Total Earnings
+                {t("admin_pages.affiliates_admin.totalEarnings")}
               </div>
               <div className="w-10 h-10 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30">
                 <DollarSign className="h-5 w-5 text-theme-500 dark:text-theme-400" />
@@ -301,7 +303,7 @@ function AdminAffiliates() {
               )}
             </div>
             <p className="text-sm text-muted-foreground">
-              Generated for affiliates
+              {t("admin_pages.affiliates_admin.generatedForAffiliates")}
             </p>
           </div>
         </div>
@@ -313,7 +315,7 @@ function AdminAffiliates() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Active Affiliates
+                {t("admin_pages.affiliates_admin.activeAffiliates")}
               </div>
               <div className="w-10 h-10 rounded-full bg-blue-500/10 dark:bg-blue-400/20 flex items-center justify-center group-hover:bg-blue-500/20 dark:group-hover:bg-blue-400/30">
                 <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />
@@ -323,7 +325,7 @@ function AdminAffiliates() {
               {isLoading ? <CountSkeleton /> : totals.activeCount}
             </div>
             <p className="text-sm text-muted-foreground">
-              of {isLoading ? "..." : affiliates?.length || 0} total
+              {t("admin_pages.affiliates_admin.ofTotal")}
             </p>
           </div>
         </div>
@@ -334,9 +336,9 @@ function AdminAffiliates() {
         className="module-card"
       >
         <div className="p-6 border-b border-border/50">
-          <h2 className="text-2xl font-semibold mb-2">All Affiliates</h2>
+          <h2 className="text-2xl font-semibold mb-2">{t("admin_pages.affiliates_admin.allAffiliates")}</h2>
           <p className="text-muted-foreground">
-            View and manage all affiliate accounts
+            {t("admin_pages.affiliates_admin.viewManageAffiliates")}
           </p>
         </div>
         <div className="p-6">
@@ -349,7 +351,7 @@ function AdminAffiliates() {
           ) : affiliates?.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <Users className="h-16 w-16 mx-auto mb-6 opacity-30" />
-              <p className="text-lg">No affiliates registered yet</p>
+              <p className="text-lg">{t("admin_pages.affiliates_admin.noAffiliates")}</p>
             </div>
           ) : (
             <div className="space-y-6">
@@ -368,28 +370,28 @@ function AdminAffiliates() {
                           {/* Show public name based on useDisplayName setting */}
                           {affiliate.useDisplayName === false && affiliate.userRealName
                             ? affiliate.userRealName
-                            : affiliate.userName || affiliate.userEmail || "Unknown User"}
+                            : affiliate.userName || affiliate.userEmail || t("admin_pages.affiliates_admin.unknownUser")}
                           {/* Show alternative name for admin context */}
                           {affiliate.useDisplayName === false && affiliate.userName && (
                             <span className="text-muted-foreground font-normal ml-2 text-sm">
-                              (alias: {affiliate.userName})
+                              {t("admin_pages.affiliates_admin.aliasName", { name: affiliate.userName })}
                             </span>
                           )}
                           {affiliate.useDisplayName !== false && affiliate.userRealName && (
                             <span className="text-muted-foreground font-normal ml-2 text-sm">
-                              (real: {affiliate.userRealName})
+                              {t("admin_pages.affiliates_admin.realName", { name: affiliate.userRealName })}
                             </span>
                           )}
                         </span>
                         {affiliate.isActive ? (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
                             <CheckCircle className="h-3.5 w-3.5" />
-                            Active
+{t("admin_pages.affiliates_admin.active")}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-800">
                             <XCircle className="h-3.5 w-3.5" />
-                            Inactive
+                            {t("admin_pages.affiliates_admin.inactive")}
                           </span>
                         )}
                         <span className="px-2 py-1 text-xs font-mono bg-muted rounded border">
@@ -400,7 +402,7 @@ function AdminAffiliates() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                         <div className="space-y-1">
                           <div className="text-sm text-muted-foreground">
-                            Unpaid Balance
+                            {t("admin_pages.affiliates_admin.unpaidBalance")}
                           </div>
                           <div className="text-xl font-bold text-orange-600 dark:text-orange-400">
                             {formatCurrency(affiliate.unpaidBalance)}
@@ -408,7 +410,7 @@ function AdminAffiliates() {
                         </div>
                         <div className="space-y-1">
                           <div className="text-sm text-muted-foreground">
-                            Total Paid
+                {t("admin_pages.affiliates_admin.totalPaid")}
                           </div>
                           <div className="text-xl font-bold text-green-600 dark:text-green-400">
                             {formatCurrency(affiliate.paidAmount)}
@@ -416,7 +418,7 @@ function AdminAffiliates() {
                         </div>
                         <div className="space-y-1">
                           <div className="text-sm text-muted-foreground">
-                            Total Earnings
+                            {t("admin_pages.affiliates_admin.totalEarnings")}
                           </div>
                           <div className="text-xl font-bold text-theme-600 dark:text-theme-400">
                             {formatCurrency(affiliate.totalEarnings)}
@@ -424,7 +426,7 @@ function AdminAffiliates() {
                         </div>
                         <div className="space-y-1">
                           <div className="text-sm text-muted-foreground">
-                            Sales Count
+                            {t("admin_pages.affiliates_admin.salesCount")}
                           </div>
                           <div className="text-xl font-bold text-blue-600 dark:text-blue-400">
                             {affiliate.totalReferrals}
@@ -435,12 +437,12 @@ function AdminAffiliates() {
                       <div className="flex items-center gap-6 mt-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          <span>Joined {formatDate(affiliate.createdAt)}</span>
+                          <span>{t("admin_pages.affiliates_admin.joined", { date: formatDate(affiliate.createdAt) })}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CreditCard className="h-4 w-4" />
                           <span>
-                            Last sale {formatDate(affiliate.lastReferralDate)}
+                            {t("admin_pages.affiliates_admin.lastSale", { date: formatDate(affiliate.lastReferralDate) })}
                           </span>
                         </div>
                       </div>
@@ -463,13 +465,13 @@ function AdminAffiliates() {
                           }
                         >
                           <ExternalLink className="mr-2 h-4 w-4" />
-                          View Payment Link
+                          {t("admin_pages.affiliates_admin.viewPaymentLink")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => copyToClipboard(affiliate.paymentLink)}
                         >
                           <Copy className="mr-2 h-4 w-4" />
-                          Copy Payment Link
+                          {t("admin_pages.affiliates_admin.copyPaymentLink")}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -480,10 +482,10 @@ function AdminAffiliates() {
                           }
                         >
                           <DollarSign className="mr-2 h-4 w-4" />
-                          Record Payout
+                          {t("admin_pages.affiliates_admin.recordPayout")}
                           {affiliate.unpaidBalance < 5000 && (
                             <span className="ml-auto text-xs text-muted-foreground">
-                              Min $50
+                              {t("admin_pages.affiliates_admin.min50")}
                             </span>
                           )}
                         </DropdownMenuItem>
@@ -495,12 +497,12 @@ function AdminAffiliates() {
                           {affiliate.isActive ? (
                             <>
                               <XCircle className="mr-2 h-4 w-4" />
-                              Deactivate
+                              {t("admin_pages.affiliates_admin.deactivate")}
                             </>
                           ) : (
                             <>
                               <CheckCircle className="mr-2 h-4 w-4" />
-                              Activate
+                              {t("admin_pages.affiliates_admin.activate")}
                             </>
                           )}
                         </DropdownMenuItem>
@@ -521,13 +523,10 @@ function AdminAffiliates() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
-              Record Payout
+              {t("admin_pages.affiliates_admin.recordPayoutTitle")}
             </DialogTitle>
             <DialogDescription className="text-base">
-              Record a payment to{" "}
-              <span className="font-medium text-foreground">
-                {payoutAffiliateName}
-              </span>
+              {t("admin_pages.affiliates_admin.recordPayoutDesc", { name: payoutAffiliateName })}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -537,7 +536,7 @@ function AdminAffiliates() {
             >
               <div className="p-4 rounded-xl bg-gradient-to-br from-theme-50 to-theme-100/50 dark:from-theme-950 dark:to-theme-900/50 border border-theme-200/60 dark:border-theme-700/60">
                 <div className="text-sm font-medium text-muted-foreground mb-1">
-                  Current Unpaid Balance
+                  {t("admin_pages.affiliates_admin.currentBalance")}
                 </div>
                 <div className="text-3xl font-bold text-theme-600 dark:text-theme-400">
                   {formatCurrency(payoutUnpaidBalance)}
@@ -549,19 +548,19 @@ function AdminAffiliates() {
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount (USD)</FormLabel>
+                    <FormLabel>{t("admin_pages.affiliates_admin.amount")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step="0.01"
-                        placeholder="50.00"
+                        placeholder={t("admin_pages.affiliates_admin.amountPlaceholder")}
                         {...field}
                         onChange={(e) =>
                           field.onChange(parseFloat(e.target.value))
                         }
                       />
                     </FormControl>
-                    <FormDescription>Minimum payout is $50.00</FormDescription>
+                    <FormDescription>{t("admin_pages.affiliates_admin.minPayoutMsg")}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -572,9 +571,9 @@ function AdminAffiliates() {
                 name="paymentMethod"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Payment Method</FormLabel>
+                    <FormLabel>{t("admin_pages.affiliates_admin.paymentMethod")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="PayPal, Venmo, etc." {...field} />
+                      <Input placeholder={t("admin_pages.affiliates_admin.paymentMethodPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -586,9 +585,9 @@ function AdminAffiliates() {
                 name="transactionId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Transaction ID (Optional)</FormLabel>
+                    <FormLabel>{t("admin_pages.affiliates_admin.transactionId")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Transaction reference" {...field} />
+                      <Input placeholder={t("admin_pages.affiliates_admin.transactionIdPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -600,9 +599,9 @@ function AdminAffiliates() {
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes (Optional)</FormLabel>
+                    <FormLabel>{t("admin_pages.affiliates_admin.notes")}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Any additional notes" {...field} />
+                      <Textarea placeholder={t("admin_pages.affiliates_admin.notesPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -616,7 +615,7 @@ function AdminAffiliates() {
                   onClick={() => setPayoutAffiliateId(null)}
                   className="flex-1"
                 >
-                  Cancel
+                  {t("admin_pages.affiliates_admin.cancel")}
                 </Button>
                 <Button
                   type="submit"
@@ -626,10 +625,10 @@ function AdminAffiliates() {
                   {recordPayoutMutation.isPending ? (
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white/70"></div>
-                      <span>Recording...</span>
+                      <span>{t("admin_pages.affiliates_admin.recording")}</span>
                     </div>
                   ) : (
-                    "Record Payout"
+                    t("admin_pages.affiliates_admin.recordBtn")
                   )}
                 </Button>
               </DialogFooter>

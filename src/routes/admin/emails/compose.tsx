@@ -13,30 +13,7 @@ import {
 import { EmailComposer } from "./-components/email-composer";
 import { TestEmailDialog } from "./-components/test-email-dialog";
 import { toast } from "sonner";
-
-const emailFormSchema = z.object({
-  subject: z
-    .string()
-    .min(1, "Subject is required")
-    .max(200, "Subject too long"),
-  content: z.string().min(1, "Content is required"),
-  recipientType: z.enum([
-    "all",
-    "premium",
-    "free",
-    "newsletter",
-    "waitlist",
-    "everyone",
-  ]),
-});
-
-type EmailFormData = z.infer<typeof emailFormSchema>;
-
-const testEmailSchema = z.object({
-  email: z.email("Please enter a valid email address"),
-});
-
-type TestEmailData = z.infer<typeof testEmailSchema>;
+import { useTranslation } from "react-i18next";
 
 const usersForEmailingQueryOptions = queryOptions({
   queryKey: ["admin", "usersForEmailing"],
@@ -51,6 +28,7 @@ export const Route = createFileRoute("/admin/emails/compose")({
 });
 
 function ComposeEmailPage() {
+  const { t } = useTranslation();
   const [testEmailOpen, setTestEmailOpen] = useState(false);
   const [showMarkdownGuide, setShowMarkdownGuide] = useState(false);
   const queryClient = useQueryClient();
@@ -58,6 +36,28 @@ function ComposeEmailPage() {
   const { data: usersForEmailing, isLoading: usersLoading } = useQuery(
     usersForEmailingQueryOptions
   );
+
+  const emailFormSchema = z.object({
+    subject: z
+      .string()
+      .min(1, t("admin_pages.emailAdmin.validation.subjectRequired"))
+      .max(200, t("admin_pages.emailAdmin.validation.subjectTooLong")),
+    content: z.string().min(1, t("admin_pages.emailAdmin.validation.contentRequired")),
+    recipientType: z.enum([
+      "all",
+      "premium",
+      "free",
+      "newsletter",
+      "waitlist",
+      "everyone",
+    ]),
+  });
+
+  type EmailFormData = z.infer<typeof emailFormSchema>;
+
+  const testEmailSchema = z.object({
+    email: z.string().email(t("admin_pages.emailAdmin.validation.validEmail")),
+  });
 
   const form = useForm<EmailFormData>({
     resolver: zodResolver(emailFormSchema),
@@ -73,12 +73,12 @@ function ComposeEmailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "emailBatches"] });
       form.reset();
-      toast.success("Email batch created!", {
-        description: "Your email is being sent to recipients.",
+      toast.success(t("admin_pages.emailAdmin.toast.emailBatchCreated"), {
+        description: t("admin_pages.emailAdmin.toast.emailSending"),
       });
     },
     onError: (error) => {
-      toast.error("Failed to create email batch", {
+      toast.error(t("admin_pages.emailAdmin.toast.failedToCreateBatch"), {
         description: error.message,
       });
     },
@@ -89,12 +89,12 @@ function ComposeEmailPage() {
       sendTestEmailFn({ data }),
     onSuccess: () => {
       setTestEmailOpen(false);
-      toast.success("Test email sent!", {
-        description: "Check your inbox for the test email.",
+      toast.success(t("admin_pages.emailAdmin.toast.testEmailSent"), {
+        description: t("admin_pages.emailAdmin.toast.checkInbox"),
       });
     },
     onError: (error) => {
-      toast.error("Failed to send test email", {
+      toast.error(t("admin_pages.emailAdmin.toast.failedToSendTest"), {
         description: error.message,
       });
     },
@@ -125,14 +125,13 @@ function ComposeEmailPage() {
     createEmailBatch.mutate(data);
   };
 
-  const onTestEmail = (data: TestEmailData) => {
+  const onTestEmail = (data: { email: string }) => {
     const subject = form.getValues("subject");
     const content = form.getValues("content");
 
     if (!subject || !content) {
-      toast.error("Missing content", {
-        description:
-          "Please enter both subject and content before sending test email.",
+      toast.error(t("admin_pages.emailAdmin.toast.missingContent"), {
+        description: t("admin_pages.emailAdmin.toast.missingContentDescription"),
       });
       return;
     }

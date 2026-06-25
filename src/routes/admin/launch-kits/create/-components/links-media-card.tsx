@@ -1,4 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import {
@@ -17,10 +18,11 @@ interface LinksMediaCardProps {
 }
 
 export function LinksMediaCard({ form, isLoading }: LinksMediaCardProps) {
+  const { t } = useTranslation();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Links & Media</CardTitle>
+        <CardTitle>{t("admin_pages.launchKitsAdmin.linksMedia")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FormField
@@ -28,10 +30,10 @@ export function LinksMediaCard({ form, isLoading }: LinksMediaCardProps) {
           name="repositoryUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Repository URL</FormLabel>
+              <FormLabel>{t("admin_pages.launchKitsAdmin.repoUrl")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://github.com/username/repo"
+                  placeholder={t("admin_pages.launchKitsAdmin.repoUrlPlaceholder")}
                   type="url"
                   disabled={isLoading}
                   {...field}
@@ -47,10 +49,10 @@ export function LinksMediaCard({ form, isLoading }: LinksMediaCardProps) {
           name="demoUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Demo URL (Optional)</FormLabel>
+              <FormLabel>{t("admin_pages.launchKitsAdmin.demoUrl")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://demo.example.com"
+                  placeholder={t("admin_pages.launchKitsAdmin.demoUrlPlaceholder")}
                   type="url"
                   disabled={isLoading}
                   {...field}
@@ -66,10 +68,10 @@ export function LinksMediaCard({ form, isLoading }: LinksMediaCardProps) {
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL (Optional)</FormLabel>
+              <FormLabel>{t("admin_pages.launchKitsAdmin.imageUrl")}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://example.com/screenshot.png"
+                  placeholder={t("admin_pages.launchKitsAdmin.imageUrlPlaceholder")}
                   type="url"
                   disabled={isLoading}
                   {...field}
@@ -84,11 +86,11 @@ export function LinksMediaCard({ form, isLoading }: LinksMediaCardProps) {
           <div className="flex items-start gap-2">
             <Info className="h-4 w-4 text-muted-foreground mt-0.5" />
             <div className="text-sm text-muted-foreground">
-              <p className="font-medium">Image Guidelines:</p>
+              <p className="font-medium">{t("admin_pages.launchKitsAdmin.imageGuidelines")}:</p>
               <ul className="mt-1 list-disc list-inside space-y-1">
-                <li>Recommended size: 800x600px</li>
-                <li>Format: PNG, JPG, or WebP</li>
-                <li>Should showcase the project</li>
+                <li>{t("admin_pages.launchKitsAdmin.imageSizeRec")}</li>
+                <li>{t("admin_pages.launchKitsAdmin.imageFormat")}</li>
+                <li>{t("admin_pages.launchKitsAdmin.imageShowcase")}</li>
               </ul>
             </div>
           </div>

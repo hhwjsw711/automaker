@@ -11,9 +11,7 @@ function RouteComponent() {
   return (
     <div>
       <h1>{t("about.heading")}</h1>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-      </p>
+      <p>{t("about.description")}</p>
     </div>
   );
 }

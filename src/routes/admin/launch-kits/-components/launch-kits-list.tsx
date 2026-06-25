@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { AppCard } from "~/components/app-card";
 import { LaunchKitCard } from "./launch-kit-card";
@@ -42,22 +43,23 @@ export function LaunchKitsList({
   isLoading,
   onDeleteKit,
 }: LaunchKitsListProps) {
+  const { t } = useTranslation();
   if (isLoading) {
-    return <div className="text-center py-8">Loading launch kits...</div>;
+    return <div className="text-center py-8">{t("admin_pages.launchKitsAdmin.loadingLaunchKits")}</div>;
   }
 
   if (launchKits?.length === 0) {
     return (
       <AppCard
-        title="No Launch Kits Found"
-        description="Get started by creating your first launch kit."
+        title={t("admin_pages.launchKitsAdmin.noKitsFound")}
+        description={t("admin_pages.launchKitsAdmin.noKitsDesc")}
         icon={GitFork}
       >
         <div className="text-center py-4">
           <Button asChild>
             <Link to="/admin/launch-kits/create">
               <Plus className="mr-2 h-4 w-4" />
-              Create Launch Kit
+              {t("admin_pages.launchKitsAdmin.createKit")}
             </Link>
           </Button>
         </div>

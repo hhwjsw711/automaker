@@ -44,6 +44,7 @@ import { Switch } from "~/components/ui/switch";
 import { Label } from "~/components/ui/label";
 import { PageHeader } from "./-components/page-header";
 import { Page } from "./-components/page";
+import { useTranslation } from "react-i18next";
 
 // Skeleton component for count cards
 function CountSkeleton() {
@@ -64,6 +65,7 @@ export const Route = createFileRoute("/admin/comments")({
 });
 
 function AdminComments() {
+  const { t } = useTranslation();
   const [filterAdminReplied, setFilterAdminReplied] = useState(true);
   const { data: comments, isLoading } = useQuery(
     allCommentsQuery(filterAdminReplied)
@@ -82,13 +84,13 @@ function AdminComments() {
       // Invalidate and refetch to ensure the UI updates
       await queryClient.refetchQueries({ queryKey: ["admin", "comments"] });
       setDeleteCommentId(null);
-      toast.success("Comment deleted", {
-        description: "The comment has been successfully deleted.",
+      toast.success(t("admin_pages.comments.commentDeleted"), {
+        description: t("admin_pages.comments.commentDeletedDesc"),
       });
     },
     onError: () => {
-      toast.error("Error", {
-        description: "Failed to delete the comment. Please try again.",
+      toast.error(t("admin_pages.comments.error"), {
+        description: t("admin_pages.comments.deleteErrorDesc"),
       });
     },
   });
@@ -110,13 +112,13 @@ function AdminComments() {
       queryClient.invalidateQueries({ queryKey: ["admin", "comments"] });
       setReplyingToCommentId(null);
       setReplyContent("");
-      toast.success("Reply posted", {
-        description: "Your reply has been posted successfully.",
+      toast.success(t("admin_pages.comments.replyPosted"), {
+        description: t("admin_pages.comments.replyPostedDesc"),
       });
     },
     onError: () => {
-      toast.error("Error", {
-        description: "Failed to post reply. Please try again.",
+      toast.error(t("admin_pages.comments.error"), {
+        description: t("admin_pages.comments.replyErrorDesc"),
       });
     },
   });
@@ -132,24 +134,24 @@ function AdminComments() {
     const trimmedContent = replyContent.trim();
 
     if (!trimmedContent) {
-      toast.error("Validation Error", {
-        description: "Please enter a reply message before posting.",
+      toast.error(t("admin_pages.comments.validationError"), {
+        description: t("admin_pages.comments.replyEmptyDesc"),
       });
       return;
     }
 
     // Check if reply content is too short
     if (trimmedContent.length < 3) {
-      toast.error("Validation Error", {
-        description: "Reply must be at least 3 characters long.",
+      toast.error(t("admin_pages.comments.validationError"), {
+        description: t("admin_pages.comments.replyTooShortDesc"),
       });
       return;
     }
 
     // Check if reply content is too long
     if (trimmedContent.length > 5000) {
-      toast.error("Validation Error", {
-        description: "Reply must be less than 5000 characters.",
+      toast.error(t("admin_pages.comments.validationError"), {
+        description: t("admin_pages.comments.replyTooLongDesc"),
       });
       return;
     }
@@ -169,14 +171,14 @@ function AdminComments() {
   return (
     <Page>
       <PageHeader
-        title="Comment Management"
-        highlightedWord="Management"
-        description="Manage and moderate all user comments across the platform"
+        title={t("admin_pages.comments.pageTitle")}
+        highlightedWord={t("admin_pages.comments.highlightedWord")}
+        description={t("admin_pages.comments.pageDescription")}
         actions={
           <div className="flex items-center gap-4 bg-card/60 dark:bg-card/40 border border-border/50 rounded-xl px-4 py-3 backdrop-blur-sm">
             <Filter className="h-4 w-4 text-theme-500 dark:text-theme-400" />
             <Label htmlFor="filter-toggle" className="text-sm font-medium">
-              Hide Addressed
+              {t("admin_pages.comments.hideAddressed")}
             </Label>
             <Switch
               id="filter-toggle"
@@ -198,7 +200,7 @@ function AdminComments() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Total Comments
+                {t("admin_pages.comments.totalComments")}
               </div>
               <div className="w-10 h-10 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30">
                 <MessageSquare className="h-5 w-5 text-theme-500 dark:text-theme-400" />
@@ -207,7 +209,7 @@ function AdminComments() {
             <div className="text-3xl font-bold text-foreground mb-2 group-hover:text-theme-600 dark:group-hover:text-theme-400">
               {isLoading ? <CountSkeleton /> : totalComments}
             </div>
-            <p className="text-sm text-muted-foreground">All user comments</p>
+            <p className="text-sm text-muted-foreground">{t("admin_pages.comments.allUserComments")}</p>
           </div>
         </div>
 
@@ -218,7 +220,7 @@ function AdminComments() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Pending
+                {t("admin_pages.comments.pending")}
               </div>
               <div className="w-10 h-10 rounded-full bg-orange-500/10 dark:bg-orange-400/20 flex items-center justify-center group-hover:bg-orange-500/20 dark:group-hover:bg-orange-400/30">
                 <Calendar className="h-5 w-5 text-orange-500 dark:text-orange-400" />
@@ -227,7 +229,7 @@ function AdminComments() {
             <div className="text-3xl font-bold text-foreground mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400">
               {isLoading ? <CountSkeleton /> : pendingComments}
             </div>
-            <p className="text-sm text-muted-foreground">Awaiting response</p>
+            <p className="text-sm text-muted-foreground">{t("admin_pages.comments.awaitingResponse")}</p>
           </div>
         </div>
 
@@ -238,7 +240,7 @@ function AdminComments() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Addressed
+                {t("admin_pages.comments.addressed")}
               </div>
               <div className="w-10 h-10 rounded-full bg-green-500/10 dark:bg-green-400/20 flex items-center justify-center group-hover:bg-green-500/20 dark:group-hover:bg-green-400/30">
                 <CheckCircle2 className="h-5 w-5 text-green-500 dark:text-green-400" />
@@ -247,7 +249,7 @@ function AdminComments() {
             <div className="text-3xl font-bold text-foreground mb-2 group-hover:text-green-600 dark:group-hover:text-green-400">
               {isLoading ? <CountSkeleton /> : addressedComments}
             </div>
-            <p className="text-sm text-muted-foreground">Admin replied</p>
+            <p className="text-sm text-muted-foreground">{t("admin_pages.comments.adminRepliedDesc")}</p>
           </div>
         </div>
       </div>
@@ -257,9 +259,9 @@ function AdminComments() {
         className="module-card"
       >
         <div className="p-6 border-b border-border/50">
-          <h2 className="text-2xl font-semibold mb-2">All Comments</h2>
+          <h2 className="text-2xl font-semibold mb-2">{t("admin_pages.comments.allComments")}</h2>
           <p className="text-muted-foreground">
-            View and respond to user comments
+            {t("admin_pages.comments.viewRespondComments")}
           </p>
         </div>
         <div className="p-6">
@@ -280,11 +282,11 @@ function AdminComments() {
           ) : comments?.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <MessageSquare className="h-16 w-16 mx-auto mb-6 opacity-30" />
-              <p className="text-lg">No comments to display</p>
+              <p className="text-lg">{t("admin_pages.comments.noComments")}</p>
               <p className="text-sm mt-2">
                 {filterAdminReplied
-                  ? "All comments have been addressed"
-                  : "No comments yet"}
+                  ? t("admin_pages.comments.allAddressed")
+                  : t("admin_pages.comments.noCommentsYet")}
               </p>
             </div>
           ) : (
@@ -324,34 +326,33 @@ function AdminComments() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-semibold flex items-center gap-2">
               <Trash2 className="h-5 w-5 text-destructive" />
-              Delete Comment
+              {t("admin_pages.comments.deleteComment")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-base">
-              Are you sure you want to delete this comment? This action cannot
-              be undone.
+              {t("admin_pages.comments.deleteConfirmDesc")}
               {deleteCommentId &&
               comments?.find((c) => c.id === deleteCommentId)?.children
                 ?.length ? (
                 <div className="mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
                   <div className="flex items-center gap-2 text-destructive font-medium text-sm">
                     <AlertCircle className="h-4 w-4" />
-                    Warning
+                    {t("admin_pages.comments.warning")}
                   </div>
                   <p className="text-sm text-destructive/80 mt-1">
-                    This comment has replies that will also be deleted.
+                    {t("admin_pages.comments.repliesWillBeDeleted")}
                   </p>
                 </div>
               ) : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3">
-            <AlertDialogCancel className="flex-1">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="flex-1">{t("admin_pages.comments.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 flex-1"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Delete Comment
+              {t("admin_pages.comments.deleteComment")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -385,6 +386,7 @@ function CommentItem({
   isPendingReply,
   level = 0,
 }: CommentItemProps) {
+  const { t } = useTranslation();
   const hasAdminReply = (comment as any).hasAdminReply;
 
   return (
@@ -403,7 +405,7 @@ function CommentItem({
                     comment.profile.image ??
                     `https://api.dicebear.com/9.x/initials/svg?seed=${comment.profile.publicName || "user"}&backgroundColor=6366f1&textColor=ffffff`
                   }
-                  alt={comment.profile.publicName || "User"}
+                  alt={comment.profile.publicName || t("admin_pages.comments.userAlt")}
                 />
                 {hasAdminReply && (
                   <div className="absolute -top-1 -right-1 size-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
@@ -414,22 +416,22 @@ function CommentItem({
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="font-semibold text-foreground">
-                    {comment.profile.publicName || comment.profile.displayName || "Anonymous"}
+                    {comment.profile.publicName || comment.profile.displayName || t("admin_pages.comments.anonymous")}
                     {comment.profile.useDisplayName !== false && comment.profile.realName && (
                       <span className="text-muted-foreground font-normal ml-2 text-sm">
-                        (real: {comment.profile.realName})
+                        {t("admin_pages.comments.realName", { name: comment.profile.realName })}
                       </span>
                     )}
                     {comment.profile.useDisplayName === false && comment.profile.displayName && (
                       <span className="text-muted-foreground font-normal ml-2 text-sm">
-                        (alias: {comment.profile.displayName})
+                        {t("admin_pages.comments.aliasName", { name: comment.profile.displayName })}
                       </span>
                     )}
                   </span>
                   {hasAdminReply && (
                     <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
                       <CheckCircle2 className="h-3 w-3" />
-                      Admin Replied
+                      {t("admin_pages.comments.adminReplied")}
                     </span>
                   )}
                   <span className="text-sm text-muted-foreground">
@@ -468,7 +470,7 @@ function CommentItem({
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Comment
+                  {t("admin_pages.comments.deleteComment")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -479,10 +481,10 @@ function CommentItem({
             <div className="space-y-4 p-4 rounded-xl bg-gradient-to-br from-theme-50/30 to-theme-100/20 dark:from-theme-950/20 dark:to-theme-900/10 border border-theme-200/30 dark:border-theme-700/30">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <Reply className="h-4 w-4 text-theme-500 dark:text-theme-400" />
-                Admin Reply
+                {t("admin_pages.comments.adminReply")}
               </div>
               <Textarea
-                placeholder="Type your reply to this comment..."
+                placeholder={t("admin_pages.comments.replyPlaceholder")}
                 value={replyingToThis ? replyContent : ""}
                 onChange={(e) => setReplyContent(e.target.value)}
                 className="min-h-[100px] resize-none bg-background/60 dark:bg-background/40"
@@ -509,7 +511,7 @@ function CommentItem({
                       onClick={onCancelReply}
                       className="border-border/50"
                     >
-                      Cancel
+                      {t("admin_pages.comments.cancel")}
                     </Button>
                   )}
                   <Button
@@ -521,12 +523,12 @@ function CommentItem({
                     {isPendingReply ? (
                       <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white/70"></div>
-                        <span>Posting...</span>
+                        <span>{t("admin_pages.comments.posting")}</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
                         <Send className="h-3.5 w-3.5" />
-                        <span>Post Reply</span>
+                        <span>{t("admin_pages.comments.postReply")}</span>
                       </div>
                     )}
                   </Button>
@@ -541,7 +543,7 @@ function CommentItem({
               <div className="text-sm text-muted-foreground mb-4 flex items-center gap-2 font-medium">
                 <MessageSquare className="h-4 w-4 text-theme-500 dark:text-theme-400" />
                 {comment.children.length}{" "}
-                {comment.children.length === 1 ? "Reply" : "Replies"}
+                {comment.children.length === 1 ? t("admin_pages.comments.reply") : t("admin_pages.comments.replies")}
               </div>
               <div className="space-y-4">
                 {comment.children.map((child) => (
@@ -557,21 +559,21 @@ function CommentItem({
                             child.profile.image ??
                             `https://api.dicebear.com/9.x/initials/svg?seed=${child.profile.publicName || "user"}&backgroundColor=6366f1&textColor=ffffff`
                           }
-                          alt={child.profile.publicName || "User"}
+                          alt={child.profile.publicName || t("admin_pages.comments.userAlt")}
                         />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="text-sm font-semibold text-foreground">
-                            {child.profile.publicName || child.profile.displayName || "Anonymous"}
+                            {child.profile.publicName || child.profile.displayName || t("admin_pages.comments.anonymous")}
                             {child.profile.useDisplayName !== false && child.profile.realName && (
                               <span className="text-muted-foreground font-normal ml-1 text-xs">
-                                (real: {child.profile.realName})
+                                {t("admin_pages.comments.realName", { name: child.profile.realName })}
                               </span>
                             )}
                             {child.profile.useDisplayName === false && child.profile.displayName && (
                               <span className="text-muted-foreground font-normal ml-1 text-xs">
-                                (alias: {child.profile.displayName})
+                                {t("admin_pages.comments.aliasName", { name: child.profile.displayName })}
                               </span>
                             )}
                           </span>

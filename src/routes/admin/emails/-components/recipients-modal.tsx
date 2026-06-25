@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { queryOptions } from "@tanstack/react-query";
 import {
@@ -23,6 +24,7 @@ interface RecipientsModalProps {
 }
 
 export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isLoading } = useQuery({
@@ -48,7 +50,7 @@ export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold flex items-center gap-2">
             <Users className="h-5 w-5 text-theme-500" />
-            Eligible Recipients
+            {t("admin_pages.emailAdmin.eligibleRecipients")}
           </DialogTitle>
         </DialogHeader>
 
@@ -59,11 +61,11 @@ export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
               <strong className="text-foreground">
                 {data?.recipients?.length ?? 0}
               </strong>{" "}
-              total
+              {t("admin_pages.emailAdmin.total")}
             </span>
             <span className="flex items-center gap-1">
               <Crown className="h-3.5 w-3.5 text-amber-500" />
-              <strong className="text-foreground">{premiumCount}</strong> premium
+              <strong className="text-foreground">{premiumCount}</strong> {t("admin_pages.emailAdmin.premium")}
             </span>
           </div>
 
@@ -71,7 +73,7 @@ export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by email..."
+              placeholder={t("admin_pages.emailAdmin.searchByEmail")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -81,8 +83,10 @@ export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
           {/* Results count when filtering */}
           {searchQuery && (
             <p className="text-sm text-muted-foreground">
-              Showing {filteredRecipients.length} of {data?.recipients?.length ?? 0}{" "}
-              recipients
+              {t("admin_pages.emailAdmin.showingFilteredRecipients", {
+                count: filteredRecipients.length,
+                total: data?.recipients?.length ?? 0,
+              })}
             </p>
           )}
 
@@ -108,7 +112,7 @@ export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
                         className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs ml-2 shrink-0"
                       >
                         <Crown className="h-3 w-3 mr-1" />
-                        Premium
+                        {t("admin_pages.emailAdmin.premium")}
                       </Badge>
                     )}
                   </li>
@@ -116,7 +120,7 @@ export function RecipientsModal({ open, onOpenChange }: RecipientsModalProps) {
               </ul>
             ) : (
               <div className="flex items-center justify-center py-12 text-muted-foreground">
-                {searchQuery ? "No recipients match your search" : "No recipients found"}
+                {searchQuery ? t("admin_pages.emailAdmin.noRecipientsMatchSearch") : t("admin_pages.emailAdmin.noRecipientsFound")}
               </div>
             )}
           </div>

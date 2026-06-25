@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,6 +64,8 @@ export function EmailComposer({
   showMarkdownGuide,
   setShowMarkdownGuide,
 }: EmailComposerProps) {
+  const { t } = useTranslation();
+
   // Configure marked for preview
   marked.setOptions({
     breaks: true,
@@ -88,13 +91,13 @@ export function EmailComposer({
     return (
       <div className="border rounded-lg p-6 bg-white dark:bg-gray-900">
         <div className="border-b pb-4 mb-4">
-          <div className="text-sm text-muted-foreground mb-2">Subject:</div>
-          <div className="font-semibold">{subject || "No subject"}</div>
+          <div className="text-sm text-muted-foreground mb-2">{t("admin_pages.emailAdmin.previewSubject", { subject: subject || t("admin_pages.emailAdmin.noSubject") })}</div>
+          <div className="font-semibold">{subject || t("admin_pages.emailAdmin.noSubject")}</div>
         </div>
         <div
           className="prose prose-sm dark:prose-invert max-w-none"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(htmlContent || "<p>No content</p>", {
+            __html: sanitizeHtml(htmlContent || `<p>${t("admin_pages.emailAdmin.noContent")}</p>`, {
               allowedTags: [
                 "h1",
                 "h2",
@@ -153,10 +156,10 @@ export function EmailComposer({
         <div className="p-6 border-b border-border/50">
           <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
             <Send className="h-6 w-6 text-theme-500" />
-            Compose Email
+            {t("admin_pages.emailAdmin.composeEmail")}
           </h2>
           <p className="text-muted-foreground">
-            Create and send emails to your course participants
+            {t("admin_pages.emailAdmin.composeEmailDescription")}
           </p>
         </div>
         <div className="p-6">
@@ -167,9 +170,9 @@ export function EmailComposer({
                 name="subject"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Subject</FormLabel>
+                    <FormLabel>{t("admin_pages.emailAdmin.subject")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter email subject..." {...field} />
+                      <Input placeholder={t("admin_pages.emailAdmin.subjectPlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -181,36 +184,36 @@ export function EmailComposer({
                 name="recipientType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Recipients</FormLabel>
+                    <FormLabel>{t("admin_pages.emailAdmin.recipients")}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select recipient type" />
+                          <SelectValue placeholder={t("admin_pages.emailAdmin.selectRecipientType")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="everyone">
-                          Everyone - Users + Waitlist (
+                          {t("admin_pages.emailAdmin.everyoneLabel")} (
                           {getRecipientCount("everyone")})
                         </SelectItem>
                         <SelectItem value="all">
-                          All Users ({getRecipientCount("all")})
+                          {t("admin_pages.emailAdmin.allUsers")} ({getRecipientCount("all")})
                         </SelectItem>
                         <SelectItem value="premium">
-                          Premium Users ({getRecipientCount("premium")})
+                          {t("admin_pages.emailAdmin.premiumUsers")} ({getRecipientCount("premium")})
                         </SelectItem>
                         <SelectItem value="free">
-                          Free Users ({getRecipientCount("free")})
+                          {t("admin_pages.emailAdmin.freeUsers")} ({getRecipientCount("free")})
                         </SelectItem>
                         <SelectItem value="newsletter">
-                          Newsletter Subscribers (
+                          {t("admin_pages.emailAdmin.newsletterSubscribers")} (
                           {getRecipientCount("newsletter")})
                         </SelectItem>
                         <SelectItem value="waitlist">
-                          Waitlist ({getRecipientCount("waitlist")})
+                          {t("admin_pages.emailAdmin.waitlist")} ({getRecipientCount("waitlist")})
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -225,14 +228,14 @@ export function EmailComposer({
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between mb-2">
-                      <FormLabel>Email Content</FormLabel>
+                      <FormLabel>{t("admin_pages.emailAdmin.emailContent")}</FormLabel>
                       <span className="text-xs text-muted-foreground">
-                        Supports Markdown formatting
+                        {t("admin_pages.emailAdmin.supportsMarkdown")}
                       </span>
                     </div>
                     <FormControl>
                       <Textarea
-                        placeholder="Enter your email content here. You can use **bold**, *italic*, [links](url), lists, headers (#, ##), and more..."
+                        placeholder={t("admin_pages.emailAdmin.contentPlaceholder")}
                         className="min-h-64 font-mono text-sm resize-none"
                         {...field}
                       />
@@ -246,13 +249,13 @@ export function EmailComposer({
                         className="text-xs flex items-center gap-1"
                       >
                         <Info className="h-3 w-3" />
-                        {showMarkdownGuide ? "Hide" : "Show"} Markdown Guide
+                        {showMarkdownGuide ? t("admin_pages.emailAdmin.hideMarkdownGuide") : t("admin_pages.emailAdmin.showMarkdownGuide")} {t("admin_pages.emailAdmin.markdownGuide")}
                       </Button>
                       {showMarkdownGuide && (
                         <div className="p-4 bg-muted/50 rounded-lg space-y-3 text-xs">
                           <div>
                             <p className="font-semibold mb-1">
-                              Text Formatting:
+                              {t("admin_pages.emailAdmin.textFormatting")}
                             </p>
                             <code className="block bg-background p-2 rounded">
                               **bold text** → <strong>bold text</strong>
@@ -266,7 +269,7 @@ export function EmailComposer({
                             </code>
                           </div>
                           <div>
-                            <p className="font-semibold mb-1">Headers:</p>
+                            <p className="font-semibold mb-1">{t("admin_pages.emailAdmin.headers")}</p>
                             <code className="block bg-background p-2 rounded">
                               # Heading 1<br />
                               ## Heading 2<br />
@@ -275,7 +278,7 @@ export function EmailComposer({
                           </div>
                           <div>
                             <p className="font-semibold mb-1">
-                              Links & Images:
+                              {t("admin_pages.emailAdmin.linksAndImages")}
                             </p>
                             <code className="block bg-background p-2 rounded">
                               [Link text](https://example.com)
@@ -284,7 +287,7 @@ export function EmailComposer({
                             </code>
                           </div>
                           <div>
-                            <p className="font-semibold mb-1">Lists:</p>
+                            <p className="font-semibold mb-1">{t("admin_pages.emailAdmin.lists")}</p>
                             <code className="block bg-background p-2 rounded">
                               - Bullet point
                               <br />
@@ -297,7 +300,7 @@ export function EmailComposer({
                             </code>
                           </div>
                           <div>
-                            <p className="font-semibold mb-1">Code:</p>
+                            <p className="font-semibold mb-1">{t("admin_pages.emailAdmin.code")}</p>
                             <code className="block bg-background p-2 rounded">
                               `inline code`
                               <br />
@@ -312,7 +315,7 @@ export function EmailComposer({
                             </code>
                           </div>
                           <div>
-                            <p className="font-semibold mb-1">Other:</p>
+                            <p className="font-semibold mb-1">{t("admin_pages.emailAdmin.other")}</p>
                             <code className="block bg-background p-2 rounded">
                               &gt; Blockquote
                               <br />
@@ -337,7 +340,7 @@ export function EmailComposer({
                   onClick={onTestEmail}
                 >
                   <TestTube className="h-4 w-4" />
-                  Send Test
+                  {t("admin_pages.emailAdmin.sendTest")}
                 </Button>
 
                 <Button
@@ -348,12 +351,12 @@ export function EmailComposer({
                   {createEmailBatchPending ? (
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white/70"></div>
-                      <span>Sending...</span>
+                      <span>{t("admin_pages.emailAdmin.sending")}</span>
                     </div>
                   ) : (
                     <>
                       <Send className="h-4 w-4" />
-                      Send Email
+                      {t("admin_pages.emailAdmin.sendEmail")}
                     </>
                   )}
                 </Button>
@@ -368,11 +371,11 @@ export function EmailComposer({
         <div className="p-6 border-b border-border/50">
           <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
             <Eye className="h-6 w-6 text-theme-500" />
-            Live Preview
+            {t("admin_pages.emailAdmin.livePreview")}
           </h2>
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
-              {getRecipientCount(form.watch("recipientType"))} recipients
+              {getRecipientCount(form.watch("recipientType"))} {t("admin_pages.emailAdmin.recipientsCount")}
             </Badge>
           </div>
         </div>

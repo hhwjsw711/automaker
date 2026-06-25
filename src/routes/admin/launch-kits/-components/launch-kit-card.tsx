@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { AppCard } from "~/components/app-card";
 import { ExternalLink, Trash2, GitFork, Eye, Edit } from "lucide-react";
@@ -33,6 +34,7 @@ interface LaunchKitCardProps {
 }
 
 export function LaunchKitCard({ kit, onDelete }: LaunchKitCardProps) {
+  const { t } = useTranslation();
   return (
     <AppCard
       title={kit.name}
@@ -85,7 +87,7 @@ export function LaunchKitCard({ kit, onDelete }: LaunchKitCardProps) {
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <GitFork className="h-4 w-4" />
-            {kit.cloneCount} clones
+            {kit.cloneCount} {t("admin_pages.launchKitsAdmin.clones")}
           </span>
           <span className="flex items-center gap-1">
             <Eye className="h-4 w-4" />

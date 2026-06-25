@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import {
   getAllLaunchKitsFn,
@@ -43,6 +44,7 @@ const tagsQuery = queryOptions({
 });
 
 function AdminLaunchKits() {
+  const { t } = useTranslation();
   const { data: launchKits, isLoading: kitsLoading } =
     useQuery(launchKitsQuery);
   const { data: stats, isLoading: statsLoading } = useQuery(statsQuery);
@@ -58,9 +60,9 @@ function AdminLaunchKits() {
   return (
     <Page>
       <PageHeader
-        title="Launch Kits Management"
-        highlightedWord="Management"
-        description="Manage launch kits and monitor analytics for starter repositories"
+        title={t("admin_pages.launchKitsAdmin.title")}
+        highlightedWord={t("admin_pages.launchKitsAdmin.highlighted")}
+        description={t("admin_pages.launchKitsAdmin.description")}
         actions={
           <div className="space-y-4">
             {/* Stats Cards */}
@@ -69,28 +71,28 @@ function AdminLaunchKits() {
                 icon={BarChart3}
                 iconColor="blue"
                 value={stats?.totalKits ?? 0}
-                label="Total Kits"
+                label={t("admin_pages.launchKitsAdmin.totalKits")}
                 loading={statsLoading}
               />
               <HeaderStatCard
                 icon={GitFork}
                 iconColor="green"
                 value={stats?.totalClones ?? 0}
-                label="Clones"
+                label={t("admin_pages.launchKitsAdmin.clones")}
                 loading={statsLoading}
               />
               <HeaderStatCard
                 icon={MessageSquare}
                 iconColor="orange"
                 value={stats?.totalComments ?? 0}
-                label="Comments"
+                label={t("admin_pages.launchKitsAdmin.comments")}
                 loading={statsLoading}
               />
               <HeaderStatCard
                 icon={Tag}
                 iconColor="purple"
                 value={tags?.length ?? 0}
-                label="Tags"
+                label={t("admin_pages.launchKitsAdmin.tags")}
                 loading={statsLoading}
               />
             </HeaderStats>
@@ -100,13 +102,13 @@ function AdminLaunchKits() {
               <Button asChild variant="outline">
                 <Link to="/admin/launch-kits/create">
                   <GitFork className="mr-2 h-4 w-4" />
-                  Create Launch Kit
+                  {t("admin_pages.launchKitsAdmin.createKit")}
                 </Link>
               </Button>
               <Button asChild>
                 <Link to="/admin/launch-kits/tags">
                   <Settings className="mr-2 h-4 w-4" />
-                  Manage Tags & Categories
+                  {t("admin_pages.launchKitsAdmin.manageTags")}
                 </Link>
               </Button>
             </div>

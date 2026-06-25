@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -23,25 +24,30 @@ function SegmentSkeleton() {
   );
 }
 
-function formatRelativeDate(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 14) return "1 week ago";
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? "s" : ""} ago`;
-}
-
 export function SegmentSelector({
   segments,
   isLoading,
   selectedIds,
   onSelectionChange,
 }: SegmentSelectorProps) {
+  const { t } = useTranslation();
+
+  const formatRelativeDate = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return t("admin_pages.emailAdmin.today");
+    if (diffDays === 1) return t("admin_pages.emailAdmin.yesterday");
+    if (diffDays < 7) return t("admin_pages.emailAdmin.daysAgo", { count: diffDays });
+    if (diffDays < 14) return t("admin_pages.emailAdmin.oneWeekAgo");
+    if (diffDays < 30) return t("admin_pages.emailAdmin.weeksAgo", { count: Math.floor(diffDays / 7) });
+    const months = Math.floor(diffDays / 30);
+    return months > 1
+      ? t("admin_pages.emailAdmin.monthsAgo_plural", { count: months })
+      : t("admin_pages.emailAdmin.monthsAgo", { count: months });
+  };
+
   // Segments are already sorted by updatedAt from the server
   const totalSegments = segments?.length ?? 0;
   const selectedCount = selectedIds.length;
@@ -69,10 +75,10 @@ export function SegmentSelector({
       <div className="p-6 border-b border-border/50">
         <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
           <Video className="h-6 w-6 text-theme-500" />
-          Select Segments
+          {t("admin_pages.emailAdmin.selectSegments")}
         </h2>
         <p className="text-muted-foreground">
-          Choose which segments to include in the notification email
+          {t("admin_pages.emailAdmin.selectSegmentsDescription")}
         </p>
       </div>
 
@@ -86,7 +92,7 @@ export function SegmentSelector({
               onClick={handleSelectAll}
               disabled={isLoading || totalSegments === 0}
             >
-              Select All
+              {t("admin_pages.emailAdmin.selectAll")}
             </Button>
             <Button
               variant="outline"
@@ -94,12 +100,12 @@ export function SegmentSelector({
               onClick={handleClearAll}
               disabled={isLoading || selectedCount === 0}
             >
-              Clear All
+              {t("admin_pages.emailAdmin.clearAll")}
             </Button>
           </div>
           <div className="text-sm text-muted-foreground">
             <span className="font-medium text-foreground">{selectedCount}</span>{" "}
-            of {totalSegments} selected
+            {t("admin_pages.emailAdmin.ofSelected", { total: totalSegments })}
           </div>
         </div>
       </div>
@@ -141,7 +147,7 @@ export function SegmentSelector({
                         className="bg-amber-500/10 text-amber-600 border-amber-500/30 text-xs"
                       >
                         <Crown className="h-3 w-3 mr-1" />
-                        Premium
+                        {t("admin_pages.emailAdmin.premium")}
                       </Badge>
                     )}
                     {segment.isComingSoon && (
@@ -150,7 +156,7 @@ export function SegmentSelector({
                         className="bg-blue-500/10 text-blue-600 border-blue-500/30 text-xs"
                       >
                         <Clock className="h-3 w-3 mr-1" />
-                        Coming Soon
+                        {t("admin_pages.emailAdmin.comingSoon")}
                       </Badge>
                     )}
                   </div>
@@ -173,9 +179,9 @@ export function SegmentSelector({
         ) : (
           <div className="text-center text-muted-foreground py-12">
             <Video className="h-16 w-16 mx-auto mb-6 opacity-30" />
-            <p className="text-lg">No recent segments found</p>
+            <p className="text-lg">{t("admin_pages.emailAdmin.noRecentSegments")}</p>
             <p className="text-sm">
-              Segments updated in the last 30 days will appear here
+              {t("admin_pages.emailAdmin.segmentsInLast30Days")}
             </p>
           </div>
         )}

@@ -10,6 +10,7 @@ import { useRagChat } from "~/hooks/use-rag-chat";
 import { ChatContainer } from "./vector-search/-components/chat-container";
 import { ChatInput } from "./vector-search/-components/chat-input";
 import { SourceVideosPanel } from "./vector-search/-components/source-videos-panel";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin/vector-search")({
   beforeLoad: () => assertIsAdminFn(),
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/admin/vector-search")({
 });
 
 function CourseAssistantPage() {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const { messages, isLoading, sendMessage, clearChat, currentSources } =
     useRagChat();
@@ -24,14 +26,14 @@ function CourseAssistantPage() {
   return (
     <Page>
       <PageHeader
-        title="Course Assistant"
-        highlightedWord="Assistant"
-        description="Ask questions about course content. The AI searches video transcripts to provide informed answers."
+        title={t("admin_pages.vectorSearch.title")}
+        highlightedWord={t("admin_pages.vectorSearch.highlightedWord")}
+        description={t("admin_pages.vectorSearch.description")}
         actions={
           messages.length > 0 ? (
             <Button variant="outline" onClick={clearChat}>
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear Chat
+              {t("admin_pages.vectorSearch.clearChat")}
             </Button>
           ) : null
         }

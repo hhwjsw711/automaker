@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useDebounce } from "~/hooks/use-debounce";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -62,10 +63,10 @@ interface SelectedUser {
 }
 
 const TARGET_MODE_LABELS: Record<TargetMode, { label: string; icon: typeof Users }> = {
-  [TARGET_MODES.ALL]: { label: "All Users", icon: Users },
-  [TARGET_MODES.PREMIUM]: { label: "Premium Only", icon: Crown },
-  [TARGET_MODES.NON_PREMIUM]: { label: "Non-Premium Only", icon: UserX },
-  [TARGET_MODES.CUSTOM]: { label: "Custom Users", icon: UserCheck },
+  [TARGET_MODES.ALL]: { label: "admin_pages.settingsAdmin.allUsers", icon: Users },
+  [TARGET_MODES.PREMIUM]: { label: "admin_pages.settingsAdmin.premiumOnly", icon: Crown },
+  [TARGET_MODES.NON_PREMIUM]: { label: "admin_pages.settingsAdmin.nonPremiumOnly", icon: UserX },
+  [TARGET_MODES.CUSTOM]: { label: "admin_pages.settingsAdmin.customUsers", icon: UserCheck },
 };
 
 export function TargetingDialog({
@@ -74,6 +75,7 @@ export function TargetingDialog({
   flagKey,
   flagName,
 }: TargetingDialogProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [targetMode, setTargetMode] = useState<TargetMode>(TARGET_MODES.ALL);
   const [selectedUsers, setSelectedUsers] = useState<SelectedUser[]>([]);
@@ -106,11 +108,11 @@ export function TargetingDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["featureFlagTargeting", flagKey] });
       queryClient.invalidateQueries({ queryKey: ["allFeatureFlags"] });
-      toast.success("Targeting settings updated");
+      toast.success(t("admin_pages.settingsAdmin.targetingUpdated"));
       onOpenChange(false);
     },
     onError: (error) => {
-      toast.error("Failed to update targeting settings");
+      toast.error(t("admin_pages.settingsAdmin.targetingUpdateFailed"));
       console.error("Failed to update targeting:", error);
     },
   });
@@ -165,7 +167,7 @@ export function TargetingDialog({
       .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
 
     if (emails.length === 0) {
-      toast.error("No valid emails found");
+      toast.error(t("admin_pages.settingsAdmin.noValidEmails"));
       return;
     }
 
@@ -188,17 +190,17 @@ export function TargetingDialog({
             image: u.image,
           })),
         ]);
-        toast.success(`Added ${newUsers.length} user(s)`);
+        toast.success(t("admin_pages.settingsAdmin.addedUsers", { count: newUsers.length }));
       }
 
       const notFound = emails.length - users.length;
       if (notFound > 0) {
-        toast.warning(`${notFound} email(s) not found`);
+        toast.warning(t("admin_pages.settingsAdmin.emailsNotFound", { count: notFound }));
       }
 
       setBulkInput("");
     } catch (error) {
-      toast.error("Failed to look up users");
+      toast.error(t("admin_pages.settingsAdmin.failedLookupUsers"));
     } finally {
       setIsProcessingBulk(false);
     }
@@ -221,14 +223,14 @@ export function TargetingDialog({
         <DialogContent className="max-w-3xl w-full max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
-              Configure Targeting: {flagName}
+              {t("admin_pages.settingsAdmin.configureTargeting", { flagName })}
             </DialogTitle>
             <DialogDescription className="text-base">
-              Choose who can access this feature when enabled.
+              {t("admin_pages.settingsAdmin.chooseAccess")}
             </DialogDescription>
             <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2 mt-2">
               <Info className="h-3.5 w-3.5 shrink-0" />
-              <span>Admins always have access to enabled features regardless of targeting.</span>
+              <span>{t("admin_pages.settingsAdmin.adminsAlwaysAccess")}</span>
             </div>
           </DialogHeader>
 
@@ -238,15 +240,15 @@ export function TargetingDialog({
             </div>
           ) : isError ? (
             <div className="flex flex-col items-center justify-center py-8 text-destructive">
-              <p className="text-sm mb-2">Failed to load targeting settings.</p>
+              <p className="text-sm mb-2">{t("admin_pages.settingsAdmin.failedLoadTargeting")}.</p>
               <Button variant="outline" size="sm" onClick={() => refetch()}>
-                Retry
+                {t("admin_pages.settingsAdmin.retry")}
               </Button>
             </div>
           ) : (
             <div className="space-y-6 py-4">
               <div className="flex items-center justify-between gap-4">
-                <Label className="shrink-0">Target Mode</Label>
+                <Label className="shrink-0">{t("admin_pages.settingsAdmin.targetMode")}</Label>
                 <Select
                   value={targetMode}
                   onValueChange={(v) => {
@@ -262,7 +264,7 @@ export function TargetingDialog({
                       <SelectItem key={mode} value={mode}>
                         <span className="flex items-center gap-2">
                           <Icon className="h-4 w-4" />
-                          {label}
+                          {t(label)}
                         </span>
                       </SelectItem>
                     ))}
@@ -274,13 +276,13 @@ export function TargetingDialog({
                 <div className="space-y-4">
                   {/* Spotlight-style user search with badges */}
                   <div className="space-y-2">
-                    <Label>Select Users</Label>
+                    <Label>{t("admin_pages.settingsAdmin.selectUsers")}</Label>
                     <Popover open={searchOpen} onOpenChange={setSearchOpen}>
                       <PopoverTrigger asChild>
                         <div
                           role="combobox"
                           tabIndex={0}
-                          aria-label="Search and select users"
+                           aria-label={t("admin_pages.settingsAdmin.searchAndSelectUsers")}
                           aria-expanded={searchOpen}
                           aria-haspopup="listbox"
                           className={cn(
@@ -304,7 +306,7 @@ export function TargetingDialog({
                               <span className="max-w-[120px] truncate">{user.email}</span>
                               <button
                                 type="button"
-                                aria-label={`Remove ${user.email}`}
+                                aria-label={t("admin_pages.settingsAdmin.removeUser", { email: user.email })}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleRemoveUser(user.id);
@@ -317,11 +319,11 @@ export function TargetingDialog({
                           ))}
                           {!searchOpen && selectedUsers.length > 3 && (
                             <Badge variant="outline" className="shrink-0">
-                              +{selectedUsers.length - 3} more
+                              +{selectedUsers.length - 3} {t("admin_pages.settingsAdmin.more")}
                             </Badge>
                           )}
                           <span className="text-muted-foreground truncate">
-                            {selectedUsers.length === 0 ? "Search users by email..." : "Add more..."}
+                            {selectedUsers.length === 0 ? t("admin_pages.settingsAdmin.searchUsersByEmail") : t("admin_pages.settingsAdmin.addMore")}
                           </span>
                         </div>
                       </PopoverTrigger>
@@ -331,22 +333,22 @@ export function TargetingDialog({
                       >
                         <Command shouldFilter={false}>
                           <CommandInput
-                            placeholder="Type to search..."
+                            placeholder={t("admin_pages.settingsAdmin.typeToSearch")}
                             value={searchQuery}
                             onValueChange={setSearchQuery}
                           />
                           <CommandList>
                             {debouncedSearchQuery.length < 2 ? (
                               <div className="py-6 text-center text-sm text-muted-foreground">
-                                Type 2+ characters to search
+                                {t("admin_pages.settingsAdmin.typeToSearchHint")}
                               </div>
                             ) : isSearching ? (
                               <div aria-live="polite" className="py-6 text-center text-sm text-muted-foreground">
                                 <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
-                                Searching...
+                                {t("admin_pages.settingsAdmin.searching")}
                               </div>
                             ) : searchResultsWithSelection.length === 0 ? (
-                              <CommandEmpty>No users found</CommandEmpty>
+                              <CommandEmpty>{t("admin_pages.settingsAdmin.noUsersFound")}</CommandEmpty>
                             ) : (
                               <CommandGroup>
                                 {searchResultsWithSelection.slice(0, 6).map((user) => {
@@ -407,7 +409,7 @@ export function TargetingDialog({
                                 })}
                                 {searchResultsWithSelection.length > 6 && (
                                   <div className="py-2 px-2 text-xs text-muted-foreground text-center border-t">
-                                    +{searchResultsWithSelection.length - 6} more results
+                                    +{searchResultsWithSelection.length - 6} {t("admin_pages.settingsAdmin.moreResults")}
                                   </div>
                                 )}
                               </CommandGroup>
@@ -417,8 +419,8 @@ export function TargetingDialog({
                       </PopoverContent>
                     </Popover>
                     {selectedUsers.length > 0 && (
-                      <p aria-live="polite" className="text-xs text-muted-foreground">
-                        {selectedUsers.length} user{selectedUsers.length !== 1 ? "s" : ""} selected
+                        <p aria-live="polite" className="text-xs text-muted-foreground">
+                        {t(selectedUsers.length === 1 ? "admin_pages.settingsAdmin.userSelectedSingular" : "admin_pages.settingsAdmin.usersSelectedPlural", { count: selectedUsers.length })}
                       </p>
                     )}
                   </div>
@@ -436,12 +438,12 @@ export function TargetingDialog({
                       ) : (
                         <ChevronDown className="h-4 w-4" />
                       )}
-                      Bulk add from email list
+                      {t("admin_pages.settingsAdmin.bulkAddFromEmailList")}
                     </button>
                     {showBulkAdd && (
                       <div className="space-y-2 pl-6">
                         <Textarea
-                          placeholder="Paste emails (comma, semicolon, or newline separated)"
+                          placeholder={t("admin_pages.settingsAdmin.pasteEmails")}
                           value={bulkInput}
                           onChange={(e) => setBulkInput(e.target.value)}
                           rows={3}
@@ -457,10 +459,10 @@ export function TargetingDialog({
                           {isProcessingBulk ? (
                             <>
                               <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                              Processing...
+                              {t("admin_pages.settingsAdmin.processing")}
                             </>
                           ) : (
-                            "Add Users"
+                            t("admin_pages.settingsAdmin.addUsers")
                           )}
                         </Button>
                       </div>
@@ -473,16 +475,16 @@ export function TargetingDialog({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("admin_pages.settingsAdmin.cancel")}
             </Button>
             <Button onClick={handleSave} disabled={updateMutation.isPending || isLoading || isError}>
               {updateMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Saving...
+                  {t("admin_pages.settingsAdmin.saving")}
                 </>
               ) : (
-                "Save Changes"
+                t("admin_pages.settingsAdmin.saveChanges")
               )}
             </Button>
           </DialogFooter>

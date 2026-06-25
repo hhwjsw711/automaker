@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { marked } from "marked";
@@ -38,6 +39,8 @@ export function WaitlistEmailEditor({
   showMarkdownGuide,
   setShowMarkdownGuide,
 }: WaitlistEmailEditorProps) {
+  const { t } = useTranslation();
+
   // Configure marked for preview
   marked.setOptions({
     breaks: true,
@@ -63,13 +66,13 @@ export function WaitlistEmailEditor({
     return (
       <div className="border rounded-lg p-6 bg-white dark:bg-gray-900">
         <div className="border-b pb-4 mb-4">
-          <div className="text-sm text-muted-foreground mb-2">Subject:</div>
-          <div className="font-semibold">{subject || "No subject"}</div>
+          <div className="text-sm text-muted-foreground mb-2">{t("admin_pages.emailAdmin.subject")}:</div>
+          <div className="font-semibold">{subject || t("admin_pages.emailAdmin.noSubject")}</div>
         </div>
         <div
           className="prose prose-sm dark:prose-invert max-w-none"
           dangerouslySetInnerHTML={{
-            __html: sanitizeHtml(htmlContent || "<p>No content</p>", {
+            __html: sanitizeHtml(htmlContent || `<p>${t("admin_pages.emailAdmin.noContent")}</p>`, {
               allowedTags: [
                 "h1",
                 "h2",
@@ -119,8 +122,7 @@ export function WaitlistEmailEditor({
         />
         <div className="mt-6 pt-4 border-t text-xs text-muted-foreground">
           <p>
-            This email will be automatically sent when someone joins the
-            waitlist.
+            {t("admin_pages.emailAdmin.autoSentOnWaitlistJoin")}
           </p>
         </div>
       </div>
@@ -133,10 +135,9 @@ export function WaitlistEmailEditor({
       <div className="lg:col-span-3">
         <Card>
           <CardHeader>
-            <CardTitle>Waitlist Welcome Email Template</CardTitle>
+            <CardTitle>{t("admin_pages.emailAdmin.waitlistWelcomeEmailTemplate")}</CardTitle>
             <CardDescription>
-              Customize the email that is automatically sent when someone joins
-              the waitlist
+              {t("admin_pages.emailAdmin.waitlistWelcomeEmailTemplateDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -150,10 +151,10 @@ export function WaitlistEmailEditor({
                   name="subject"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Subject</FormLabel>
+                      <FormLabel>{t("admin_pages.emailAdmin.emailSubject")}</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Welcome to the waitlist! 🎉"
+                          placeholder={t("admin_pages.emailAdmin.waitlistSubjectPlaceholder")}
                           {...field}
                         />
                       </FormControl>
@@ -168,7 +169,7 @@ export function WaitlistEmailEditor({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex items-center justify-between">
-                        <FormLabel>Email Content (Markdown)</FormLabel>
+                        <FormLabel>{t("admin_pages.emailAdmin.emailContentMarkdown")}</FormLabel>
                         <Button
                           type="button"
                           variant="ghost"
@@ -178,12 +179,12 @@ export function WaitlistEmailEditor({
                           }
                         >
                           <Info className="h-4 w-4 mr-1" />
-                          Markdown Guide
+                          {t("admin_pages.emailAdmin.markdownGuide")}
                         </Button>
                       </div>
                       <FormControl>
                         <Textarea
-                          placeholder="Write your email content here using Markdown..."
+                          placeholder={t("admin_pages.emailAdmin.waitlistContentPlaceholder")}
                           className="min-h-[400px] font-mono text-sm"
                           {...field}
                         />
@@ -195,7 +196,7 @@ export function WaitlistEmailEditor({
 
                 {showMarkdownGuide && (
                   <div className="rounded-lg bg-muted p-4 text-sm space-y-2">
-                    <p className="font-semibold">Markdown Quick Reference:</p>
+                    <p className="font-semibold">{t("admin_pages.emailAdmin.markdownQuickReference")}</p>
                     <ul className="space-y-1 ml-4">
                       <li>
                         • **Bold text** → <strong>Bold text</strong>
@@ -211,26 +212,25 @@ export function WaitlistEmailEditor({
                       <li>• --- for horizontal line</li>
                     </ul>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      The email will automatically include an unsubscribe link
-                      at the bottom.
+                      {t("admin_pages.emailAdmin.autoUnsubscribeLink")}
                     </p>
                   </div>
                 )}
 
                 <div className="flex justify-between items-center pt-4 border-t">
                   <div className="text-sm text-muted-foreground">
-                    Changes will apply to all future waitlist signups
+                    {t("admin_pages.emailAdmin.changesApplyToFutureSignups")}
                   </div>
                   <Button type="submit" disabled={isSaving}>
                     {isSaving ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
+                        {t("admin_pages.emailAdmin.saving")}
                       </>
                     ) : (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        Save Template
+                        {t("admin_pages.emailAdmin.saveTemplate")}
                       </>
                     )}
                   </Button>
@@ -247,10 +247,10 @@ export function WaitlistEmailEditor({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5" />
-              Email Preview
+              {t("admin_pages.emailAdmin.emailPreview")}
             </CardTitle>
             <CardDescription>
-              Live preview of how the email will appear
+              {t("admin_pages.emailAdmin.livePreviewDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>{renderEmailPreview()}</CardContent>

@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -56,6 +57,7 @@ export function NewsEntryForm({
   availableTags,
   onSuccess,
 }: NewsEntryFormProps) {
+  const { t } = useTranslation();
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     entry?.tags?.map((tag: any) => tag.id) || []
   );
@@ -131,9 +133,9 @@ export function NewsEntryForm({
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel>{t("admin_pages.newsAdmin.titleLabel")}</FormLabel>
               <FormControl>
-                <Input placeholder="Enter news title..." {...field} />
+                <Input placeholder={t("admin_pages.newsAdmin.titlePlaceholder")} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -145,17 +147,16 @@ export function NewsEntryForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{t("admin_pages.newsAdmin.descriptionLabel")}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Brief description of the content..."
+                  placeholder={t("admin_pages.newsAdmin.descriptionPlaceholder")}
                   rows={12}
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                Optional description that will be shown in the news list.
-                Supports markdown formatting.
+                {t("admin_pages.newsAdmin.descriptionHelp")}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -168,12 +169,12 @@ export function NewsEntryForm({
             name="url"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>URL</FormLabel>
+                <FormLabel>{t("admin_pages.newsAdmin.url")}</FormLabel>
                 <FormControl>
-                  <Input placeholder="https://example.com/article" {...field} />
+                  <Input placeholder={t("admin_pages.newsAdmin.urlPlaceholder")} {...field} />
                 </FormControl>
                 <FormDescription>
-                  Link to the YouTube video, blog post, or changelog
+                  {t("admin_pages.newsAdmin.urlHelp")}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -185,20 +186,20 @@ export function NewsEntryForm({
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Content Type</FormLabel>
+                <FormLabel>{t("admin_pages.newsAdmin.contentType")}</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select content type" />
+                      <SelectValue placeholder={t("admin_pages.newsAdmin.contentTypePlaceholder")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="video">📹 YouTube Video</SelectItem>
-                    <SelectItem value="blog">📝 Blog Post</SelectItem>
-                    <SelectItem value="changelog">🔄 Changelog</SelectItem>
+                    <SelectItem value="video">{t("admin_pages.newsAdmin.youtubeVideo")}</SelectItem>
+                    <SelectItem value="blog">{t("admin_pages.newsAdmin.blogPost")}</SelectItem>
+                    <SelectItem value="changelog">{t("admin_pages.newsAdmin.changelog")}</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -212,12 +213,12 @@ export function NewsEntryForm({
           name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL (Optional)</FormLabel>
+              <FormLabel>{t("admin_pages.newsAdmin.imageUrlOptional")}</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <Input placeholder={t("admin_pages.newsAdmin.imageUrlPlaceholder")} {...field} />
               </FormControl>
               <FormDescription>
-                Thumbnail or preview image for the news entry
+                {t("admin_pages.newsAdmin.imageUrlHelp")}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -229,23 +230,23 @@ export function NewsEntryForm({
           name="publishedAt"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Published Date & Time</FormLabel>
+              <FormLabel>{t("admin_pages.newsAdmin.publishedDateTime")}</FormLabel>
               <FormControl>
                 <Input type="datetime-local" {...field} />
               </FormControl>
-              <FormDescription>When this content was published</FormDescription>
+              <FormDescription>{t("admin_pages.newsAdmin.publishedDateTimeHelp")}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
         <div>
-          <FormLabel>Tags</FormLabel>
+          <FormLabel>{t("admin_pages.newsAdmin.tags")}</FormLabel>
           <div className="space-y-3">
             {selectedTagIds.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedTagIds.map((tagId) => {
-                  const tag = availableTags.find((t) => t.id === tagId);
+                  const tag = availableTags.find((t: any) => t.id === tagId);
                   if (!tag) return null;
                   return (
                     <Badge
@@ -270,12 +271,12 @@ export function NewsEntryForm({
 
             <Select onValueChange={(value) => addTag(parseInt(value))}>
               <SelectTrigger>
-                <SelectValue placeholder="Add tags..." />
+                <SelectValue placeholder={t("admin_pages.newsAdmin.addTagsPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {availableTags
-                  .filter((tag) => !selectedTagIds.includes(tag.id))
-                  .map((tag) => (
+                  .filter((tag: any) => !selectedTagIds.includes(tag.id))
+                  .map((tag: any) => (
                     <SelectItem key={tag.id} value={tag.id.toString()}>
                       <div className="flex items-center gap-2">
                         <div
@@ -290,8 +291,7 @@ export function NewsEntryForm({
             </Select>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
-            Select tags to categorize this news entry (claude, cursor, cline,
-            llms, tutorial, etc.)
+            {t("admin_pages.newsAdmin.tagsHelp")}
           </p>
         </div>
 
@@ -301,9 +301,9 @@ export function NewsEntryForm({
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">Published</FormLabel>
+                <FormLabel className="text-base">{t("admin_pages.newsAdmin.published")}</FormLabel>
                 <FormDescription>
-                  Make this news entry visible to the public
+                  {t("admin_pages.newsAdmin.publishedHelp")}
                 </FormDescription>
               </div>
               <FormControl>
@@ -320,11 +320,11 @@ export function NewsEntryForm({
           <Button type="submit" disabled={isLoading}>
             {isLoading
               ? entry
-                ? "Updating..."
-                : "Creating..."
+                ? t("admin_pages.newsAdmin.updating")
+                : t("admin_pages.newsAdmin.creating")
               : entry
-                ? "Update Entry"
-                : "Create Entry"}
+                ? t("admin_pages.newsAdmin.updateEntry")
+                : t("admin_pages.newsAdmin.createEntry")}
           </Button>
         </div>
       </form>

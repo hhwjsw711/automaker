@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -62,6 +63,7 @@ interface BlogPostFormProps {
 }
 
 export function BlogPostForm({ blogPost }: BlogPostFormProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("write");
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>(
@@ -136,7 +138,7 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
     mutationFn: createBlogPostFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "blog-posts"] });
-      toast.success("Blog post created successfully!");
+      toast.success(t("admin_pages.blogAdmin.blogPostCreated"));
       navigate({ to: "/admin/blog" });
     },
   });
@@ -145,7 +147,7 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
     mutationFn: updateBlogPostFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin", "blog-posts"] });
-      toast.success("Blog post updated successfully!");
+      toast.success(t("admin_pages.blogAdmin.blogPostUpdated"));
       navigate({ to: "/admin/blog" });
     },
   });
@@ -204,7 +206,7 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
       }
     } catch (error) {
       console.error("Failed to submit blog post:", error);
-      toast.error("Failed to save blog post. Please try again.");
+      toast.error(t("admin_pages.blogAdmin.failedToSaveBlogPost"));
     } finally {
       setIsUploading(false);
       setUploadProgress(null);
@@ -220,23 +222,23 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
           <AppCard
             icon={FileText}
             iconColor="blue"
-            title="Content"
+            title={t("admin_pages.blogAdmin.content")}
             className="h-full flex flex-col"
           >
             <div className="flex flex-col flex-1 space-y-6">
               {/* Title */}
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">{t("admin_pages.blogAdmin.title")}</Label>
                 <Input
                   id="title"
                   {...register("title", {
-                    required: "Title is required",
+                    required: t("admin_pages.blogAdmin.titleRequired"),
                     minLength: {
                       value: 5,
-                      message: "Title must be at least 5 characters",
+                      message: t("admin_pages.blogAdmin.titleMinLength"),
                     },
                   })}
-                  placeholder="Enter blog post title..."
+                  placeholder={t("admin_pages.blogAdmin.titlePlaceholder")}
                   className={cn(errors.title && "border-destructive")}
                 />
                 {errors.title && (
@@ -254,24 +256,24 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="write" className="flex items-center gap-2">
                     <Edit className="h-4 w-4" />
-                    Write
+                    {t("admin_pages.blogAdmin.write")}
                   </TabsTrigger>
                   <TabsTrigger value="preview" className="flex items-center gap-2">
                     <Eye className="h-4 w-4" />
-                    Preview
+                    {t("admin_pages.blogAdmin.preview")}
                   </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="write" className="mt-4 flex-1">
                   <Textarea
                     {...register("content", {
-                      required: "Content is required",
+                      required: t("admin_pages.blogAdmin.contentRequired"),
                       minLength: {
                         value: 50,
-                        message: "Content must be at least 50 characters",
+                        message: t("admin_pages.blogAdmin.contentMinLength"),
                       },
                     })}
-                    placeholder="Write your blog post content in Markdown..."
+                    placeholder={t("admin_pages.blogAdmin.contentPlaceholder")}
                     className={cn(
                       "h-full min-h-[500px] font-mono resize-none",
                       errors.content && "border-destructive"
@@ -290,8 +292,7 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
                       <MarkdownRenderer content={content} />
                     ) : (
                       <p className="text-muted-foreground">
-                        No content to preview. Write some content in the Write
-                        tab.
+                        {t("admin_pages.blogAdmin.noContentToPreview")}
                       </p>
                     )}
                   </div>
@@ -304,10 +305,10 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
         {/* Sidebar */}
         <div className="space-y-6 lg:sticky lg:top-6">
           {/* Publish settings */}
-          <AppCard icon={Settings} iconColor="green" title="Publish">
+          <AppCard icon={Settings} iconColor="green" title={t("admin_pages.blogAdmin.publish")}>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label htmlFor="isPublished">Published</Label>
+                <Label htmlFor="isPublished">{t("admin_pages.blogAdmin.published")}</Label>
                 <Switch
                   id="isPublished"
                   {...register("isPublished")}
@@ -321,30 +322,30 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
           </AppCard>
 
           {/* Excerpt */}
-          <AppCard icon={FileText} iconColor="orange" title="Excerpt">
+          <AppCard icon={FileText} iconColor="orange" title={t("admin_pages.blogAdmin.excerpt")}>
             <Textarea
               {...register("excerpt")}
-              placeholder="Brief description of the post..."
+              placeholder={t("admin_pages.blogAdmin.excerptPlaceholder")}
               className="min-h-[100px]"
             />
           </AppCard>
 
           {/* Featured Image */}
-          <AppCard icon={Image} iconColor="purple" title="Featured Image">
+          <AppCard icon={Image} iconColor="purple" title={t("admin_pages.blogAdmin.featuredImage")}>
             <div className="space-y-4">
               {/* Image URL input (fallback) */}
               <div className="space-y-2">
-                <Label htmlFor="featuredImage">Image URL (optional)</Label>
+                <Label htmlFor="featuredImage">{t("admin_pages.blogAdmin.imageUrlOptional")}</Label>
                 <Input
                   id="featuredImage"
                   {...register("featuredImage")}
-                  placeholder="Or enter image URL manually..."
+                  placeholder={t("admin_pages.blogAdmin.imageUrlPlaceholder")}
                 />
               </div>
 
               {/* Dropzone */}
               <div className="space-y-2">
-                <Label>Upload Image</Label>
+                <Label>{t("admin_pages.blogAdmin.uploadImage")}</Label>
                 {!selectedImage && (
                   <div
                     {...getRootProps()}
@@ -359,11 +360,11 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
                     <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
                       {isDragActive
-                        ? "Drop the image here..."
-                        : "Drag & drop an image here, or click to select"}
+                        ? t("admin_pages.blogAdmin.dropImageHere")
+                        : t("admin_pages.blogAdmin.dragDropImage")}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Supports: JPEG, PNG, WebP, GIF
+                      {t("admin_pages.blogAdmin.supportedImageFormats")}
                     </p>
                   </div>
                 )}
@@ -399,7 +400,7 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
                       {uploadProgress && (
                         <div className="mt-3">
                           <div className="flex justify-between text-xs mb-1">
-                            <span>Uploading...</span>
+                            <span>{t("admin_pages.blogAdmin.uploading")}</span>
                             <span>{uploadProgress.percentage}%</span>
                           </div>
                           <div className="w-full bg-muted-foreground/20 rounded-full h-2">
@@ -418,14 +419,14 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
           </AppCard>
 
           {/* Tags */}
-          <AppCard icon={Tags} iconColor="yellow" title="Tags">
+          <AppCard icon={Tags} iconColor="yellow" title={t("admin_pages.blogAdmin.tags")}>
             <div className="space-y-3">
               <div className="flex gap-2">
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Add a tag..."
+                  placeholder={t("admin_pages.blogAdmin.addTagPlaceholder")}
                   className="flex-1"
                 />
                 <Button
@@ -435,7 +436,7 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
                   onClick={addTag}
                   disabled={!tagInput.trim()}
                 >
-                  Add
+                  {t("admin_pages.blogAdmin.add")}
                 </Button>
               </div>
 
@@ -472,18 +473,18 @@ export function BlogPostForm({ blogPost }: BlogPostFormProps) {
           className="min-w-[120px]"
         >
           {isUploading ? (
-            "Uploading image..."
+            t("admin_pages.blogAdmin.uploadingImage")
           ) : isSubmitting ? (
-            "Saving..."
+            t("admin_pages.blogAdmin.saving")
           ) : blogPost ? (
             <>
               <Save className="h-4 w-4 mr-2" />
-              Update Post
+              {t("admin_pages.blogAdmin.updatePost")}
             </>
           ) : (
             <>
               <Send className="h-4 w-4 mr-2" />
-              Create Post
+              {t("admin_pages.blogAdmin.createPost")}
             </>
           )}
         </Button>

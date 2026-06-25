@@ -11,16 +11,7 @@ import {
 } from "~/fn/email-templates";
 import { WaitlistEmailEditor } from "./-components/waitlist-email-editor";
 import { toast } from "sonner";
-
-const waitlistEmailSchema = z.object({
-  subject: z
-    .string()
-    .min(1, "Subject is required")
-    .max(200, "Subject too long"),
-  content: z.string().min(1, "Content is required"),
-});
-
-type WaitlistEmailData = z.infer<typeof waitlistEmailSchema>;
+import { useTranslation } from "react-i18next";
 
 const waitlistEmailTemplateQueryOptions = queryOptions({
   queryKey: ["admin", "waitlistEmailTemplate"],
@@ -35,11 +26,22 @@ export const Route = createFileRoute("/admin/emails/waitlist")({
 });
 
 function WaitlistEmailPage() {
+  const { t } = useTranslation();
   const [showMarkdownGuide, setShowMarkdownGuide] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: waitlistTemplate, isLoading: waitlistTemplateLoading } =
     useQuery(waitlistEmailTemplateQueryOptions);
+
+  const waitlistEmailSchema = z.object({
+    subject: z
+      .string()
+      .min(1, t("admin_pages.emailAdmin.validation.subjectRequired"))
+      .max(200, t("admin_pages.emailAdmin.validation.subjectTooLong")),
+    content: z.string().min(1, t("admin_pages.emailAdmin.validation.contentRequired")),
+  });
+
+  type WaitlistEmailData = z.infer<typeof waitlistEmailSchema>;
 
   const waitlistForm = useForm<WaitlistEmailData>({
     resolver: zodResolver(waitlistEmailSchema),
@@ -65,12 +67,12 @@ function WaitlistEmailPage() {
       queryClient.invalidateQueries({
         queryKey: ["admin", "waitlistEmailTemplate"],
       });
-      toast.success("Template saved!", {
-        description: "Waitlist email template has been updated.",
+      toast.success(t("admin_pages.emailAdmin.toast.templateSaved"), {
+        description: t("admin_pages.emailAdmin.toast.waitlistTemplateUpdated"),
       });
     },
     onError: (error) => {
-      toast.error("Failed to save template", {
+      toast.error(t("admin_pages.emailAdmin.toast.failedToSaveTemplate"), {
         description: error.message,
       });
     },

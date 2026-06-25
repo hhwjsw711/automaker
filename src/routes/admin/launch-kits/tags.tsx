@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { assertIsAdminFn } from "~/fn/auth";
 import { Page } from "~/routes/admin/-components/page";
 import { PageHeader } from "~/routes/admin/-components/page-header";
@@ -62,6 +63,7 @@ export const Route = createFileRoute("/admin/launch-kits/tags")({
 });
 
 function TagManagementPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<any>(null);
@@ -103,13 +105,14 @@ function TagManagementPage() {
     mutationFn: deleteTagFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
-      toast.success("Tag deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["launch-kit-tags"] });
+      toast.success(t("admin_pages.launchKitsAdmin.tagDeleted"));
       setDeletingTagId(null);
     },
     onError: (error: any) => {
-      const message = error.message || "Failed to delete tag";
+      const message = error.message || t("admin_pages.launchKitsAdmin.tagDeleteFailed");
       if (message.includes("in use")) {
-        toast.error("Cannot delete tag: " + message);
+        toast.error(t("admin_pages.launchKitsAdmin.cannotDeleteTag") + ": " + message);
       } else {
         toast.error(message);
       }
@@ -122,11 +125,11 @@ function TagManagementPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["tags"] });
-      toast.success("Category deleted successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.categoryDeleted"));
       setDeletingCategoryId(null);
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete category");
+      toast.error(error.message || t("admin_pages.launchKitsAdmin.categoryDeleteFailed"));
       setDeletingCategoryId(null);
     },
   });
@@ -136,12 +139,12 @@ function TagManagementPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["tags"] });
-      toast.success("Category renamed successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.categoryRenamed"));
       setRenamingCategoryId(null);
       setCategoryNewName("");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to rename category");
+      toast.error(error.message || t("admin_pages.launchKitsAdmin.categoryRenameFailed"));
     },
   });
 
@@ -150,12 +153,12 @@ function TagManagementPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["tags"] });
-      toast.success("Category created successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.categoryCreated"));
       setIsCategoryDialogOpen(false);
       setNewCategoryName("");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to create category");
+      toast.error(error.message || t("admin_pages.launchKitsAdmin.categoryCreateFailed"));
     },
   });
 
@@ -240,16 +243,16 @@ function TagManagementPage() {
           className="flex items-center gap-1 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Launch Kits
+          {t("admin_pages.launchKitsAdmin.backToKits")}
         </Link>
         <span>/</span>
-        <span className="text-foreground">Tag Management</span>
+        <span className="text-foreground">{t("admin_pages.launchKitsAdmin.tagManagement")}</span>
       </div>
 
       <PageHeader
-        title="Tag Management"
-        highlightedWord="Management"
-        description="Manage tags and categories for launch kits"
+        title={t("admin_pages.launchKitsAdmin.tagManagement")}
+        highlightedWord={t("admin_pages.launchKitsAdmin.highlighted")}
+        description={t("admin_pages.launchKitsAdmin.manageTagsDesc")}
         actions={
           <div className="flex gap-2 self-end">
             <Dialog
@@ -266,24 +269,24 @@ function TagManagementPage() {
               <DialogTrigger asChild>
                 <Button variant="outline">
                   <FolderOpen className="mr-2 h-4 w-4" />
-                  New Category
+                  {t("admin_pages.launchKitsAdmin.newCategory")}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create New Category</DialogTitle>
+                  <DialogTitle>{t("admin_pages.launchKitsAdmin.createNewCategory")}</DialogTitle>
                   <DialogDescription>
-                    Create a new category to organize your tags.
+                    {t("admin_pages.launchKitsAdmin.createNewCategoryDesc")}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="category-name">Category Name</Label>
+                    <Label htmlFor="category-name">{t("admin_pages.launchKitsAdmin.categoryName")}</Label>
                     <Input
                       id="category-name"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder="Enter category name"
+                      placeholder={t("admin_pages.launchKitsAdmin.enterCategoryName")}
                       autoFocus
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -301,7 +304,7 @@ function TagManagementPage() {
                       setNewCategoryName("");
                     }}
                   >
-                    Cancel
+                    {t("admin_pages.launchKitsAdmin.cancel")}
                   </Button>
                   <Button
                     onClick={handleCreateCategory}
@@ -311,8 +314,8 @@ function TagManagementPage() {
                     }
                   >
                     {createCategoryMutation.isPending
-                      ? "Creating..."
-                      : "Create Category"}
+                      ? t("admin_pages.launchKitsAdmin.creating")
+                      : t("admin_pages.launchKitsAdmin.createCategory")}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -331,7 +334,7 @@ function TagManagementPage() {
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
-                  New Tag
+                  {t("admin_pages.launchKitsAdmin.newTag")}
                 </Button>
               </DialogTrigger>
               <TagForm
@@ -345,18 +348,18 @@ function TagManagementPage() {
       />
 
       {tagsLoading || categoriesLoading ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="text-center py-8">{t("admin_pages.launchKitsAdmin.loading")}</div>
       ) : tags.length === 0 ? (
         <Card>
           <CardContent className="text-center py-12">
             <TagIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No tags yet</h3>
+            <h3 className="text-lg font-semibold mb-2">{t("admin_pages.launchKitsAdmin.noKits")}</h3>
             <p className="text-muted-foreground mb-4">
-              Create your first tag to start categorizing launch kits.
+              {t("admin_pages.launchKitsAdmin.createFirstTag")}
             </p>
             <Button onClick={() => setIsTagDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
-              Create Tag
+              {t("admin_pages.launchKitsAdmin.createTag")}
             </Button>
           </CardContent>
         </Card>
@@ -411,10 +414,10 @@ function TagManagementPage() {
                         </div>
                       ) : (
                         <>
-                          {categoryName}
+                          {categoryName === "Uncategorized" ? t("admin_pages.launchKitsAdmin.uncategorized") : categoryName}
                           <span className="text-sm text-muted-foreground font-normal">
                             ({categoryTags.length}{" "}
-                            {categoryTags.length === 1 ? "tag" : "tags"})
+                            {categoryTags.length === 1 ? t("admin_pages.launchKitsAdmin.tag_singular") : t("admin_pages.launchKitsAdmin.tag_plural")})
                           </span>
                         </>
                       )}
@@ -429,7 +432,7 @@ function TagManagementPage() {
                             className="flex items-center gap-2"
                           >
                             <Plus className="h-4 w-4" />
-                            Add Tag
+                            {t("admin_pages.launchKitsAdmin.addTag")}
                           </Button>
                         )
                       ) : (
@@ -443,7 +446,7 @@ function TagManagementPage() {
                           className="flex items-center gap-2"
                         >
                           <Plus className="h-4 w-4" />
-                          Add Tag
+                          {t("admin_pages.launchKitsAdmin.addTag")}
                         </Button>
                       )}
                       {category &&
@@ -469,7 +472,7 @@ function TagManagementPage() {
                                 }
                               >
                                 <Edit2 className="mr-2 h-4 w-4" />
-                                Rename Category
+                                {t("admin_pages.launchKitsAdmin.renameCategory")}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() =>
@@ -478,7 +481,7 @@ function TagManagementPage() {
                                 className="text-destructive"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Delete Category
+                                {t("admin_pages.launchKitsAdmin.deleteCategory")}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -489,7 +492,7 @@ function TagManagementPage() {
                 <CardContent className="pt-0">
                   {categoryTags.length === 0 ? (
                     <div className="text-center py-6 text-muted-foreground text-sm border-t border-border/50">
-                      No tags in this category
+                      {t("admin_pages.launchKitsAdmin.noTagsInCategory")}
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-2 pt-3 border-t border-border/50">
@@ -546,15 +549,13 @@ function TagManagementPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Tag</AlertDialogTitle>
+            <AlertDialogTitle>{t("admin_pages.launchKitsAdmin.deleteTag")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the tag "
-              {tags.find((t: any) => t.id === deletingTagId)?.name}"? This
-              action cannot be undone.
+              {t("admin_pages.launchKitsAdmin.deleteTagConfirm", { name: tags.find((t: any) => t.id === deletingTagId)?.name || "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogFooter>
+            <AlertDialogCancel>{t("admin_pages.launchKitsAdmin.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deletingTagId) {
@@ -563,7 +564,7 @@ function TagManagementPage() {
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              {t("admin_pages.launchKitsAdmin.deleteBtn")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -578,15 +579,13 @@ function TagManagementPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogTitle>{t("admin_pages.launchKitsAdmin.deleteCategory")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the category "
-              {categories.find((c: any) => c.id === deletingCategoryId)?.name}"?
-              Tags in this category will become uncategorized.
+              {t("admin_pages.launchKitsAdmin.deleteCategoryConfirm", { name: categories.find((c: any) => c.id === deletingCategoryId)?.name || "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("admin_pages.launchKitsAdmin.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deletingCategoryId) {
@@ -597,7 +596,7 @@ function TagManagementPage() {
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Category
+              {t("admin_pages.launchKitsAdmin.deleteCategoryBtn")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { queryOptions } from "@tanstack/react-query";
 import { assertIsAdminFn } from "~/fn/auth";
 import { getAdminUserAnalyticsFn } from "~/fn/admin-users";
@@ -46,6 +47,7 @@ const userAnalyticsQuery = (userId: number) =>
 
 function AdminUserDetail() {
   const { userId } = Route.useParams();
+  const { t } = useTranslation();
   const userIdNum = Number(userId);
   const { data, isLoading } = useQuery(userAnalyticsQuery(userIdNum));
 
@@ -65,11 +67,11 @@ function AdminUserDetail() {
       <Page>
         <div className="text-center py-16">
           <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">User not found</h2>
+          <h2 className="text-xl font-semibold mb-2">{t("admin_pages.usersAdmin.userNotFound")}</h2>
           <Link to="/admin/users">
             <Button variant="outline">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Users
+              {t("admin_pages.usersAdmin.backToUsers")}
             </Button>
           </Link>
         </div>
@@ -114,23 +116,23 @@ function AdminUserDetail() {
     <Page>
       <Link to="/admin/users" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6">
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Users
+        {t("admin_pages.usersAdmin.backToUsers")}
       </Link>
 
       <PageHeader
-        title="User Analytics"
-        highlightedWord="Analytics"
+        title={t("admin_pages.usersAdmin.userAnalytics")}
+        highlightedWord={t("admin_pages.usersAdmin.analytics")}
         description={
           <div className="flex items-center gap-4">
             <Avatar className="h-12 w-12 ring-2 ring-background shadow-sm">
-              <AvatarImage src={getUserAvatar()} alt={profile?.displayName || user.email || "User"} />
+              <AvatarImage src={getUserAvatar()} alt={profile?.displayName || user.email || t("admin_pages.usersAdmin.user")} />
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
                 {getUserInitials(profile?.displayName, user.email)}
               </AvatarFallback>
             </Avatar>
             <div>
               <div className="font-semibold text-foreground">
-                {profile?.displayName || "No name"}
+                {profile?.displayName || t("admin_pages.usersAdmin.noName")}
               </div>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <Mail className="h-3 w-3" />
@@ -149,25 +151,25 @@ function AdminUserDetail() {
                 {user.isPremium ? (
                   <>
                     <Crown className="h-3 w-3 mr-1" />
-                    Premium
+                    {t("admin_pages.usersAdmin.premium")}
                   </>
                 ) : (
                   <>
                     <User className="h-3 w-3 mr-1" />
-                    Free
+                    {t("admin_pages.usersAdmin.free")}
                   </>
                 )}
               </Badge>
               {user.isAdmin && (
                 <Badge variant="destructive">
                   <UserCheck className="h-3 w-3 mr-1" />
-                  Admin
+                  {t("admin_pages.usersAdmin.admin")}
                 </Badge>
               )}
               {isSuspicious && (
                 <Badge variant="destructive" className="animate-pulse">
                   <AlertTriangle className="h-3 w-3 mr-1" />
-                  Suspicious Activity
+                  {t("admin_pages.usersAdmin.suspiciousActivity")}
                 </Badge>
               )}
             </div>
@@ -179,28 +181,28 @@ function AdminUserDetail() {
               icon={PlayCircle}
               iconColor="green"
               value={progress.length}
-              label="Videos Completed"
+              label={t("admin_pages.usersAdmin.videosCompleted")}
               loading={isLoading}
             />
             <HeaderStatCard
               icon={MessageSquare}
               iconColor="blue"
               value={comments.length}
-              label="Comments"
+              label={t("admin_pages.usersAdmin.comments")}
               loading={isLoading}
             />
             <HeaderStatCard
               icon={Download}
               iconColor={isSuspicious ? "red" : "purple"}
               value={downloadStats.totalDownloads}
-              label="Total Downloads"
+              label={t("admin_pages.usersAdmin.totalDownloads")}
               loading={isLoading}
             />
             <HeaderStatCard
               icon={PlayCircle}
               iconColor="cyan"
               value={downloadStats.uniqueVideos}
-              label="Unique Videos"
+              label={t("admin_pages.usersAdmin.uniqueVideos")}
               loading={isLoading}
             />
           </HeaderStats>
@@ -211,17 +213,17 @@ function AdminUserDetail() {
         <TabsList>
           <TabsTrigger value="downloads" className="flex items-center gap-2">
             <Download className="h-4 w-4" />
-            Downloads
+            {t("admin_pages.usersAdmin.downloads")}
             {isSuspicious && <AlertTriangle className="h-3 w-3 text-destructive" />}
           </TabsTrigger>
           <TabsTrigger value="progress" className="flex items-center gap-2">
             <PlayCircle className="h-4 w-4" />
-            Progress
+            {t("admin_pages.usersAdmin.progress")}
             <Badge variant="secondary" className="ml-1">{progress.length}</Badge>
           </TabsTrigger>
           <TabsTrigger value="comments" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
-            Comments
+            {t("admin_pages.usersAdmin.comments")}
             <Badge variant="secondary" className="ml-1">{comments.length}</Badge>
           </TabsTrigger>
         </TabsList>
@@ -233,11 +235,14 @@ function AdminUserDetail() {
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="h-5 w-5 text-destructive" />
                   <div>
-                    <div className="font-semibold text-destructive">Suspicious Download Activity</div>
+                    <div className="font-semibold text-destructive">{t("admin_pages.usersAdmin.suspiciousDownloadActivity")}</div>
                     <div className="text-sm text-muted-foreground">
-                      This user has downloaded {downloadStats.totalDownloads} videos ({downloadStats.uniqueVideos} unique).
-                      Average {downloadRatio.toFixed(1)} downloads per unique video.
-                      {downloadStats.premiumDownloads > 0 && ` ${downloadStats.premiumDownloads} premium video downloads.`}
+                      {t("admin_pages.usersAdmin.suspiciousDownloadDetail", {
+                        totalDownloads: downloadStats.totalDownloads,
+                        uniqueVideos: downloadStats.uniqueVideos,
+                        ratio: downloadRatio.toFixed(1),
+                        premiumDownloads: downloadStats.premiumDownloads,
+                      })}
                     </div>
                   </div>
                 </div>
@@ -248,23 +253,23 @@ function AdminUserDetail() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Download Summary</CardTitle>
+                <CardTitle className="text-lg">{t("admin_pages.usersAdmin.downloadSummary")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b">
-                  <span className="text-muted-foreground">Total Downloads</span>
+                  <span className="text-muted-foreground">{t("admin_pages.usersAdmin.totalDownloads")}</span>
                   <span className="font-semibold">{downloadStats.totalDownloads}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b">
-                  <span className="text-muted-foreground">Unique Videos</span>
+                  <span className="text-muted-foreground">{t("admin_pages.usersAdmin.uniqueVideos")}</span>
                   <span className="font-semibold">{downloadStats.uniqueVideos}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b">
-                  <span className="text-muted-foreground">Premium Downloads</span>
+                  <span className="text-muted-foreground">{t("admin_pages.usersAdmin.premiumDownloads")}</span>
                   <span className="font-semibold">{downloadStats.premiumDownloads}</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-muted-foreground">Avg. per Video</span>
+                  <span className="text-muted-foreground">{t("admin_pages.usersAdmin.avgPerVideo")}</span>
                   <span className="font-semibold">{downloadRatio.toFixed(1)}x</span>
                 </div>
               </CardContent>
@@ -272,12 +277,12 @@ function AdminUserDetail() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Most Downloaded Videos</CardTitle>
+                <CardTitle className="text-lg">{t("admin_pages.usersAdmin.mostDownloadedVideos")}</CardTitle>
               </CardHeader>
               <CardContent>
                 {downloadStats.mostDownloaded.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No downloads yet
+                    {t("admin_pages.usersAdmin.noDownloadsYet")}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -302,12 +307,12 @@ function AdminUserDetail() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Recent Downloads</CardTitle>
+              <CardTitle className="text-lg">{t("admin_pages.usersAdmin.recentDownloads")}</CardTitle>
             </CardHeader>
             <CardContent>
               {downloadStats.recentDownloads.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No downloads recorded
+                  {t("admin_pages.usersAdmin.noDownloadsRecorded")}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -320,7 +325,7 @@ function AdminUserDetail() {
                           <div className="text-xs text-muted-foreground">
                             {download.segment?.module?.title}
                             {download.segment?.isPremium && (
-                              <Badge variant="outline" className="ml-2 text-xs">Premium</Badge>
+                              <Badge variant="outline" className="ml-2 text-xs">{t("admin_pages.usersAdmin.premium")}</Badge>
                             )}
                           </div>
                         </div>
@@ -340,12 +345,12 @@ function AdminUserDetail() {
         <TabsContent value="progress" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Completed Videos</CardTitle>
+              <CardTitle className="text-lg">{t("admin_pages.usersAdmin.completedVideos")}</CardTitle>
             </CardHeader>
             <CardContent>
               {progress.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No videos completed yet
+                  {t("admin_pages.usersAdmin.noVideosCompleted")}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -361,7 +366,7 @@ function AdminUserDetail() {
                               <span className="ml-2">({p.segment.length})</span>
                             )}
                             {p.segment?.isPremium && (
-                              <Badge variant="outline" className="ml-2 text-xs">Premium</Badge>
+                              <Badge variant="outline" className="ml-2 text-xs">{t("admin_pages.usersAdmin.premium")}</Badge>
                             )}
                           </div>
                         </div>
@@ -381,12 +386,12 @@ function AdminUserDetail() {
         <TabsContent value="comments" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">User Comments</CardTitle>
+              <CardTitle className="text-lg">{t("admin_pages.usersAdmin.userComments")}</CardTitle>
             </CardHeader>
             <CardContent>
               {comments.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  No comments yet
+                  {t("admin_pages.usersAdmin.noCommentsYet")}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -410,7 +415,7 @@ function AdminUserDetail() {
                       </div>
                       {comment.children && comment.children.length > 0 && (
                         <div className="text-xs text-muted-foreground mt-2">
-                          {comment.children.length} {comment.children.length === 1 ? "reply" : "replies"}
+                          {comment.children.length} {comment.children.length === 1 ? t("admin_pages.usersAdmin.reply") : t("admin_pages.usersAdmin.replies")}
                         </div>
                       )}
                     </div>

@@ -1,4 +1,5 @@
 import { User, Bot } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
 import { Badge } from "~/components/ui/badge";
 import type { ConversationMessage } from "~/hooks/use-rag-chat";
@@ -8,6 +9,7 @@ interface ChatMessageProps {
 }
 
 export function ChatMessage({ message }: ChatMessageProps) {
+  const { t } = useTranslation();
   const isUser = message.role === "user";
 
   return (
@@ -46,7 +48,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
             ))}
             {message.sources.length > 3 && (
               <Badge variant="outline" className="text-xs">
-                +{message.sources.length - 3} more
+                {t("admin_pages.vectorSearch.moreSources", { count: message.sources.length - 3 })}
               </Badge>
             )}
           </div>

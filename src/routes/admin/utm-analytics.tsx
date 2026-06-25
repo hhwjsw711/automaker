@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import {
@@ -59,6 +60,7 @@ const CAMPAIGN_COLORS = [
 ];
 
 function UtmAnalyticsPage() {
+  const { t } = useTranslation();
   const currentDate = new Date();
   const [selectedDate, setSelectedDate] = useState({
     year: currentDate.getFullYear(),
@@ -233,9 +235,9 @@ function UtmAnalyticsPage() {
   return (
     <Page>
       <PageHeader
-        title="UTM Analytics"
-        highlightedWord="UTM"
-        description="Track page views and traffic from UTM campaigns, sources, and mediums"
+        title={t("admin_pages.utmAdmin.title")}
+        highlightedWord={t("admin_pages.utmAdmin.highlighted")}
+        description={t("admin_pages.utmAdmin.description")}
       />
 
       {/* Month Navigation */}
@@ -269,36 +271,36 @@ function UtmAnalyticsPage() {
           icon={TrendingUp}
           iconColor="text-blue-500"
           iconBgColor="bg-blue-500/10"
-          title="Total UTM Events"
+          title={t("admin_pages.utmAdmin.totalClicks")}
           value={statsLoading ? null : stats?.totalUtmEvents}
-          description="Total tracked UTM visits"
+          description={t("admin_pages.utmAdmin.totalUtmDesc")}
           hoverColor="group-hover:text-blue-600"
         />
         <StatsCard
           icon={Megaphone}
           iconColor="text-emerald-500"
           iconBgColor="bg-emerald-500/10"
-          title="Unique Campaigns"
+          title={t("admin_pages.utmAdmin.uniqueCampaigns")}
           value={statsLoading ? null : stats?.uniqueCampaigns}
-          description="Different campaign tags"
+          description={t("admin_pages.utmAdmin.campaignTags")}
           hoverColor="group-hover:text-emerald-600"
         />
         <StatsCard
           icon={Link2}
           iconColor="text-amber-500"
           iconBgColor="bg-amber-500/10"
-          title="Unique Sources"
+          title={t("admin_pages.utmAdmin.uniqueSources")}
           value={statsLoading ? null : stats?.uniqueSources}
-          description="Traffic sources tracked"
+          description={t("admin_pages.utmAdmin.sourcesTracked")}
           hoverColor="group-hover:text-amber-600"
         />
         <StatsCard
           icon={Target}
           iconColor="text-violet-500"
           iconBgColor="bg-violet-500/10"
-          title="Unique Mediums"
+          title={t("admin_pages.utmAdmin.uniqueMediums")}
           value={statsLoading ? null : stats?.uniqueMediums}
-          description="Marketing mediums used"
+          description={t("admin_pages.utmAdmin.mediumsUsed")}
           hoverColor="group-hover:text-violet-600"
         />
       </div>
@@ -309,7 +311,7 @@ function UtmAnalyticsPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <Target className="h-5 w-5" />
-              Select Campaigns to Compare
+              {t("admin_pages.utmAdmin.selectCampaigns")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -320,7 +322,7 @@ function UtmAnalyticsPage() {
                 onClick={toggleAllCampaigns}
                 className="mr-2"
               >
-                {enabledCampaigns.size === uniqueCampaignKeys.length ? "Deselect All" : "Select All"}
+                {enabledCampaigns.size === uniqueCampaignKeys.length ? t("admin_pages.utmAdmin.deselectAll") : t("admin_pages.utmAdmin.selectAll")}
               </Button>
               {uniqueCampaignKeys.map((item) => {
                 const isEnabled = enabledCampaigns.has(item.campaign);
@@ -355,7 +357,7 @@ function UtmAnalyticsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            UTM Page Views Over Time
+            {t("admin_pages.utmAdmin.utmPageViewsOverTime")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -386,7 +388,7 @@ function UtmAnalyticsPage() {
                               <p className="font-medium mb-2">{label}</p>
                               {payload.map((entry, index) => (
                                 <p key={index} style={{ color: entry.color }} className="text-sm">
-                                  {entry.dataKey}: {entry.value} views
+                                  {item.campaign}: {entry.value} {t("admin_pages.utmAdmin.views_lowercase")}
                                 </p>
                               ))}
                             </div>
@@ -418,14 +420,14 @@ function UtmAnalyticsPage() {
             <div className="flex flex-col items-center justify-center h-80 text-muted-foreground">
               <BarChart3 className="h-16 w-16 mb-4 opacity-30" />
               <p className="text-lg">
-                {enabledCampaigns.size === 0
-                  ? "Select at least one campaign to view the chart"
-                  : "No UTM data available"}
+                  {enabledCampaigns.size === 0
+                    ? t("admin_pages.utmAdmin.selectAtLeastOneCampaign")
+                    : t("admin_pages.utmAdmin.noData")}
               </p>
               <p className="text-sm">
-                {enabledCampaigns.size === 0
-                  ? "Use the toggle buttons above to select campaigns"
-                  : `No UTM tracking data found for ${formatMonthYear(selectedDate.year, selectedDate.month)}`}
+                  {enabledCampaigns.size === 0
+                    ? t("admin_pages.utmAdmin.useToggleButtons")
+                    : t("admin_pages.utmAdmin.noUtmDataFor", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
               </p>
             </div>
           )}
@@ -438,7 +440,7 @@ function UtmAnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Megaphone className="h-5 w-5" />
-              Campaign Breakdown
+              {t("admin_pages.utmAdmin.campaignBreakdown")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -446,10 +448,10 @@ function UtmAnalyticsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Campaign</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Source</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Medium</th>
-                    <th className="text-right py-3 px-4 font-medium text-muted-foreground">Events</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("admin_pages.utmAdmin.campaign")}</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("admin_pages.utmAdmin.source")}</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("admin_pages.utmAdmin.medium")}</th>
+                    <th className="text-right py-3 px-4 font-medium text-muted-foreground">{t("admin_pages.utmAdmin.events")}</th>
                   </tr>
                 </thead>
                 <tbody>

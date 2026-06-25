@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { PageHeader } from "../-components/page-header";
 import { Page } from "../-components/page";
 import { 
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/admin/conversions")({
 });
 
 function ConversionsLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
 
   const getCurrentTab = () => {
@@ -47,9 +49,9 @@ function ConversionsLayout() {
   return (
     <Page>
       <PageHeader
-        title="Conversion Analytics"
-        highlightedWord="Conversion"
-        description="Comprehensive analytics including conversions, events, and popular pages"
+        title={t("admin_pages.conversionsAdmin.title")}
+        highlightedWord={t("admin_pages.conversionsAdmin.highlighted")}
+        description={t("admin_pages.conversionsAdmin.description")}
       />
 
       <div className="w-full">
@@ -59,19 +61,19 @@ function ConversionsLayout() {
               <Link to="/admin/conversions/overview">
                 <TabsTrigger value="overview" className="flex items-center gap-2 w-full">
                   <TrendingUp className="h-4 w-4" />
-                  Overview
+                  {t("admin_pages.conversionsAdmin.overview")}
                 </TabsTrigger>
               </Link>
               <Link to="/admin/conversions/events">
                 <TabsTrigger value="events" className="flex items-center gap-2 w-full">
                   <BarChart3 className="h-4 w-4" />
-                  Event Types
+                  {t("admin_pages.conversionsAdmin.events")}
                 </TabsTrigger>
               </Link>
               <Link to="/admin/conversions/pages">
                 <TabsTrigger value="pages" className="flex items-center gap-2 w-full">
                   <Eye className="h-4 w-4" />
-                  Popular Pages
+                  {t("admin_pages.conversionsAdmin.pages")}
                 </TabsTrigger>
               </Link>
             </TabsList>

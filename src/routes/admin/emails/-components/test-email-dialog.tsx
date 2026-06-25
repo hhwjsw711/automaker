@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,7 +23,7 @@ import {
 import { Send } from "lucide-react";
 
 const testEmailSchema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.string().email("Please enter a valid email address"),
 });
 
 type TestEmailData = z.infer<typeof testEmailSchema>;
@@ -40,6 +41,8 @@ export function TestEmailDialog({
   onSubmit,
   isPending,
 }: TestEmailDialogProps) {
+  const { t } = useTranslation();
+
   const form = useForm<TestEmailData>({
     resolver: zodResolver(testEmailSchema),
     defaultValues: {
@@ -57,10 +60,10 @@ export function TestEmailDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Send Test Email
+            {t("admin_pages.emailAdmin.sendTestEmail")}
           </DialogTitle>
           <DialogDescription className="text-base">
-            Send a test email to verify your content and formatting.
+            {t("admin_pages.emailAdmin.sendTestEmailDescription")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -73,10 +76,10 @@ export function TestEmailDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Test Email Address</FormLabel>
+                  <FormLabel>{t("admin_pages.emailAdmin.testEmailAddress")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="test@example.com"
+                      placeholder={t("admin_pages.emailAdmin.testEmailPlaceholder")}
                       type="email"
                       {...field}
                     />
@@ -92,7 +95,7 @@ export function TestEmailDialog({
                 onClick={() => onOpenChange(false)}
                 className="flex-1"
               >
-                Cancel
+                {t("admin_pages.emailAdmin.cancel")}
               </Button>
               <Button
                 type="submit"
@@ -102,12 +105,12 @@ export function TestEmailDialog({
                 {isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white/70"></div>
-                    <span>Sending...</span>
+                    <span>{t("admin_pages.emailAdmin.sending")}</span>
                   </div>
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    Send Test
+                    {t("admin_pages.emailAdmin.sendTest")}
                   </>
                 )}
               </Button>

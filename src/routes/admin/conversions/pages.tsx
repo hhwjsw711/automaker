@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { 
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/admin/conversions/pages")({
 });
 
 function PagesPage() {
+  const { t } = useTranslation();
   const currentDate = new Date();
   const [selectedDate, setSelectedDate] = useState({
     year: currentDate.getFullYear(),
@@ -68,9 +70,9 @@ function PagesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold mb-2">Page Analytics</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("admin_pages.conversionsAdmin.pageAnalytics")}</h3>
           <p className="text-muted-foreground text-sm">
-            Page views for {formatMonthYear(selectedDate.year, selectedDate.month)}
+            {t("admin_pages.conversionsAdmin.pageViewsFor", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
           </p>
         </div>
         
@@ -101,7 +103,7 @@ function PagesPage() {
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Page Views</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("admin_pages.conversionsAdmin.totalPageViews")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
@@ -112,13 +114,13 @@ function PagesPage() {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              For {formatMonthYear(selectedDate.year, selectedDate.month)}
+              {t("admin_pages.conversionsAdmin.for", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Unique Pages</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("admin_pages.conversionsAdmin.uniquePages")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -129,13 +131,13 @@ function PagesPage() {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Pages with traffic
+              {t("admin_pages.conversionsAdmin.pagesWithTraffic")}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Average Views per Page</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t("admin_pages.conversionsAdmin.avgViewsPerPage")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
@@ -148,7 +150,7 @@ function PagesPage() {
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Views per page
+              {t("admin_pages.conversionsAdmin.viewsPerPage")}
             </p>
           </CardContent>
         </Card>
@@ -159,10 +161,10 @@ function PagesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Eye className="h-5 w-5 text-blue-500" />
-              Most Popular Pages
+              {t("admin_pages.conversionsAdmin.mostPopularPages")}
             </CardTitle>
             <p className="text-muted-foreground">
-              Pages with the highest view counts and engagement
+              {t("admin_pages.conversionsAdmin.pagesHighestViews")}
             </p>
           </CardHeader>
           <CardContent>
@@ -192,7 +194,7 @@ function PagesPage() {
                         <span className="font-medium">{page.pagePath}</span>
                         {page.pagePath !== '/' && (
                           <div className="text-sm text-muted-foreground">
-                            Path: {page.pagePath}
+                            {t("admin_pages.conversionsAdmin.path")}: {page.pagePath}
                           </div>
                         )}
                       </div>
@@ -201,7 +203,7 @@ function PagesPage() {
                       <div className="font-semibold text-blue-600 dark:text-blue-400">
                         {page.views}
                       </div>
-                      <div className="text-sm text-muted-foreground">views</div>
+                      <div className="text-sm text-muted-foreground">{t("admin_pages.conversionsAdmin.views_lowercase")}</div>
                     </div>
                   </div>
                 ))}
@@ -209,9 +211,9 @@ function PagesPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <Eye className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                <h3 className="font-medium text-muted-foreground mb-2">No page views tracked yet</h3>
+                <h3 className="font-medium text-muted-foreground mb-2">{t("admin_pages.conversionsAdmin.noPageViews")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  No page views found for {formatMonthYear(selectedDate.year, selectedDate.month)}
+                  {t("admin_pages.conversionsAdmin.noPageViewsFound", { month: formatMonthYear(selectedDate.year, selectedDate.month) })}
                 </p>
               </div>
             )}

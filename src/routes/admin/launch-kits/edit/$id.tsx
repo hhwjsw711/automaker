@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { getAllTagsFn, getLaunchKitByIdFn } from "~/fn/launch-kits";
 import { assertIsAdminFn } from "~/fn/auth";
 import { PageHeader } from "../../-components/page-header";
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/admin/launch-kits/edit/$id")({
 });
 
 function EditLaunchKitPage() {
+  const { t } = useTranslation();
   const { id } = Route.useParams();
 
   // Get launch kit data
@@ -49,7 +51,7 @@ function EditLaunchKitPage() {
   if (!launchKit) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">Launch kit not found</p>
+        <p className="text-muted-foreground">{t("admin_pages.launchKitsAdmin.kitNotFound")}</p>
       </div>
     );
   }
@@ -63,16 +65,16 @@ function EditLaunchKitPage() {
           className="flex items-center gap-1 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Launch Kits
+          {t("admin_pages.launchKitsAdmin.backToKits")}
         </Link>
         <span>/</span>
-        <span className="text-foreground">Edit {launchKit.name}</span>
+        <span className="text-foreground">{t("admin_pages.launchKitsAdmin.editBreadcrumb", { name: launchKit.name })}</span>
       </div>
 
       <PageHeader
-        title="Edit Launch Kit"
-        highlightedWord="Edit"
-        description={`Update details for ${launchKit.name}`}
+        title={t("admin_pages.launchKitsAdmin.editKit")}
+        highlightedWord={t("admin_pages.launchKitsAdmin.editHighlighted")}
+        description={t("admin_pages.launchKitsAdmin.editKitDesc", { name: launchKit.name })}
       />
 
       <LaunchKitForm
@@ -81,7 +83,7 @@ function EditLaunchKitPage() {
         formError={formError}
         onSubmit={onSubmit}
         onTagToggle={handleTagToggle}
-        submitLabel="Update Launch Kit"
+        submitLabel={t("admin_pages.launchKitsAdmin.updateKit")}
         mode="edit"
       />
     </div>

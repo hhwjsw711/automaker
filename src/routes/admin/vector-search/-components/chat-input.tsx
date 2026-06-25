@@ -1,5 +1,6 @@
 import { useRef, useEffect, KeyboardEvent } from "react";
 import { Send, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 
@@ -11,6 +12,7 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSend, isLoading, value, onChange }: ChatInputProps) {
+  const { t } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ export function ChatInput({ onSend, isLoading, value, onChange }: ChatInputProps
       <Textarea
         ref={textareaRef}
         data-chat-input
-        placeholder="Ask a question about the course content..."
+        placeholder={t("admin_pages.vectorSearch.askQuestionPlaceholder")}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}

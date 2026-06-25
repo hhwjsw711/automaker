@@ -1,5 +1,6 @@
 import { UseFormReturn } from "react-hook-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
@@ -53,6 +54,7 @@ export function TagsCard({
   onTagToggle,
   refetchTags,
 }: TagsCardProps) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<Tag | null>(null);
@@ -64,12 +66,12 @@ export function TagsCard({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       queryClient.invalidateQueries({ queryKey: ["launch-kit-tags"] });
-      toast.success("Tag deleted successfully");
+      toast.success(t("admin_pages.launchKitsAdmin.tagDeleted"));
       setDeletingTagId(null);
       refetchTags();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete tag");
+      toast.error(error.message || t("admin_pages.launchKitsAdmin.deleteFailed"));
       setDeletingTagId(null);
     },
   });
@@ -121,7 +123,7 @@ export function TagsCard({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Tags (Optional)</CardTitle>
+            <CardTitle>{t("admin_pages.launchKitsAdmin.tagsSection")}</CardTitle>
             <Dialog
               open={isTagDialogOpen}
               onOpenChange={(open) => {
@@ -140,7 +142,7 @@ export function TagsCard({
                   data-testid="new-tag-button"
                 >
                   <Plus className="mr-2 h-3 w-3" />
-                  New Tag
+                  {t("admin_pages.launchKitsAdmin.newTag")}
                 </Button>
               </DialogTrigger>
               <TagForm
@@ -162,9 +164,9 @@ export function TagsCard({
                 {tags.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <TagIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No tags available yet.</p>
+                    <p className="text-sm">{t("admin_pages.launchKitsAdmin.noTagsAvailable")}</p>
                     <p className="text-sm">
-                      Create your first tag to categorize launch kits.
+                      {t("admin_pages.launchKitsAdmin.createFirstTag")}
                     </p>
                   </div>
                 ) : (
@@ -172,7 +174,7 @@ export function TagsCard({
                     {sortedCategories.map((categoryName) => (
                       <div key={categoryName}>
                         <Label className="text-sm font-medium mb-2 block">
-                          {categoryName}
+                          {categoryName === "Uncategorized" ? t("admin_pages.launchKitsAdmin.uncategorized") : categoryName}
                         </Label>
                         <div className="flex flex-wrap gap-2">
                           {tagsByCategory[categoryName].map((tag) => {
@@ -280,15 +282,13 @@ export function TagsCard({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Tag</AlertDialogTitle>
+            <AlertDialogTitle>{t("admin_pages.launchKitsAdmin.deleteTag")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the tag "
-              {tags.find((t) => t.id === deletingTagId)?.name}"?
-              {/* Note: The backend will prevent deletion if the tag is in use */}
+              {t("admin_pages.launchKitsAdmin.deleteTagConfirm", { name: tags.find((t) => t.id === deletingTagId)?.name || "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("admin_pages.launchKitsAdmin.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deletingTagId) {
@@ -297,7 +297,7 @@ export function TagsCard({
               }}
               variant="destructive"
             >
-              Delete
+              {t("admin_pages.launchKitsAdmin.deleteBtn")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

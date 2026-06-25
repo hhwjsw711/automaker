@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,6 +29,7 @@ const createLaunchKitSchema = z.object({
 export type CreateLaunchKitForm = z.infer<typeof createLaunchKitSchema>;
 
 export function useCreateLaunchKit() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
@@ -49,14 +51,14 @@ export function useCreateLaunchKit() {
   const createMutation = useMutation({
     mutationFn: createLaunchKitFn,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["launch-kits"] });
-      queryClient.invalidateQueries({ queryKey: ["launch-kit-stats"] });
-      toast.success("Launch kit created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["admin", "launch-kits"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "launch-kit-stats"] });
+      toast.success(t("admin_pages.launchKitsAdmin.kitCreated"));
       navigate({ to: "/admin/launch-kits" });
     },
     onError: (error: any) => {
-      setFormError(error?.message || "Failed to create launch kit");
-      toast.error("Failed to create launch kit");
+      setFormError(error?.message || t("admin_pages.launchKitsAdmin.kitCreateFailed"));
+      toast.error(t("admin_pages.launchKitsAdmin.kitCreateFailed"));
     },
     onSettled: () => {
       setIsLoading(false);

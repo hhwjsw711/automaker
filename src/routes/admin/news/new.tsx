@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { assertIsAdminFn } from "~/fn/auth";
 import { NewsEntryForm } from "../-components/news-entry-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/admin/news/new")({
 });
 
 function NewNewsEntry() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -35,20 +37,20 @@ function NewNewsEntry() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/admin/news">News</Link>
+                <Link to="/admin/news">{t("admin_pages.newsAdmin.news")}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>Add Entry</BreadcrumbPage>
+              <BreadcrumbPage>{t("admin_pages.newsAdmin.addEntry")}</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <PageHeader
-          title="Add News Entry"
-          highlightedWord="News"
-          description="Add a new AI news entry, YouTube video, or blog post"
+          title={t("admin_pages.newsAdmin.addNewsEntryTitle")}
+          highlightedWord={t("admin_pages.newsAdmin.news")}
+          description={t("admin_pages.newsAdmin.addNewsEntryDescription")}
         />
 
         <div className="animate-pulse">
@@ -66,20 +68,20 @@ function NewNewsEntry() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/admin/news">News</Link>
+              <Link to="/admin/news">{t("admin_pages.newsAdmin.news")}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Add Entry</BreadcrumbPage>
+            <BreadcrumbPage>{t("admin_pages.newsAdmin.addEntry")}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       <PageHeader
-        title="Add News Entry"
-        highlightedWord="News"
-        description="Add a new AI news entry, YouTube video, or blog post"
+        title={t("admin_pages.newsAdmin.addNewsEntryTitle")}
+        highlightedWord={t("admin_pages.newsAdmin.news")}
+        description={t("admin_pages.newsAdmin.addNewsEntryDescription")}
       />
 
       <div className="max-w-2xl">
