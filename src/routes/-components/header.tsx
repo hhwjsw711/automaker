@@ -40,10 +40,12 @@ import {
   DropdownMenuGroup,
 } from "../../components/ui/dropdown-menu";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useContinueSlug } from "~/hooks/use-continue-slug";
 import { cn } from "~/lib/utils";
 import { useAuthWithProfile } from "~/hooks/use-auth";
 import { ModeToggle } from "~/components/ModeToggle";
+import { LanguageSwitcher } from "~/components/language-switcher";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 import { checkIfUserIsAffiliateFn } from "~/fn/affiliates";
@@ -82,7 +84,7 @@ const NAVIGATION_LINKS: NavLink[] = [
   // Primary navigation (always visible in top nav)
   {
     to: "/learn/$slug",
-    label: "Course Content",
+    label: "nav.courseContent",
     icon: Video,
     condition: ({ continueSlug }) => !!continueSlug,
     params: (data: any) => ({ slug: data.continueSlug }),
@@ -90,14 +92,14 @@ const NAVIGATION_LINKS: NavLink[] = [
   },
   {
     to: "/learn",
-    label: "Course Content",
+    label: "nav.courseContent",
     icon: Video,
     condition: ({ continueSlug }) => !continueSlug,
     category: "primary",
   },
   {
     to: "/purchase",
-    label: "Pricing",
+    label: "nav.pricing",
     icon: Tag,
     condition: ({ user }) => !user?.isPremium && !user?.isAdmin,
     category: "primary",
@@ -105,13 +107,13 @@ const NAVIGATION_LINKS: NavLink[] = [
   // Community dropdown
   {
     to: "/community",
-    label: "Discord",
+    label: "nav.discord",
     icon: MessageSquare,
     category: "community",
   },
   {
     to: "/members",
-    label: "Members",
+    label: "nav.members",
     icon: Users,
     category: "community",
   },
@@ -119,17 +121,17 @@ const NAVIGATION_LINKS: NavLink[] = [
   // Resources dropdown (all secondary links)
   {
     to: "/blog",
-    label: "Blog",
+    label: "nav.blog",
     icon: Video,
     condition: ({ blogFeatureEnabled }) => !!blogFeatureEnabled,
     category: "resources",
   },
   {
     to: "/launch-kits",
-    label: "Launch Kits",
+    label: "nav.launchKits",
     icon: Rocket,
     badge: {
-      text: "NEW",
+      text: "nav.new",
       className:
         "ml-2 px-1.5 py-0.5 text-xs bg-theme-500/20 text-theme-600 dark:text-theme-400 rounded-md font-medium",
     },
@@ -138,10 +140,10 @@ const NAVIGATION_LINKS: NavLink[] = [
   },
   {
     to: "/news",
-    label: "AI News",
+    label: "nav.aiNews",
     icon: Newspaper,
     badge: {
-      text: "NEW",
+      text: "nav.new",
       className:
         "ml-2 px-1.5 py-0.5 text-xs bg-theme-500/20 text-theme-600 dark:text-theme-400 rounded-md font-medium",
     },
@@ -150,10 +152,10 @@ const NAVIGATION_LINKS: NavLink[] = [
   },
   {
     to: "/agents",
-    label: "Agents",
+    label: "nav.agents",
     icon: Bot,
     badge: {
-      text: "Beta",
+      text: "nav.beta",
       className:
         "ml-2 px-1.5 py-0.5 text-xs bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded-md font-medium",
     },
@@ -162,7 +164,7 @@ const NAVIGATION_LINKS: NavLink[] = [
   },
   {
     to: "/affiliates",
-    label: "Affiliate Program",
+    label: "nav.affiliateProgram",
     icon: DollarSign,
     condition: ({ user, affiliatesFeatureEnabled }) =>
       !user && !!affiliatesFeatureEnabled,
@@ -170,7 +172,7 @@ const NAVIGATION_LINKS: NavLink[] = [
   },
   {
     to: "/affiliates",
-    label: "Become an Affiliate",
+    label: "nav.becomeAffiliate",
     icon: DollarSign,
     condition: ({ user, affiliateStatus, affiliatesFeatureEnabled }) =>
       user &&
@@ -185,18 +187,18 @@ const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
   // Content Management
   {
     to: "/admin/comments",
-    label: "Comments",
+    label: "admin.comments",
     icon: MessageCircle,
     category: "content",
   },
-  { to: "/admin/blog", label: "Blog", icon: Video, category: "content" },
-  { to: "/admin/news", label: "News", icon: Newspaper, category: "content" },
+  { to: "/admin/blog", label: "admin.blog", icon: Video, category: "content" },
+  { to: "/admin/news", label: "admin.news", icon: Newspaper, category: "content" },
 
   // User Management
-  { to: "/admin/users", label: "Users", icon: Users, category: "users" },
+  { to: "/admin/users", label: "admin.users", icon: Users, category: "users" },
   {
     to: "/admin/affiliates",
-    label: "Affiliates",
+    label: "admin.affiliates",
     icon: DollarSign,
     category: "users",
   },
@@ -204,25 +206,25 @@ const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
   // Business
   {
     to: "/admin/launch-kits",
-    label: "Launch Kits",
+    label: "admin.launchKits",
     icon: Rocket,
     category: "business",
   },
   {
     to: "/admin/analytics",
-    label: "Analytics",
+    label: "admin.analytics",
     icon: TrendingUp,
     category: "business",
   },
   {
     to: "/admin/conversions",
-    label: "Conversions",
+    label: "admin.conversions",
     icon: Target,
     category: "business",
   },
   {
     to: "/admin/utm-analytics",
-    label: "UTM Analytics",
+    label: "admin.utmAnalytics",
     icon: Link2,
     category: "business",
   },
@@ -230,7 +232,7 @@ const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
   // Communications
   {
     to: "/admin/emails",
-    label: "Emails",
+    label: "admin.emails",
     icon: Mail,
     category: "communications",
   },
@@ -238,18 +240,18 @@ const ADMIN_MENU_ITEMS: AdminMenuItem[] = [
   // System
   {
     to: "/admin/settings",
-    label: "Settings",
+    label: "admin.settings",
     icon: Settings,
     category: "system",
   },
 ];
 
 const ADMIN_CATEGORY_LABELS: Record<AdminMenuItem["category"], string> = {
-  content: "Content Management",
-  users: "User Management",
-  business: "Business",
-  communications: "Communications",
-  system: "System",
+  content: "admin.contentManagement",
+  users: "admin.userManagement",
+  business: "admin.business",
+  communications: "admin.communications",
+  system: "admin.system",
 };
 
 function getFilteredNavLinks(data: {
@@ -289,6 +291,7 @@ const DesktopNavigation = ({
   routerState: any;
   navData: any;
 }) => {
+  const { t } = useTranslation();
   const primaryLinks = navLinks.filter((link) => link.category === "primary");
   const resourcesLinks = navLinks.filter(
     (link) => link.category === "resources"
@@ -318,9 +321,9 @@ const DesktopNavigation = ({
         )}
       >
         {Icon && <Icon className="mr-2 h-4 w-4 text-theme-400" />}
-        {link.label}
+        {t(link.label)}
         {link.badge && (
-          <span className={link.badge.className}>{link.badge.text}</span>
+          <span className={link.badge.className}>{t(link.badge.text)}</span>
         )}
       </Link>
     );
@@ -343,10 +346,10 @@ const DesktopNavigation = ({
           )}
         >
           {Icon && <Icon className="mr-2 h-4 w-4 text-theme-400" />}
-          {link.label}
+          {t(link.label)}
           {link.badge && (
             <span className={cn("ml-auto", link.badge.className)}>
-              {link.badge.text}
+              {t(link.badge.text)}
             </span>
           )}
         </Link>
@@ -368,9 +371,9 @@ const DesktopNavigation = ({
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted/50"
             >
               <Users className="h-4 w-4" />
-              <span>Community</span>
+              <span>{t("nav.community")}</span>
               <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 text-green-600 dark:text-green-400 rounded-md font-medium">
-                FREE
+                {t("nav.free")}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -390,9 +393,9 @@ const DesktopNavigation = ({
               className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-muted-foreground hover:text-foreground hover:bg-muted/50"
             >
               <BookOpen className="h-4 w-4" />
-              <span>Resources</span>
+              <span>{t("nav.resources")}</span>
               <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 text-green-600 dark:text-green-400 rounded-md font-medium">
-                FREE
+                {t("nav.free")}
               </span>
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -415,6 +418,7 @@ const MobileNavigation = ({
   setIsOpen: (open: boolean) => void;
   navData: any;
 }) => {
+  const { t } = useTranslation();
   const primaryLinks = navLinks.filter((link) => link.category === "primary");
   const resourcesLinks = navLinks.filter(
     (link) => link.category === "resources"
@@ -439,9 +443,9 @@ const MobileNavigation = ({
         ) : (
           <div className="mr-3 h-5 w-5 flex-shrink-0" />
         )}
-        <span className="flex-1">{link.label}</span>
+        <span className="flex-1">{t(link.label)}</span>
         {link.badge && (
-          <span className={link.badge.className}>{link.badge.text}</span>
+          <span className={link.badge.className}>{t(link.badge.text)}</span>
         )}
       </Link>
     );
@@ -461,9 +465,9 @@ const MobileNavigation = ({
         <div className="space-y-1 mt-6">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 px-3 flex items-center">
             <Users className="mr-2 h-4 w-4" />
-            Community
+            {t("nav.community")}
             <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 text-green-600 dark:text-green-400 rounded-md font-medium">
-              FREE
+              {t("nav.free")}
             </span>
           </h3>
           {communityLinks.map((link) => renderMobileNavLink(link))}
@@ -475,9 +479,9 @@ const MobileNavigation = ({
         <div className="space-y-1 mt-6">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 px-3 flex items-center">
             <BookOpen className="mr-2 h-4 w-4" />
-            Resources
+            {t("nav.resources")}
             <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 text-green-600 dark:text-green-400 rounded-md font-medium">
-              FREE
+              {t("nav.free")}
             </span>
           </h3>
           {resourcesLinks.map((link) => renderMobileNavLink(link))}
@@ -488,6 +492,7 @@ const MobileNavigation = ({
 };
 
 export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const continueSlug = useContinueSlug();
   const { user, profile } = useAuthWithProfile();
@@ -586,10 +591,10 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                     variant="ghost"
                     size="icon"
                     className="relative"
-                    title="Admin Panel"
+                    title={t("nav.adminPanel")}
                   >
                     <ShieldCheck className="h-[1.2rem] w-[1.2rem]" />
-                    <span className="sr-only">Admin Panel</span>
+                    <span className="sr-only">{t("nav.adminPanel")}</span>
                   </Button>
                 </Link>
               )}
@@ -611,7 +616,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                               {getUserInitials()}
                             </AvatarFallback>
                           </Avatar>
-                          <span>Admin</span>
+                          <span>{t("nav.admin")}</span>
                           <ChevronDown className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -621,11 +626,11 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                             <div key={category}>
                               {categoryIndex > 0 && <DropdownMenuSeparator />}
                               <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
-                                {
+                                {t(
                                   ADMIN_CATEGORY_LABELS[
                                     category as AdminMenuItem["category"]
                                   ]
-                                }
+                                )}
                               </DropdownMenuLabel>
                               <DropdownMenuGroup>
                                 {items.map((item) => {
@@ -637,7 +642,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                                         className="flex items-center"
                                       >
                                         <Icon className="mr-2 h-4 w-4" />
-                                        {item.label}
+                                        {t(item.label)}
                                       </Link>
                                     </DropdownMenuItem>
                                   );
@@ -650,7 +655,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                         <DropdownMenuItem asChild>
                           <a href="/api/logout" className="flex items-center">
                             <LogOut className="mr-2 h-4 w-4" />
-                            Logout
+                            {t("nav.logout")}
                           </a>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -682,13 +687,13 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                             className="flex items-center"
                           >
                             <User className="mr-2 h-4 w-4" />
-                            Edit Profile
+                            {t("nav.editProfile")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/settings" className="flex items-center">
                             <Settings className="mr-2 h-4 w-4" />
-                            Settings
+                            {t("nav.settings")}
                           </Link>
                         </DropdownMenuItem>
 
@@ -698,14 +703,14 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                             className="flex items-center"
                           >
                             <TrendingUp className="mr-2 h-4 w-4" />
-                            Affiliate Dashboard
+                            {t("nav.affiliateDashboard")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                           <a href="/api/logout" className="flex items-center">
                             <LogOut className="mr-2 h-4 w-4" />
-                            Logout
+                            {t("nav.logout")}
                           </a>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -737,20 +742,20 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                             className="flex items-center"
                           >
                             <User className="mr-2 h-4 w-4" />
-                            Edit Profile
+                            {t("nav.editProfile")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/settings" className="flex items-center">
                             <Settings className="mr-2 h-4 w-4" />
-                            Settings
+                            {t("nav.settings")}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                           <a href="/api/logout" className="flex items-center">
                             <LogOut className="mr-2 h-4 w-4" />
-                            Logout
+                            {t("nav.logout")}
                           </a>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -762,14 +767,15 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                   href="/api/login/google"
                   className={buttonVariants({ variant: "ghost" })}
                 >
-                  Login
+                  {t("nav.login")}
                 </a>
               )}
               {!user?.isPremium && !user?.isAdmin && (
                 <Link to="/purchase">
-                  <Button>Buy Now</Button>
+                  <Button>{t("nav.buyNow")}</Button>
                 </Link>
               )}
+              <LanguageSwitcher />
               <ModeToggle />
             </div>
 
@@ -779,14 +785,13 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                 <SheetTrigger asChild>
                   <Button>
                     <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle menu</span>
+                    <span className="sr-only">{t("common.toggleMenu")}</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] sm:w-[350px]">
-                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  <SheetTitle className="sr-only">{t("common.navigationMenu")}</SheetTitle>
                   <SheetDescription className="sr-only">
-                    Main navigation menu with links to different sections of the
-                    website
+                    {t("common.navigationDescription")}
                   </SheetDescription>
                   {/* Mobile menu with matching gradient background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-background"></div>
@@ -798,13 +803,13 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                         <Link to="/admin/analytics" onClick={() => setIsOpen(false)}>
                           <Button variant="outline" className="w-full mb-4 flex items-center justify-center gap-2">
                             <ShieldCheck className="h-4 w-4" />
-                            Admin Panel
+                            {t("nav.adminPanel")}
                           </Button>
                         </Link>
                       )}
                       {!user?.isPremium && !user?.isAdmin && (
                         <Link to="/purchase" onClick={() => setIsOpen(false)}>
-                          <Button className="w-full mb-4">Buy Now</Button>
+                          <Button className="w-full mb-4">{t("nav.buyNow")}</Button>
                         </Link>
                       )}
                     </div>
@@ -823,17 +828,17 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                           <>
                             <div className="border-t border-border pt-4">
                               <h3 className="text-sm font-medium text-muted-foreground mb-3 px-3">
-                                Admin
+                                {t("nav.admin")}
                               </h3>
                               {Object.entries(getGroupedAdminMenuItems()).map(
                                 ([category, items], categoryIndex) => (
                                   <div key={category} className="mb-4">
                                     <h4 className="text-xs font-medium text-muted-foreground mb-2 px-3 uppercase tracking-wider">
-                                      {
+                                      {t(
                                         ADMIN_CATEGORY_LABELS[
                                           category as AdminMenuItem["category"]
                                         ]
-                                      }
+                                      )}
                                     </h4>
                                     {items.map((item) => {
                                       const Icon = item.icon;
@@ -849,7 +854,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                                           onClick={() => setIsOpen(false)}
                                         >
                                           <Icon className="mr-2 h-4 w-4" />
-                                          {item.label}
+                                          {t(item.label)}
                                         </Link>
                                       );
                                     })}
@@ -871,11 +876,11 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                               onClick={() => setIsOpen(false)}
                             >
                               <TrendingUp className="mr-2 h-4 w-4" />
-                              Affiliate Dashboard
+                              {t("nav.affiliateDashboard")}
                             </Link>
                           </div>
                         )}
-
+                        
                         {user ? (
                           <div className="border-t border-border pt-4">
                             {!user.isAdmin && !affiliateStatus?.isAffiliate && (
@@ -889,7 +894,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                                   onClick={() => setIsOpen(false)}
                                 >
                                   <User className="mr-2 h-4 w-4" />
-                                  Edit Profile
+                                  {t("nav.editProfile")}
                                 </Link>
                                 <Link
                                   to="/settings"
@@ -900,7 +905,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                                   onClick={() => setIsOpen(false)}
                                 >
                                   <Settings className="mr-2 h-4 w-4" />
-                                  Settings
+                                  {t("nav.settings")}
                                 </Link>
                               </>
                             )}
@@ -912,7 +917,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                               })}
                             >
                               <LogOut className="mr-2 h-4 w-4" />
-                              Logout
+                              {t("nav.logout")}
                             </a>
                           </div>
                         ) : (
@@ -925,7 +930,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                               })}
                             >
                               <LogIn className="h-4 w-4" />
-                              Login
+                              {t("nav.login")}
                             </a>
                           </div>
                         )}

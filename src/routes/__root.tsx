@@ -24,6 +24,9 @@ import { shouldShowEarlyAccessFn } from "~/fn/early-access";
 import { useAnalytics } from "~/hooks/use-analytics";
 import { publicEnv } from "~/utils/env-public";
 import { lazy, Suspense } from "react";
+import { I18nProvider } from "~/i18n/i18n-provider";
+import { fallbackLng, cookieName, supportedLngs, isRtl } from "~/i18n/settings";
+import type { SupportedLocale } from "~/i18n/settings";
 
 // Lazy load DevFloatingMenu - only needed in development
 const DevFloatingMenu = lazy(() =>
@@ -41,6 +44,21 @@ const getOgImageUrl = () => {
 };
 
 const isDev = process.env.NODE_ENV === "development";
+
+async function detectInitialLocale(): Promise<string> {
+  if (import.meta.env.SSR) {
+    try {
+      const { getCookie } = await import("@tanstack/react-start/server");
+      const locale = getCookie(cookieName);
+      if (locale && supportedLngs.includes(locale as SupportedLocale)) {
+        return locale;
+      }
+    } catch {
+      // getCookie not available
+    }
+  }
+  return fallbackLng;
+}
 
 function ThemedToaster() {
   const { theme } = useTheme();
@@ -76,7 +94,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         currentUserId = await getCurrentUserIdFn();
       }
 
-      return { shouldShowEarlyAccess, isDev, currentUserId };
+      const initialLocale = await detectInitialLocale();
+
+      return { shouldShowEarlyAccess, isDev, currentUserId, initialLocale };
     },
     head: () => ({
       meta: [
@@ -131,6 +151,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { rel: "icon", href: "/favicon.ico" },
       ],
       scripts: [
+        // Locale detection script - sets lang/dir before page render
+        {
+          id: "locale-init",
+          children: `(function() {
+            var LANG_COOKIE = '${cookieName}';
+            var DEFAULT_LANG = '${fallbackLng}';
+            var RTL_LOCALES = ${JSON.stringify([])};
+            var match = document.cookie.match(new RegExp('(?:^|;\\\\s*)' + LANG_COOKIE + '=([^;]*)'));
+            var lang = match ? match[1] : DEFAULT_LANG;
+            document.documentElement.lang = lang;
+            if (RTL_LOCALES.indexOf(lang) !== -1) {
+              document.documentElement.dir = 'rtl';
+            }
+          })();`,
+        },
         // Theme detection script - must run before page renders to prevent flash
         {
           id: "theme-init",
@@ -167,12 +202,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     }),
     errorComponent: (props) => {
       return (
-        <RootDocument>
+        <RootDocument initialLocale={fallbackLng}>
           <DefaultCatchBoundary {...props} />
         </RootDocument>
       );
     },
-    notFoundComponent: () => <NotFound />,
+    notFoundComponent: () => (
+      <RootDocument initialLocale={fallbackLng}>
+        <NotFound />
+      </RootDocument>
+    ),
     component: RootComponent,
   }
 );
@@ -181,6 +220,8 @@ function RootComponent() {
   // Initialize analytics tracking
   useAnalytics();
   const routerState = useRouterState();
+  const loaderData = Route.useLoaderData();
+  const initialLocale = (loaderData?.initialLocale ?? fallbackLng) as string;
 
   // Load Google Analytics scripts client-side only to avoid hydration mismatch
   // (gtag dynamically injects scripts which breaks React hydration)
@@ -217,13 +258,19 @@ function RootComponent() {
   }, []); // Only run on mount
 
   return (
-    <RootDocument>
+    <RootDocument initialLocale={initialLocale}>
       <Outlet />
     </RootDocument>
   );
 }
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({
+  children,
+  initialLocale = fallbackLng,
+}: {
+  children: React.ReactNode;
+  initialLocale?: string;
+}) {
   const routerState = useRouterState();
   const loaderData = Route.useLoaderData();
   const shouldShowEarlyAccess = loaderData?.shouldShowEarlyAccess ?? false;
@@ -262,50 +309,59 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   }, [routerState.status, routerState.location.pathname]);
 
   return (
-    <html className="font-inter" suppressHydrationWarning>
+    <html
+      className="font-inter"
+      lang={initialLocale}
+      dir={isRtl(initialLocale) ? "rtl" : "ltr"}
+      suppressHydrationWarning
+    >
       <head>
         <HeadContent />
       </head>
       <body className="min-h-screen flex flex-col">
-        <ThemeProvider>
-          {/* Configurable banner */}
-          {showBanner && (
-            <div className="fixed top-0 left-0 right-0 z-[60] bg-yellow-500 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100 border-b border-yellow-600 dark:border-yellow-700">
-              <div className="container mx-auto px-4 py-2 text-center text-sm font-medium">
-                {bannerMessage}
+        <I18nProvider
+          initialLocale={initialLocale as SupportedLocale}
+        >
+          <ThemeProvider>
+            {/* Configurable banner */}
+            {showBanner && (
+              <div className="fixed top-0 left-0 right-0 z-[60] bg-yellow-500 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100 border-b border-yellow-600 dark:border-yellow-700">
+                <div className="container mx-auto px-4 py-2 text-center text-sm font-medium">
+                  {bannerMessage}
+                </div>
               </div>
-            </div>
-          )}
-          {showHeader && <Header hasBanner={showBanner} />}
-          <main
-            className={`overflow-x-hidden flex-1 ${
-              showHeader
-                ? showBanner
-                  ? "mt-[104px]"
-                  : "mt-16"
-                : showBanner
-                  ? "mt-[40px]"
-                  : ""
-            }`}
-          >
-            {children}
-          </main>
-          {showFooter && <FooterSection />}
-          {showThemeToggle && (
-            <div className="fixed top-4 right-4 z-50">
-              <ThemeToggle />
-            </div>
-          )}
-          <ThemedToaster />
-          {showDevMenu && (
-            <Suspense fallback={null}>
-              <DevFloatingMenu currentUserId={currentUserId} />
-            </Suspense>
-          )}
-          {/* <TanStackRouterDevtools position="bottom-right" />
-          <ReactQueryDevtools buttonPosition="bottom-left" /> */}
-          <Scripts />
-        </ThemeProvider>
+            )}
+            {showHeader && <Header hasBanner={showBanner} />}
+            <main
+              className={`overflow-x-hidden flex-1 ${
+                showHeader
+                  ? showBanner
+                    ? "mt-[104px]"
+                    : "mt-16"
+                  : showBanner
+                    ? "mt-[40px]"
+                    : ""
+              }`}
+            >
+              {children}
+            </main>
+            {showFooter && <FooterSection />}
+            {showThemeToggle && (
+              <div className="fixed top-4 right-4 z-50">
+                <ThemeToggle />
+              </div>
+            )}
+            <ThemedToaster />
+            {showDevMenu && (
+              <Suspense fallback={null}>
+                <DevFloatingMenu currentUserId={currentUserId} />
+              </Suspense>
+            )}
+            {/* <TanStackRouterDevtools position="bottom-right" />
+            <ReactQueryDevtools buttonPosition="bottom-left" /> */}
+            <Scripts />
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

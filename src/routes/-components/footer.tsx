@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { DISCORD_INVITE_LINK } from "~/config";
 import { useFirstSegment } from "~/hooks/use-first-segment";
+import { useTranslation } from "react-i18next";
 
 export function FooterSection() {
+  const { t } = useTranslation();
   const firstSegment = useFirstSegment();
 
   return (
@@ -11,7 +13,7 @@ export function FooterSection() {
       <div className="max-w-4xl mx-auto text-muted-foreground">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Learn</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t("footer.learn")}</h3>
             <ul className="space-y-2">
               <li>
                 {firstSegment.data && (
@@ -20,7 +22,7 @@ export function FooterSection() {
                     params={{ slug: firstSegment.data.slug }}
                     className="hover:text-foreground transition-colors"
                   >
-                    Get Started
+                    {t("footer.getStarted")}
                   </Link>
                 )}
               </li>
@@ -28,28 +30,28 @@ export function FooterSection() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Purchase</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t("footer.purchase")}</h3>
             <ul className="space-y-2">
               <li>
                 <a
                   href="/purchase"
                   className="hover:text-foreground transition-colors"
                 >
-                  Buy Now
+                  {t("footer.buyNow")}
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Legal</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t("footer.legal")}</h3>
             <ul className="space-y-2">
               <li>
                 <Link
                   to="/terms-of-service"
                   className="hover:text-foreground transition-colors"
                 >
-                  Terms of Service
+                  {t("footer.termsOfService")}
                 </Link>
               </li>
               <li>
@@ -57,7 +59,7 @@ export function FooterSection() {
                   to="/privacy-policy"
                   className="hover:text-foreground transition-colors"
                 >
-                  Privacy Policy
+                  {t("footer.privacyPolicy")}
                 </Link>
               </li>
               <li>
@@ -65,14 +67,14 @@ export function FooterSection() {
                   to="/refund-policy"
                   className="hover:text-foreground transition-colors"
                 >
-                  Refund Policy
+                  {t("footer.refundPolicy")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Contact</h3>
+            <h3 className="font-semibold text-foreground mb-4">{t("footer.contact")}</h3>
             <ul className="space-y-2">
               <li>
                 <a
@@ -90,7 +92,7 @@ export function FooterSection() {
                   rel="noopener noreferrer"
                   className="hover:text-foreground transition-colors"
                 >
-                  Discord
+                  {t("footer.discord")}
                 </a>
               </li>
             </ul>
@@ -98,7 +100,7 @@ export function FooterSection() {
         </div>
 
         <div className="text-center pt-8 border-t border-border">
-          <p>© 2025 Hugo. All rights reserved.</p>
+          <p>{t("footer.copyright")}</p>
         </div>
       </div>
     </footer>
