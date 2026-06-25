@@ -93,12 +93,12 @@ export function MobileNavigation({
             <div className="bg-cyan-600/10 dark:bg-cyan-500/10 p-1.5 rounded-lg border border-cyan-600/30 dark:border-cyan-500/30">
               <img
                 src="/logo.png"
-                alt="Agentic Jumpstart Logo"
+                alt="Automaker Logo"
                 className="w-5 h-5"
               />
             </div>
             <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-              Agentic Jumpstart
+              Automaker
             </h1>
           </Link>
           {isAdmin && (

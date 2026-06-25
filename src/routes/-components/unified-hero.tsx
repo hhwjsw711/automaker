@@ -259,7 +259,7 @@ function EarlyAccessHeroContent({ waitlistCount }: { waitlistCount?: number }) {
             <div className="relative">
               <img
                 src="/logo.png"
-                alt="Agentic Jumpstart"
+                alt="Automaker"
                 className="size-24 md:size-32 mx-auto"
                 fetchPriority="high"
                 loading="eager"

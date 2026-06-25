@@ -109,7 +109,7 @@ export function MultiSegmentNotificationEmail({
 
           <EmailFooter
             unsubscribeUrl={unsubscribeUrl}
-            footerMessage="You're receiving this email because you signed up for course updates from Agentic Jumpstart."
+            footerMessage="You're receiving this email because you signed up for course updates from Automaker."
           />
         </Container>
       </Body>

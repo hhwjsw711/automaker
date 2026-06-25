@@ -8,10 +8,10 @@ export function EmailHeader() {
         src={`${env.HOST_NAME}/logo.png`}
         width="48"
         height="48"
-        alt="Agentic Jumpstart"
+        alt="Automaker"
         style={logo}
       />
-      <Text style={brandName}>Agentic Jumpstart</Text>
+      <Text style={brandName}>Automaker</Text>
     </Section>
   );
 }

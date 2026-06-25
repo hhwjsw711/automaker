@@ -240,7 +240,7 @@ function AffiliatesPage() {
 
             <h1 className="text-6xl font-bold mb-6">
               Partner With{" "}
-              <span className="text-theme-400">Agentic Jumpstart</span>
+              <span className="text-theme-400">Automaker</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
               Join our affiliate program and earn generous commissions by

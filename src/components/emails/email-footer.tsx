@@ -9,7 +9,7 @@ interface EmailFooterProps {
 
 export function EmailFooter({
   unsubscribeUrl,
-  footerMessage = "You're receiving this email because you signed up for updates from Agentic Jumpstart.",
+  footerMessage = "You're receiving this email because you signed up for updates from Automaker.",
 }: EmailFooterProps) {
   return (
     <>
@@ -33,7 +33,7 @@ export function EmailFooter({
 
         <Text style={footerText}>
           <Link href={`${env.HOST_NAME}`} style={link}>
-            Agentic Jumpstart
+            Automaker
           </Link>{" "}
           - Learn to build fast using LLMs tooling
         </Text>

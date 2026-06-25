@@ -3,7 +3,7 @@
 > **Navigation**: [← Back to Affiliates](./readme.md) | [Changelog](./changelog.md) | [Test Scenarios](./tests/)
 
 ## Overview
-The affiliate program enables users to earn commissions by referring new customers to purchase the Agentic Jumpstart course. Affiliates receive a unique tracking link and earn 30% commission on all referred sales.
+The affiliate program enables users to earn commissions by referring new customers to purchase the Automaker course. Affiliates receive a unique tracking link and earn 30% commission on all referred sales.
 
 > **Note**: Requirements with clickable links have detailed test scenarios available. Click on any linked requirement ID to view its test documentation.
 

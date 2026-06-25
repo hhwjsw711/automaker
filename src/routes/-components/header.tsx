@@ -567,7 +567,7 @@ export function Header({ hasBanner = false }: { hasBanner?: boolean }) {
                   <div className="absolute inset-0 rounded-full bg-theme-500/10 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
                 <span className="font-semibold text-sm text-foreground/90">
-                  Agentic Jumpstart
+                  Automaker
                 </span>
               </Link>
 

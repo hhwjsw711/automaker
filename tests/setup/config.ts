@@ -58,9 +58,9 @@ export const TEST_CONFIG = {
     EARLY_ACCESS_INDICATOR: "early",
     WELCOME_TO_COURSE_INDICATOR: "welcome to the course",
     START_LEARNING_LINK: "Start Learning",
-    LOGO_ALT_TEXT: "Agentic Jumpstart",
+    LOGO_ALT_TEXT: "Automaker",
     LOGO_SRC: "/logo.png",
-    AGENTIC_JUMPSTART_TEXT: /agentic jumpstart/i,
+    AUTOMAKER_TEXT: /automaker/i,
     PREVIOUS_LESSON_BUTTON: /previous lesson/i,
     NEXT_VIDEO_BUTTON: /next video/i
   },
