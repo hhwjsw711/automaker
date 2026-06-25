@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { queryOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 import { assertFeatureEnabled } from "~/lib/feature-flags";
 
 export const Route = createFileRoute("/launch-kits/$slug")({
@@ -90,6 +91,7 @@ function LaunchKitDetailPage() {
   const [newComment, setNewComment] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { t } = useTranslation();
 
   // Check authentication and admin status
   useEffect(() => {
@@ -109,10 +111,10 @@ function LaunchKitDetailPage() {
         queryKey: ["launch-kit-comments", slug],
       });
       setNewComment("");
-      toast.success("Comment added successfully");
+      toast.success(t("launchKits.commentAdded"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to add comment");
+      toast.error(error.message || t("launchKits.commentFailed"));
     },
   });
 
@@ -121,10 +123,10 @@ function LaunchKitDetailPage() {
 
     try {
       await cloneLaunchKitFn({ data: { slug: launchKit.slug } });
-      toast.success(`${launchKit.name} cloned! Check the repository.`);
+      toast.success(t("launchKits.cloneSuccess", { name: launchKit.name }));
       window.open(launchKit.repositoryUrl, "_blank");
     } catch (error) {
-      toast.error("Failed to track clone");
+      toast.error(t("launchKits.cloneFailed"));
       window.open(launchKit.repositoryUrl, "_blank");
     }
   };
@@ -160,7 +162,7 @@ function LaunchKitDetailPage() {
         <Button variant="ghost" asChild>
           <Link to="/launch-kits">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Launch Kits
+            {t("launchKits.backToLaunchKits")}
           </Link>
         </Button>
       </div>
@@ -182,7 +184,7 @@ function LaunchKitDetailPage() {
                         className="text-muted-foreground hover:text-foreground"
                       >
                         <Edit className="h-4 w-4 mr-1" />
-                        Edit
+                        {t("launchKits.edit")}
                       </Link>
                     </Button>
                   )}
@@ -199,11 +201,11 @@ function LaunchKitDetailPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <GitFork className="h-4 w-4" />
-                    {launchKit.cloneCount} clones
+                    {t("launchKits.cloneCount", { count: launchKit.cloneCount })}
                   </span>
                   <span className="flex items-center gap-1">
                     <MessageSquare className="h-4 w-4" />
-                    {comments?.length || 0} comments
+                    {t("launchKits.commentCount", { count: comments?.length || 0 })}
                   </span>
                 </div>
               </div>
@@ -226,7 +228,7 @@ function LaunchKitDetailPage() {
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   <TagIcon className="h-4 w-4" />
-                  Technologies
+                  {t("launchKits.technologies")}
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {launchKit.tags.map((tag: any) => (
@@ -249,7 +251,7 @@ function LaunchKitDetailPage() {
             {/* Long Description */}
             {launchKit.longDescription && (
               <div>
-                <h3 className="font-semibold mb-2">About this Launch Kit</h3>
+                <h3 className="font-semibold mb-2">{t("launchKits.aboutThisKit")}</h3>
                 <div className="text-muted-foreground">
                   <MarkdownRenderer content={launchKit.longDescription} />
                 </div>
@@ -264,7 +266,7 @@ function LaunchKitDetailPage() {
                 className="group flex-1 min-w-0"
               >
                 <GitFork className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
-                Clone Repository
+                {t("launchKits.cloneRepository")}
               </Button>
 
               {launchKit.demoUrl && (
@@ -280,7 +282,7 @@ function LaunchKitDetailPage() {
                     rel="noopener noreferrer"
                   >
                     <ExternalLink className="mr-2 h-5 w-5" />
-                    View Demo
+                    {t("launchKits.viewDemo")}
                   </a>
                 </Button>
               )}
@@ -297,7 +299,7 @@ function LaunchKitDetailPage() {
                   rel="noopener noreferrer"
                 >
                   <LinkIcon className="mr-2 h-5 w-5" />
-                  View Repository
+                  {t("launchKits.viewRepository")}
                 </a>
               </Button>
             </div>
@@ -309,10 +311,10 @@ function LaunchKitDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              Comments ({comments?.length || 0})
+              {t("launchKits.commentsTitle", { count: comments?.length || 0 })}
             </CardTitle>
             <CardDescription>
-              Share your thoughts and experiences with this launch kit
+              {t("launchKits.commentsDescription")}
             </CardDescription>
           </CardHeader>
 
@@ -321,7 +323,7 @@ function LaunchKitDetailPage() {
             {isAuthenticated ? (
               <form onSubmit={handleCommentSubmit} className="space-y-3">
                 <Textarea
-                  placeholder="Share your thoughts about this launch kit..."
+                  placeholder={t("launchKits.commentPlaceholder")}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   rows={3}
@@ -337,21 +339,21 @@ function LaunchKitDetailPage() {
                   >
                     <Send className="mr-2 h-4 w-4" />
                     {createCommentMutation.isPending
-                      ? "Posting..."
-                      : "Post Comment"}
+                      ? t("launchKits.posting")
+                      : t("launchKits.postComment")}
                   </Button>
                 </div>
               </form>
             ) : (
               <div className="text-center py-4 bg-muted/30 rounded-lg">
                 <p className="text-muted-foreground">
-                  <Link
-                    to="/auth"
-                    className="text-theme-600 hover:text-theme-700 font-medium"
-                  >
-                    Sign in
-                  </Link>{" "}
-                  to leave a comment
+                    <Link
+                      to="/auth"
+                      className="text-theme-600 hover:text-theme-700 font-medium"
+                    >
+                      {t("launchKits.signIn")}
+                    </Link>{" "}
+                    {t("launchKits.toLeaveComment")}
                 </p>
               </div>
             )}
@@ -373,7 +375,7 @@ function LaunchKitDetailPage() {
               ) : comments?.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <MessageSquare className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>No comments yet. Be the first to share your thoughts!</p>
+                  <p>{t("launchKits.noComments")}</p>
                 </div>
               ) : (
                 comments?.map((comment: any) => (

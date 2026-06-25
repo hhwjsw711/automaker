@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Page } from "~/routes/admin/-components/page";
 import { PageHeader } from "~/routes/admin/-components/page-header";
 import {
@@ -35,17 +36,14 @@ export const Route = createFileRoute("/profile/$userId")({
     const { user: currentUser } = await getUserInfoFn();
     const currentUserId = currentUser?.id;
 
-    // Fetch the profile to check if it's public
     const profile = await getPublicProfileFn({ data: { userId } });
 
     if (!profile) {
       return { userId, currentUserId, profile: null, hasAccess: false };
     }
 
-    // Check access: profile is public OR user is viewing their own profile
     const hasAccess = profile.isPublicProfile || currentUserId === userId;
 
-    // If no access, return early with access denied flag
     if (!hasAccess) {
       return { userId, currentUserId, profile: null, hasAccess: false };
     }
@@ -55,6 +53,7 @@ export const Route = createFileRoute("/profile/$userId")({
 });
 
 function ProfilePage() {
+  const { t } = useTranslation();
   const {
     userId,
     currentUserId,
@@ -63,18 +62,14 @@ function ProfilePage() {
   } = Route.useLoaderData();
   const isOwnProfile = currentUserId === userId;
 
-  // Use loader data for initial render, query for updates
-  // staleTime: 0 ensures we always fetch fresh data (fixes useDisplayName toggle)
   const { data: profile } = useSuspenseQuery({
     queryKey: ["profile", "public", userId],
     queryFn: () => getPublicProfileFn({ data: { userId } }),
     staleTime: 0,
   });
 
-  // Use query data if available, otherwise fall back to loader data
   const profileData = profile || loaderProfile;
 
-  // Check if profile exists
   if (!profileData) {
     return (
       <Page>
@@ -87,14 +82,14 @@ function ProfilePage() {
             </div>
             <div className="space-y-3">
               <h3 className="text-xl font-semibold text-foreground">
-                Profile Not Found
+                {t("profile.profileNotFound")}
               </h3>
               <p className="text-muted-foreground">
-                This user profile does not exist or is not available.
+                {t("profile.profileNotFoundDesc")}
               </p>
             </div>
             <Link to="/">
-              <Button>Go Home</Button>
+              <Button>{t("profile.goHome")}</Button>
             </Link>
           </div>
         </div>
@@ -102,11 +97,8 @@ function ProfilePage() {
     );
   }
 
-  // Check access: profile is public OR user is viewing their own profile
-  // This check happens both in loader and component for security
   const canAccess = profileData.isPublicProfile || isOwnProfile;
 
-  // Early return if user doesn't have access
   if (!canAccess) {
     return (
       <Page>
@@ -119,15 +111,14 @@ function ProfilePage() {
             </div>
             <div className="space-y-3">
               <h3 className="text-xl font-semibold text-foreground">
-                Profile is Private
+                {t("profile.profilePrivate")}
               </h3>
               <p className="text-muted-foreground">
-                This profile is set to private and is only visible to the
-                profile owner.
+                {t("profile.profilePrivateDesc")}
               </p>
             </div>
             <Link to="/">
-              <Button>Go Home</Button>
+              <Button>{t("profile.goHome")}</Button>
             </Link>
           </div>
         </div>
@@ -135,7 +126,7 @@ function ProfilePage() {
     );
   }
 
-  const publicName = profileData.publicName || profileData.displayName || "User";
+  const publicName = profileData.publicName || profileData.displayName || t("profile.userFallback");
   const initials = publicName
     .trim()
     .split(/\s+/)
@@ -151,10 +142,10 @@ function ProfilePage() {
         <div className="flex items-start justify-between">
           <PageHeader
             title={publicName}
-            highlightedWord={publicName.split(" ")[0] || "User"}
+            highlightedWord={publicName.split(" ")[0] || t("profile.userFallback")}
             description={
               <span>
-                Explore {publicName}'s work and projects
+                {t("profile.exploreProfile")}{publicName}{t("profile.exploreProfileWork")}
               </span>
             }
           />
@@ -162,18 +153,16 @@ function ProfilePage() {
             <Link to="/profile/edit">
               <Button variant="outline" size="sm">
                 <Pencil className="h-4 w-4 mr-2" />
-                Edit Profile
+                {t("profile.editProfileBtn")}
               </Button>
             </Link>
           )}
         </div>
 
         <div className="space-y-8">
-          {/* Profile Info Section */}
           <Card>
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row gap-8 items-start">
-                {/* Avatar */}
                 <div className="flex-shrink-0">
                   <Avatar className="w-32 h-32 shadow-elevation-2">
                     <AvatarImage
@@ -187,7 +176,6 @@ function ProfilePage() {
                   </Avatar>
                 </div>
 
-                {/* Profile Details */}
                 <div className="flex-1 space-y-4">
                   <div>
                     <h1 className="text-3xl font-bold mb-2">
@@ -200,7 +188,6 @@ function ProfilePage() {
                     )}
                   </div>
 
-                  {/* Social Links */}
                   {(profileData.twitterHandle ||
                     profileData.githubHandle ||
                     profileData.websiteUrl) && (
@@ -240,7 +227,7 @@ function ProfilePage() {
                             className="flex items-center gap-2"
                           >
                             <Globe className="h-4 w-4" />
-                            Website
+                            {t("profile.website")}
                           </a>
                         </Button>
                       )}
@@ -251,18 +238,17 @@ function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* Projects Section */}
           {profileData.projects && profileData.projects.length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  Projects & Showcases
+                  {t("profile.projectsShowcase")}
                   <Badge variant="secondary">
                     {profileData.projects.length}
                   </Badge>
                 </CardTitle>
                 <CardDescription>
-                  Explore the projects and work by {publicName}
+                  {t("profile.projectsShowcaseDesc")}{publicName}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -317,7 +303,7 @@ function ProfilePage() {
                                   rel="noopener noreferrer"
                                 >
                                   <ExternalLink className="h-3 w-3 mr-1" />
-                                  Live Demo
+                                  {t("profile.liveDemo")}
                                 </a>
                               </Button>
                             )}
@@ -329,7 +315,7 @@ function ProfilePage() {
                                   rel="noopener noreferrer"
                                 >
                                   <Github className="h-3 w-3 mr-1" />
-                                  Code
+                                  {t("profile.codeBtn")}
                                 </a>
                               </Button>
                             )}
@@ -343,7 +329,6 @@ function ProfilePage() {
             </Card>
           )}
 
-          {/* Empty Projects State */}
           {(!profileData.projects || profileData.projects.length === 0) && (
             <Card>
               <CardContent className="p-8 text-center">
@@ -353,10 +338,10 @@ function ProfilePage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold mb-2">
-                      No Projects Yet
+                      {t("profile.noProjectsPublic")}
                     </h3>
                     <p className="text-muted-foreground">
-                      {publicName} hasn't added any projects to showcase yet.
+                      {publicName}{t("profile.noProjectsPublicDesc")}
                     </p>
                   </div>
                 </div>

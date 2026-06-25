@@ -2,6 +2,7 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Zap } from "lucide-react";
 import { LaunchKitCard } from "./launch-kit-card";
+import { useTranslation } from "react-i18next";
 
 interface ResultsGridProps {
   isLoading: boolean;
@@ -18,16 +19,16 @@ export function ResultsGrid({
   onClone,
   onClearFilters,
 }: ResultsGridProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex-1 min-w-0">
       {/* Results Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="text-sm text-muted-foreground">
           {isLoading
-            ? "Loading..."
-            : filteredLaunchKits?.length === 1
-              ? "1 launch kit found"
-              : `${filteredLaunchKits?.length || 0} launch kits found`}
+            ? t("launchKits.loading")
+            : t("launchKits.resultsCount", { count: filteredLaunchKits?.length || 0 })}
         </div>
       </div>
 
@@ -52,15 +53,15 @@ export function ResultsGrid({
             <div className="text-center">
               <Zap className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                No Launch Kits Found
+                {t("launchKits.noResults")}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {hasActiveFilters
-                  ? "Try adjusting your filters to find more results."
-                  : "No launch kits are available yet. Check back soon!"}
+                  ? t("launchKits.noResultsFiltered")
+                  : t("launchKits.noResultsEmpty")}
               </p>
               {hasActiveFilters && (
-                <Button onClick={onClearFilters}>Clear Filters</Button>
+                <Button onClick={onClearFilters}>{t("launchKits.clearFilters")}</Button>
               )}
             </div>
           </CardContent>

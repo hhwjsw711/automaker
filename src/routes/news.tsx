@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { getPublishedNewsEntriesFn, getAllNewsTagsFn } from "~/fn/news";
 import { isAdminFn } from "~/fn/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/news")({
 });
 
 function NewsPage() {
+  const { t } = useTranslation();
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
@@ -44,18 +46,18 @@ function NewsPage() {
     queryFn: () => isAdminFn(),
   });
 
-  const formatTimeAgo = (date: Date | string) => {
+  const formatTimeAgo = (date: Date | string, t: ReturnType<typeof useTranslation>["t"]) => {
     const now = new Date();
     const past = new Date(date);
     const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return "just now";
+    if (diffInSeconds < 60) return t("news.justNow");
     if (diffInSeconds < 3600)
-      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+      return `${Math.floor(diffInSeconds / 60)}${t("news.minutesAgo")}`;
     if (diffInSeconds < 86400)
-      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+      return `${Math.floor(diffInSeconds / 3600)}${t("news.hoursAgo")}`;
     if (diffInSeconds < 2592000)
-      return `${Math.floor(diffInSeconds / 86400)} days ago`;
+      return `${Math.floor(diffInSeconds / 86400)}${t("news.daysAgo")}`;
 
     return past.toLocaleDateString("en-US", {
       year: "numeric",
@@ -100,14 +102,14 @@ function NewsPage() {
     }
   };
 
-  const getTypeLabel = (type: string) => {
+  const getTypeLabel = (type: string, t: ReturnType<typeof useTranslation>["t"]) => {
     switch (type) {
       case "video":
-        return "YouTube Video";
+        return t("news.typeVideo");
       case "blog":
-        return "Blog Post";
+        return t("news.typeBlog");
       case "changelog":
-        return "Changelog";
+        return t("news.typeChangelog");
       default:
         return type;
     }
@@ -123,9 +125,9 @@ function NewsPage() {
     return (
       <Page>
         <PageHeader
-          title="AI News"
-          highlightedWord="News"
-          description="Stay up to date with the latest AI tools, YouTube videos, blog posts, and changelog updates. Curated content about Claude, Cursor, Cline, LLMs, and more."
+          title={t("news.title")}
+          highlightedWord={t("news.highlight")}
+          description={t("news.description")}
         />
         
         {/* Content Skeleton */}
@@ -156,13 +158,13 @@ function NewsPage() {
       <PageHeader
         title="AI News"
         highlightedWord="News"
-        description="Stay up to date with the latest AI tools, YouTube videos, blog posts, and changelog updates. Curated content about Claude, Cursor, Cline, LLMs, and more."
+          description={t("news.description")}
         actions={
           isAdmin ? (
             <Button asChild size="sm">
               <Link to="/admin/news">
                 <Settings className="h-4 w-4 mr-2" />
-                Edit
+                  {t("news.edit")}
               </Link>
             </Button>
           ) : undefined
@@ -175,7 +177,7 @@ function NewsPage() {
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium text-muted-foreground">
-              Filter by:
+              {t("news.filterBy")}
             </span>
           </div>
 
@@ -184,13 +186,13 @@ function NewsPage() {
             onValueChange={(value) => setSelectedType(value || null)}
           >
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Content Type" />
+              <SelectValue placeholder={t("news.contentType")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
-              <SelectItem value="video">📹 Videos</SelectItem>
-              <SelectItem value="blog">📝 Blog Posts</SelectItem>
-              <SelectItem value="changelog">🔄 Changelogs</SelectItem>
+                <SelectItem value="">{t("news.allTypes")}</SelectItem>
+                <SelectItem value="video">{t("news.filterVideos")}</SelectItem>
+                <SelectItem value="blog">{t("news.filterBlogPosts")}</SelectItem>
+                <SelectItem value="changelog">{t("news.filterChangelogs")}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -204,7 +206,7 @@ function NewsPage() {
               className="h-8"
             >
               <X className="h-3 w-3 mr-1" />
-              Clear
+              {t("news.clear")}
             </Button>
           )}
         </div>
@@ -226,7 +228,7 @@ function NewsPage() {
                       className={getTypeColor(entry.type)}
                     >
                       {getTypeIcon(entry.type)}
-                      <span className="ml-1">{getTypeLabel(entry.type)}</span>
+                      <span className="ml-1">{getTypeLabel(entry.type, t)}</span>
                     </Badge>
                   </div>
 
@@ -243,10 +245,10 @@ function NewsPage() {
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      <span>{formatTimeAgo(entry.publishedAt)}</span>
+                      <span>{formatTimeAgo(entry.publishedAt, t)}</span>
                     </div>
 
-                    {entry.authorName && <span>by {entry.authorName}</span>}
+                    {entry.authorName && <span>{t("news.by")} {entry.authorName}</span>}
                   </div>
                 </div>
 
@@ -266,7 +268,7 @@ function NewsPage() {
                       className="flex items-center gap-2"
                     >
                       <ExternalLink className="h-4 w-4" />
-                      {entry.type === "video" ? "Watch" : "Read"}
+                      {entry.type === "video" ? t("news.watch") : t("news.read")}
                     </a>
                   </Button>
                 </div>
@@ -293,12 +295,12 @@ function NewsPage() {
             <CardContent>
               <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
               <h3 className="text-xl font-semibold mb-2">
-                No news entries found
+                {t("news.noEntries")}
               </h3>
               <p className="text-muted-foreground">
                 {selectedType || selectedTag
-                  ? "Try adjusting your filters to see more content."
-                  : "Check back soon for the latest AI news and updates!"}
+                  ? t("news.tryAdjustingFilters")
+                  : t("news.checkBackSoon")}
               </p>
             </CardContent>
           </Card>

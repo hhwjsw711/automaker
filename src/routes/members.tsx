@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Page } from "~/routes/admin/-components/page";
 import { Card, CardContent } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -52,6 +53,7 @@ export const Route = createFileRoute("/members")({
 });
 
 function MembersPage() {
+  const { t } = useTranslation();
   const { members, stats } = Route.useLoaderData();
 
   return (
@@ -75,24 +77,22 @@ function MembersPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-theme-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-theme-500"></span>
               </span>
-              Global Community
+              {t("members.badge")}
             </div>
           </ScrollFadeIn>
 
           <ScrollAnimation direction="up" delay={0.1}>
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/70">
-              Build the Future with <br />
+              {t("members.headingLine1")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-theme-500 to-purple-500">
-                {stats?.totalUsers.toLocaleString()} Developers
+                {stats?.totalUsers.toLocaleString()}{t("members.headingLine2")}
               </span>
             </h1>
           </ScrollAnimation>
 
           <ScrollAnimation direction="up" delay={0.2}>
             <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-2xl mx-auto">
-              Join the fastest-growing network of agentic developers. Share your
-              journey, showcase your work, and collaborate on the next
-              generation of AI.
+              {t("members.description")}
             </p>
           </ScrollAnimation>
 
@@ -108,7 +108,7 @@ function MembersPage() {
                   className="h-14 px-8 text-lg rounded-full bg-gradient-to-r from-theme-600 to-theme-500 hover:from-theme-500 hover:to-theme-400 shadow-lg shadow-theme-500/25 hover:shadow-theme-500/40 transition-all duration-300 transform hover:-translate-y-1"
                 >
                   <Rocket className="mr-2 h-5 w-5" />
-                  Join the Community
+                  {t("members.joinCommunity")}
                 </Button>
               </a>
               <Link to="/profile/edit">
@@ -117,7 +117,7 @@ function MembersPage() {
                   size="lg"
                   className="h-14 px-8 text-lg rounded-full border-2 hover:bg-muted/50 transition-all duration-300"
                 >
-                  Create Public Profile
+                  {t("members.createProfile")}
                 </Button>
               </Link>
             </div>
@@ -139,14 +139,14 @@ function MembersPage() {
                       <Globe className="w-6 h-6" />
                     </div>
                     <span className="font-semibold uppercase tracking-wider text-sm">
-                      Total Members
+                      {t("members.totalMembers")}
                     </span>
                   </div>
                   <div className="text-6xl font-bold mb-2 tracking-tight text-foreground">
                     {stats.totalUsers.toLocaleString()}
                   </div>
                   <p className="text-muted-foreground">
-                    Developers, creators, and innovators from around the world
+                    {t("members.totalMembersDesc")}
                   </p>
                 </div>
               </div>
@@ -162,14 +162,14 @@ function MembersPage() {
                       <UserCheck className="w-6 h-6" />
                     </div>
                     <span className="font-semibold uppercase tracking-wider text-sm">
-                      Public Profiles
+                      {t("members.publicProfiles")}
                     </span>
                   </div>
                   <div className="text-6xl font-bold mb-2 tracking-tight text-foreground">
                     {stats.publicProfiles.toLocaleString()}
                   </div>
                   <p className="text-muted-foreground">
-                    Members showcasing their portfolio and contributions
+                    {t("members.publicProfilesDesc")}
                   </p>
                 </div>
               </div>
@@ -185,22 +185,21 @@ function MembersPage() {
                         <Zap className="w-6 h-6" />
                       </div>
                       <span className="font-semibold uppercase tracking-wider text-sm">
-                        Join the Action
+                        {t("members.joinAction")}
                       </span>
                     </div>
                     <div>
                       <div className="text-2xl font-bold mb-2">
-                        Ready to make your mark?
+                        {t("members.joinActionTitle")}
                       </div>
                       <p className="text-muted-foreground mb-6">
-                        Create your profile and start connecting with fellow
-                        makers today.
+                        {t("members.joinActionDesc")}
                       </p>
                       <Link
                         to="/profile/edit"
                         className="inline-flex items-center text-sm font-semibold text-theme-500 hover:text-theme-400 transition-colors"
                       >
-                        Get Started <ArrowRight className="ml-1 w-4 h-4" />
+                        {t("members.getStarted")} <ArrowRight className="ml-1 w-4 h-4" />
                       </Link>
                     </div>
                   </div>
@@ -213,9 +212,9 @@ function MembersPage() {
         {/* Members Grid Header */}
         <div className="flex items-center justify-between mb-12">
           <div>
-            <h2 className="text-3xl font-bold mb-2">Meet the Members</h2>
+            <h2 className="text-3xl font-bold mb-2">{t("members.meetMembers")}</h2>
             <p className="text-muted-foreground">
-              Browse profiles of the talented individuals in our community
+              {t("members.meetMembersDesc")}
             </p>
           </div>
           <div className="hidden md:block h-px flex-1 bg-gradient-to-r from-border/50 to-transparent ml-8"></div>
@@ -246,7 +245,7 @@ function MembersPage() {
                             <Avatar className="w-24 h-24 border-4 border-background shadow-xl">
                               <AvatarImage
                                 src={member.image || undefined}
-                                alt={member.publicName || "Member"}
+                                alt={member.publicName || t("members.memberFallback")}
                                 className="object-cover transition-transform duration-500 group-hover:scale-110"
                               />
                               <AvatarFallback className="bg-theme-100 dark:bg-theme-900 text-theme-600 dark:text-theme-300 text-2xl font-bold">
@@ -268,16 +267,16 @@ function MembersPage() {
                             {member.publicName || "Anonymous"}
                           </h3>
                           <p className="text-sm text-muted-foreground line-clamp-2 mt-2 min-h-[2.5rem] px-2">
-                            {member.bio || "Member of the Agentic Community"}
+                            {member.bio || t("members.memberOfCommunity")}
                           </p>
                         </div>
 
                         <div className="w-full pt-4 mt-4 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
                           <span>
-                            Joined {new Date(member.updatedAt).getFullYear()}
+                            {t("members.joined")} {new Date(member.updatedAt).getFullYear()}
                           </span>
                           <span className="group-hover:translate-x-1 transition-transform duration-300">
-                            View Profile →
+                            {t("members.viewProfile")}
                           </span>
                         </div>
                       </CardContent>
@@ -292,14 +291,13 @@ function MembersPage() {
             <div className="inline-flex justify-center items-center w-20 h-20 rounded-full bg-theme-100 dark:bg-theme-900/30 text-theme-500 mb-6">
               <Users className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-bold mb-2">Be the First</h3>
+            <h3 className="text-2xl font-bold mb-2">{t("members.beFirst")}</h3>
             <p className="text-muted-foreground max-w-md mx-auto mb-8">
-              The community is just getting started. Create your public profile
-              to be featured here.
+              {t("members.beFirstDesc")}
             </p>
             <Link to="/profile/edit">
               <Button size="lg" className="rounded-full">
-                Create Public Profile
+                {t("members.createProfile")}
               </Button>
             </Link>
           </div>

@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { getPublicAgentsFn } from "~/fn/agents";
 import { Button } from "~/components/ui/button";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/agents/")({
 
 function AgentsListPage() {
   const { agents, isAuthenticated } = Route.useLoaderData();
+  const { t } = useTranslation();
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -59,16 +61,16 @@ function AgentsListPage() {
   return (
     <Page>
       <PageHeader
-        title="Agent Marketplace"
-        highlightedWord="Agent"
-        description="Discover and share community agents."
+        title={t("agents_public.title")}
+        highlightedWord={t("agents_public.highlighted")}
+        description={t("agents_public.description")}
         actions={
           <div className="flex items-center gap-4">
             {isAuthenticated && (
               <Link to="/agents/new">
                 <Button size="lg">
                   <Plus className="h-5 w-5" />
-                  Upload Agent
+                  {t("agents_public.uploadAgent")}
                 </Button>
               </Link>
             )}
@@ -82,7 +84,7 @@ function AgentsListPage() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Total Agents
+                {t("agents_public.totalAgents")}
               </div>
               <div className="w-10 h-10 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30 transition-colors duration-300">
                 <Bot className="h-5 w-5 text-theme-500 dark:text-theme-400" />
@@ -92,7 +94,7 @@ function AgentsListPage() {
               {agents.length}
             </div>
             <p className="text-sm text-muted-foreground">
-              Available in marketplace
+              {t("agents_public.availableDesc")}
             </p>
           </div>
         </div>
@@ -101,7 +103,7 @@ function AgentsListPage() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                Contributors
+                {t("agents_public.contributors")}
               </div>
               <div className="w-10 h-10 rounded-full bg-blue-500/10 dark:bg-blue-400/20 flex items-center justify-center group-hover:bg-blue-500/20 dark:group-hover:bg-blue-400/30 transition-colors duration-300">
                 <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />
@@ -111,7 +113,7 @@ function AgentsListPage() {
               {new Set(agents.map((a) => a.authorId)).size}
             </div>
             <p className="text-sm text-muted-foreground">
-              Community members sharing
+              {t("agents_public.contributorsDesc")}
             </p>
           </div>
         </div>
@@ -120,7 +122,7 @@ function AgentsListPage() {
           <div className="module-card p-6 h-full">
             <div className="flex flex-row items-center justify-between space-y-0 mb-4">
               <div className="text-sm font-medium text-muted-foreground">
-                AI Agents
+                {t("agents_public.aiAgents")}
               </div>
               <div className="w-10 h-10 rounded-full bg-green-500/10 dark:bg-green-400/20 flex items-center justify-center group-hover:bg-green-500/20 dark:group-hover:bg-green-400/30 transition-colors duration-300">
                 <Zap className="h-5 w-5 text-green-500 dark:text-green-400" />
@@ -130,7 +132,7 @@ function AgentsListPage() {
               {agents.filter((a) => a.type === "agent").length}
             </div>
             <p className="text-sm text-muted-foreground">
-              Ready-to-use AI assistants
+              {t("agents_public.aiAgentsDesc")}
             </p>
           </div>
         </div>
@@ -175,7 +177,7 @@ function AgentsListPage() {
                 >
                   <Button variant="outline" className="w-full">
                     <Bot className="mr-2 h-4 w-4" />
-                    View Details
+                    {t("agents_public.viewDetails")}
                   </Button>
                 </Link>
               </CardFooter>
@@ -188,15 +190,15 @@ function AgentsListPage() {
             <div className="w-24 h-24 rounded-full bg-theme-500/10 dark:bg-theme-400/10 flex items-center justify-center mx-auto mb-6">
               <Bot className="w-12 h-12 text-theme-600 dark:text-theme-400" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">No Agents Yet</h3>
+            <h3 className="text-xl font-semibold mb-2">{t("agents_public.noAgents")}</h3>
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Be the first to share an AI agent with the community!
+              {t("agents_public.noAgentsDesc")}
             </p>
             {isAuthenticated && (
               <Link to="/agents/new">
                 <Button>
                   <Plus className="mr-2 h-4 w-4" />
-                  Create First Agent
+                  {t("agents_public.createFirstAgent")}
                 </Button>
               </Link>
             )}

@@ -10,6 +10,7 @@ import {
 } from "~/components/ui/card";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "~/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 const unsubscribeSearchSchema = z.object({
   token: z.string().optional(),
@@ -34,6 +35,7 @@ export const Route = createFileRoute("/unsubscribe")({
 
 function UnsubscribePage() {
   const data = Route.useLoaderData();
+  const { t } = useTranslation();
 
   const renderContent = () => {
     if (data.status === "success") {
@@ -44,27 +46,27 @@ function UnsubscribePage() {
           </div>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-green-600 dark:text-green-400">
-              Successfully Unsubscribed
+              {t("unsubscribe.successTitle")}
             </CardTitle>
             <CardDescription className="text-base">
-              You have been unsubscribed from all emails for{" "}
+              {t("unsubscribe.successDesc")}{" "}
               <span className="font-medium">{data.emailAddress}</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                You will no longer receive course updates, promotional emails, or newsletters from us.
+                {t("unsubscribe.noMoreEmails")}
               </p>
             </div>
             <p className="text-sm text-muted-foreground">
-              If you'd like to manage your preferences or resubscribe, you can do so in your account settings.
+              {t("unsubscribe.managePrefs")}
             </p>
             <Button
               onClick={() => (window.location.href = "/")}
               className="btn-gradient"
             >
-              Return to Homepage
+              {t("unsubscribe.returnHome")}
             </Button>
           </CardContent>
         </>
@@ -77,30 +79,28 @@ function UnsubscribePage() {
           </div>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold text-red-600 dark:text-red-400">
-              Unsubscribe Failed
+              {t("unsubscribe.failureTitle")}
             </CardTitle>
             <CardDescription className="text-base">
-              {data.message || "We couldn't process your unsubscribe request"}
+              {data.message || t("unsubscribe.failureDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              The unsubscribe link may have expired or already been used. If you
-              continue to receive unwanted emails, please contact our support
-              team.
+              {t("unsubscribe.expiredLink")}
             </p>
             <div className="flex gap-3 justify-center">
               <Button
                 onClick={() => (window.location.href = "/")}
                 variant="outline"
               >
-                Return to Homepage
+                {t("unsubscribe.returnHome")}
               </Button>
               <Button
                 onClick={() => (window.location.href = "/settings")}
                 className="btn-gradient"
               >
-                Manage Email Settings
+                {t("unsubscribe.manageSettings")}
               </Button>
             </div>
           </CardContent>

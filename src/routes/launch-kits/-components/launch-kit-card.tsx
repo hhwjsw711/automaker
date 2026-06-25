@@ -9,6 +9,7 @@ import {
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { GitFork, ExternalLink, Eye, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface LaunchKitCardProps {
   kit: any;
@@ -17,6 +18,7 @@ interface LaunchKitCardProps {
 
 export function LaunchKitCard({ kit, onClone }: LaunchKitCardProps) {
   const kitTags = kit.tags || [];
+  const { t } = useTranslation();
 
   return (
     <Card 
@@ -94,7 +96,7 @@ export function LaunchKitCard({ kit, onClone }: LaunchKitCardProps) {
           className="w-full group/btn text-xs mb-3"
         >
           <GitFork className="mr-1 h-3 w-3 group-hover/btn:rotate-12 transition-transform" />
-          Clone Repository
+          {t("launchKits.cloneRepository")}
         </Button>
 
         {/* Secondary Actions - Horizontal layout */}
@@ -106,7 +108,7 @@ export function LaunchKitCard({ kit, onClone }: LaunchKitCardProps) {
           >
             <Button variant="outline" size="sm" className="w-full text-xs">
               <Eye className="mr-1 h-3 w-3" />
-              Details
+              {t("launchKits.details")}
             </Button>
           </Link>
 
@@ -119,7 +121,7 @@ export function LaunchKitCard({ kit, onClone }: LaunchKitCardProps) {
                 className="text-xs"
               >
                 <ExternalLink className="mr-1 h-3 w-3" />
-                Demo
+                {t("launchKits.demo")}
               </a>
             </Button>
           )}

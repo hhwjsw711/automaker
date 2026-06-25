@@ -4,9 +4,10 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Page } from "~/routes/admin/-components/page";
 import { PageHeader } from "~/routes/admin/-components/page-header";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { AppCard } from "~/components/app-card";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -46,7 +47,6 @@ import {
   Save,
   Trash2,
   User,
-  Settings,
   FolderOpen,
   Eye,
 } from "lucide-react";
@@ -54,45 +54,47 @@ import { toast } from "sonner";
 import { authenticatedMiddleware } from "~/lib/auth";
 import { assertAuthenticatedFn } from "~/fn/auth";
 
-const profileFormSchema = z.object({
-  displayName: z.string().min(1, "Display name is required").max(100),
-  realName: z.string().max(100).optional().or(z.literal("")),
-  useDisplayName: z.boolean().optional(),
-  bio: z.string().max(500).optional(),
-  twitterHandle: z.string().max(50).optional(),
-  githubHandle: z.string().max(50).optional(),
-  websiteUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal("")),
-  isPublicProfile: z.boolean().optional(),
-});
-
-const projectFormSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100),
-  description: z.string().min(1, "Description is required").max(500),
-  imageUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-  projectUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal("")),
-  repositoryUrl: z
-    .string()
-    .url("Must be a valid URL")
-    .optional()
-    .or(z.literal("")),
-  technologies: z.string().optional(),
-  isVisible: z.boolean().optional(),
-});
-
 export const Route = createFileRoute("/profile/edit")({
   beforeLoad: () => assertAuthenticatedFn(),
   component: EditProfilePage,
 });
 
 function EditProfilePage() {
+  const { t } = useTranslation();
+
+  const profileFormSchema = z.object({
+    displayName: z.string().min(1, t("profile.displayNameRequired")).max(100),
+    realName: z.string().max(100).optional().or(z.literal("")),
+    useDisplayName: z.boolean().optional(),
+    bio: z.string().max(500).optional(),
+    twitterHandle: z.string().max(50).optional(),
+    githubHandle: z.string().max(50).optional(),
+    websiteUrl: z
+      .string()
+      .url(t("profile.invalidUrl"))
+      .optional()
+      .or(z.literal("")),
+    isPublicProfile: z.boolean().optional(),
+  });
+
+  const projectFormSchema = z.object({
+    title: z.string().min(1, t("profile.titleRequired")).max(100),
+    description: z.string().min(1, t("profile.descRequired")).max(500),
+    imageUrl: z.string().url(t("profile.invalidUrl")).optional().or(z.literal("")),
+    projectUrl: z
+      .string()
+      .url(t("profile.invalidUrl"))
+      .optional()
+      .or(z.literal("")),
+    repositoryUrl: z
+      .string()
+      .url(t("profile.invalidUrl"))
+      .optional()
+      .or(z.literal("")),
+    technologies: z.string().optional(),
+    isVisible: z.boolean().optional(),
+  });
+
   const queryClient = useQueryClient();
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
@@ -141,13 +143,13 @@ function EditProfilePage() {
     mutationFn: updateProfileFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Profile updated", {
-        description: "Your profile has been updated successfully.",
+      toast.success(t("profile.profileUpdated"), {
+        description: t("profile.profileUpdatedDesc"),
       });
     },
     onError: () => {
-      toast.error("Error", {
-        description: "Failed to update profile. Please try again.",
+      toast.error(t("profile.updateFailed"), {
+        description: t("profile.updateFailedDesc"),
       });
     },
   });
@@ -158,13 +160,13 @@ function EditProfilePage() {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       setIsAddingProject(false);
       projectForm.reset();
-      toast.success("Project added", {
-        description: "Your project has been added successfully.",
+      toast.success(t("profile.projectAdded"), {
+        description: t("profile.projectAddedDesc"),
       });
     },
     onError: () => {
-      toast.error("Error", {
-        description: "Failed to add project. Please try again.",
+      toast.error(t("profile.actionFailed"), {
+        description: t("profile.actionFailedDesc"),
       });
     },
   });
@@ -174,13 +176,13 @@ function EditProfilePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       setEditingProject(null);
-      toast.success("Project updated", {
-        description: "Your project has been updated successfully.",
+      toast.success(t("profile.projectUpdated"), {
+        description: t("profile.projectUpdatedDesc"),
       });
     },
     onError: () => {
-      toast.error("Error", {
-        description: "Failed to update project. Please try again.",
+      toast.error(t("profile.actionFailed"), {
+        description: t("profile.actionFailedDesc"),
       });
     },
   });
@@ -189,13 +191,13 @@ function EditProfilePage() {
     mutationFn: deleteProjectFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
-      toast.success("Project deleted", {
-        description: "Your project has been deleted successfully.",
+      toast.success(t("profile.projectDeleted"), {
+        description: t("profile.projectDeletedDesc"),
       });
     },
     onError: () => {
-      toast.error("Error", {
-        description: "Failed to delete project. Please try again.",
+      toast.error(t("profile.actionFailed"), {
+        description: t("profile.actionFailedDesc"),
       });
     },
   });
@@ -206,7 +208,6 @@ function EditProfilePage() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Show preview immediately
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreviewImage(e.target?.result as string);
@@ -235,20 +236,17 @@ function EditProfilePage() {
         throw new Error("Failed to upload image");
       }
 
-      // Only store the imageId (R2 key), not the presigned URL
       await updateProfileMutation.mutateAsync({
         data: {
           imageId: imageKey,
         },
       });
 
-      // Clear preview after successful upload
       setPreviewImage(null);
     } catch (error) {
-      toast.error("Upload failed", {
-        description: "Failed to upload image. Please try again.",
+      toast.error(t("profile.uploadFailed"), {
+        description: t("profile.uploadFailedDesc"),
       });
-      // Clear preview on error
       setPreviewImage(null);
     } finally {
       setIsUploading(false);
@@ -279,7 +277,6 @@ function EditProfilePage() {
   return (
     <Page>
       <div className="max-w-6xl mx-auto">
-        {/* Breadcrumbs */}
         <div className="mb-6 flex items-center justify-between">
           <Breadcrumb>
             <BreadcrumbList>
@@ -289,13 +286,13 @@ function EditProfilePage() {
                     to="/profile/$userId"
                     params={{ userId: profile?.id?.toString() || "" }}
                   >
-                    Profile
+                    {t("profile.highlighted")}
                   </Link>
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Edit Profile</BreadcrumbPage>
+                <BreadcrumbPage>{t("profile.editTitle")}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
@@ -306,38 +303,35 @@ function EditProfilePage() {
               params={{ userId: profile?.id?.toString() || "" }}
             >
               <Eye className="h-4 w-4 mr-2" />
-              View Profile
+              {t("profile.viewProfile")}
             </Link>
           </Button>
         </div>
 
         <PageHeader
-          title="Edit Profile"
-          highlightedWord="Profile"
-          description="Update your profile information and showcase your projects"
+          title={t("profile.editTitle")}
+          highlightedWord={t("profile.highlighted")}
+          description={t("profile.editDescription")}
         />
 
-        {/* Main Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Profile Information */}
           <div className="lg:col-span-1">
             <AppCard
               icon={User}
-              title="Profile Information"
-              description="Update your personal details"
+              title={t("profile.profileInformation")}
+              description={t("profile.updateDetails")}
             >
               <form
                 onSubmit={profileForm.handleSubmit(onProfileSubmit)}
                 className="space-y-6 p-6"
               >
-                {/* Profile Image */}
                 <div className="space-y-2">
-                  <Label>Profile Picture</Label>
+                  <Label>{t("profile.profilePicture")}</Label>
                   <div className="flex flex-col items-center gap-4">
                     <Avatar className="w-24 h-24">
                       <AvatarImage
                         src={previewImage || profile?.image || undefined}
-                        alt="Profile"
+                        alt={t("profile.profileAlt")}
                         className="object-cover"
                       />
                       <AvatarFallback className="bg-theme-500 text-white text-2xl font-semibold">
@@ -362,7 +356,7 @@ function EditProfilePage() {
                         }
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        {isUploading ? "Uploading..." : "Upload Image"}
+                        {isUploading ? t("profile.uploading") : t("profile.uploadImage")}
                       </Button>
                       <input
                         id="image-upload"
@@ -372,20 +366,19 @@ function EditProfilePage() {
                         className="hidden"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
-                        JPG, PNG or GIF. Max 5MB
+                        {t("profile.imageHint")}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Form Fields */}
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="displayName">Display Name *</Label>
+                    <Label htmlFor="displayName">{t("profile.displayName")} *</Label>
                     <Input
                       id="displayName"
                       {...profileForm.register("displayName")}
-                      placeholder="Your display name"
+                      placeholder={t("profile.displayNamePlaceholder")}
                     />
                     {profileForm.formState.errors.displayName && (
                       <p className="text-sm text-destructive">
@@ -394,14 +387,13 @@ function EditProfilePage() {
                     )}
                   </div>
 
-                  {/* Use Display Name Toggle */}
                   <div className="flex items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
                       <Label htmlFor="useDisplayName" className="text-base">
-                        Use Display Name
+                        {t("profile.useDisplayName")}
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        Show your alias instead of real name publicly
+                        {t("profile.useDisplayNameDesc")}
                       </p>
                     </div>
                     <Controller
@@ -417,14 +409,13 @@ function EditProfilePage() {
                     />
                   </div>
 
-                  {/* Real Name */}
                   <div className="space-y-2">
-                    <Label htmlFor="realName">Real Name</Label>
+                    <Label htmlFor="realName">{t("profile.realName")}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         id="realName"
                         {...profileForm.register("realName")}
-                        placeholder="Your real name (optional)"
+                        placeholder={t("profile.realNamePlaceholder")}
                       />
                       {profileForm.watch("realName") && (
                         <Button
@@ -440,16 +431,16 @@ function EditProfilePage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Required for affiliate program. Clear for privacy.
+                      {t("profile.realNameHint")}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label htmlFor="bio">{t("profile.bio")}</Label>
                     <Textarea
                       id="bio"
                       {...profileForm.register("bio")}
-                      placeholder="Tell us about yourself..."
+                      placeholder={t("profile.bioPlaceholder")}
                       rows={3}
                     />
                     {profileForm.formState.errors.bio && (
@@ -460,11 +451,11 @@ function EditProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="websiteUrl">Website</Label>
+                    <Label htmlFor="websiteUrl">{t("profile.website")}</Label>
                     <Input
                       id="websiteUrl"
                       {...profileForm.register("websiteUrl")}
-                      placeholder="https://yourwebsite.com"
+                      placeholder={t("profile.websitePlaceholder")}
                     />
                     {profileForm.formState.errors.websiteUrl && (
                       <p className="text-sm text-destructive">
@@ -474,31 +465,30 @@ function EditProfilePage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="twitterHandle">Twitter Handle</Label>
+                    <Label htmlFor="twitterHandle">{t("profile.twitter")}</Label>
                     <Input
                       id="twitterHandle"
                       {...profileForm.register("twitterHandle")}
-                      placeholder="username (without @)"
+                      placeholder={t("profile.twitterPlaceholder")}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="githubHandle">GitHub Handle</Label>
+                    <Label htmlFor="githubHandle">{t("profile.github")}</Label>
                     <Input
                       id="githubHandle"
                       {...profileForm.register("githubHandle")}
-                      placeholder="username"
+                      placeholder={t("profile.githubPlaceholder")}
                     />
                   </div>
 
-                  {/* Public Profile Toggle */}
                   <div className="flex items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
                       <Label htmlFor="isPublicProfile" className="text-base">
-                        Public Profile
+                        {t("profile.publicProfile")}
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        Show your profile on the community members page
+                        {t("profile.publicProfileDesc")}
                       </p>
                     </div>
                     <Controller
@@ -523,15 +513,14 @@ function EditProfilePage() {
                   >
                     <Save className="h-4 w-4 mr-2" />
                     {updateProfileMutation.isPending
-                      ? "Saving..."
-                      : "Save Profile"}
+                      ? t("profile.saving")
+                      : t("profile.saveProfile")}
                   </Button>
                 </div>
               </form>
             </AppCard>
           </div>
 
-          {/* Right Column - Tabs */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="projects" className="w-full">
               <TabsList className="grid w-full grid-cols-1">
@@ -540,16 +529,15 @@ function EditProfilePage() {
                   className="flex items-center gap-2"
                 >
                   <FolderOpen className="h-4 w-4" />
-                  Projects
+                  {t("profile.projects")}
                 </TabsTrigger>
               </TabsList>
 
-              {/* Projects Tab */}
               <TabsContent value="projects">
                 <AppCard
                   icon={FolderOpen}
-                  title="Projects & Showcases"
-                  description="Manage your project portfolio"
+                  title={t("profile.projectsTitle")}
+                  description={t("profile.projectsDesc")}
                   actions={
                     <Button
                       onClick={() => setIsAddingProject(true)}
@@ -557,12 +545,11 @@ function EditProfilePage() {
                       size="sm"
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Project
+                      {t("profile.addProject")}
                     </Button>
                   }
                 >
                   <div className="p-6">
-                    {/* Add Project Form */}
                     {isAddingProject && (
                       <Card className="mb-6">
                         <CardContent className="p-4">
@@ -572,11 +559,11 @@ function EditProfilePage() {
                           >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <Label htmlFor="title">Project Title *</Label>
+                                <Label htmlFor="title">{t("profile.projectTitle")} *</Label>
                                 <Input
                                   id="title"
                                   {...projectForm.register("title")}
-                                  placeholder="My Awesome Project"
+                                  placeholder={t("profile.projectTitlePlaceholder")}
                                 />
                                 {projectForm.formState.errors.title && (
                                   <p className="text-sm text-destructive">
@@ -587,56 +574,56 @@ function EditProfilePage() {
 
                               <div className="space-y-2">
                                 <Label htmlFor="technologies">
-                                  Technologies
+                                  {t("profile.technologies")}
                                 </Label>
                                 <Input
                                   id="technologies"
                                   {...projectForm.register("technologies")}
-                                  placeholder="React, TypeScript, Node.js"
+                                  placeholder={t("profile.technologiesPlaceholder")}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                  Comma-separated list
+                                  {t("profile.technologiesHint")}
                                 </p>
                               </div>
 
                               <div className="space-y-2">
                                 <Label htmlFor="projectUrl">
-                                  Live Demo URL
+                                  {t("profile.demoUrl")}
                                 </Label>
                                 <Input
                                   id="projectUrl"
                                   {...projectForm.register("projectUrl")}
-                                  placeholder="https://myproject.com"
+                                  placeholder={t("profile.demoUrlPlaceholder")}
                                 />
                               </div>
 
                               <div className="space-y-2">
                                 <Label htmlFor="repositoryUrl">
-                                  Repository URL
+                                  {t("profile.repoUrl")}
                                 </Label>
                                 <Input
                                   id="repositoryUrl"
                                   {...projectForm.register("repositoryUrl")}
-                                  placeholder="https://github.com/username/repo"
+                                  placeholder={t("profile.repoUrlPlaceholder")}
                                 />
                               </div>
 
                               <div className="space-y-2 md:col-span-2">
-                                <Label htmlFor="imageUrl">Image URL</Label>
+                                <Label htmlFor="imageUrl">{t("profile.imageUrl")}</Label>
                                 <Input
                                   id="imageUrl"
                                   {...projectForm.register("imageUrl")}
-                                  placeholder="https://example.com/image.jpg"
+                                  placeholder={t("profile.imageUrlPlaceholder")}
                                 />
                               </div>
                             </div>
 
                             <div className="space-y-2">
-                              <Label htmlFor="description">Description *</Label>
+                              <Label htmlFor="description">{t("profile.projectDescription")} *</Label>
                               <Textarea
                                 id="description"
                                 {...projectForm.register("description")}
-                                placeholder="Describe your project..."
+                                placeholder={t("profile.projectDescriptionPlaceholder")}
                                 rows={3}
                               />
                               {projectForm.formState.errors.description && (
@@ -655,8 +642,8 @@ function EditProfilePage() {
                                 disabled={createProjectMutation.isPending}
                               >
                                 {createProjectMutation.isPending
-                                  ? "Adding..."
-                                  : "Add Project"}
+                                  ? t("profile.adding")
+                                  : t("profile.addProject")}
                               </Button>
                               <Button
                                 type="button"
@@ -666,7 +653,7 @@ function EditProfilePage() {
                                   projectForm.reset();
                                 }}
                               >
-                                Cancel
+                                {t("profile.cancel")}
                               </Button>
                             </div>
                           </form>
@@ -674,7 +661,6 @@ function EditProfilePage() {
                       </Card>
                     )}
 
-                    {/* Projects List */}
                     {projects && projects.length > 0 ? (
                       <div className="space-y-4">
                         {projects.map((project) => (
@@ -716,7 +702,7 @@ function EditProfilePage() {
                                           rel="noopener noreferrer"
                                         >
                                           <ExternalLink className="h-3 w-3 mr-1" />
-                                          Demo
+                                          {t("profile.demoBtn")}
                                         </a>
                                       </Button>
                                     )}
@@ -732,7 +718,7 @@ function EditProfilePage() {
                                           rel="noopener noreferrer"
                                         >
                                           <Github className="h-3 w-3 mr-1" />
-                                          Code
+                                          {t("profile.codeBtn")}
                                         </a>
                                       </Button>
                                     )}
@@ -746,7 +732,7 @@ function EditProfilePage() {
                                       setEditingProject(project.id)
                                     }
                                   >
-                                    Edit
+                                    {t("profile.editBtn")}
                                   </Button>
                                   <Button
                                     size="sm"
@@ -774,18 +760,17 @@ function EditProfilePage() {
                           </div>
                           <div>
                             <h3 className="text-xl font-semibold mb-2">
-                              No Projects Yet
+                              {t("profile.noProjects")}
                             </h3>
                             <p className="text-muted-foreground mb-4">
-                              Start building your portfolio by adding your first
-                              project.
+                              {t("profile.noProjectsDesc")}
                             </p>
                             <Button
                               onClick={() => setIsAddingProject(true)}
                               disabled={isAddingProject}
                             >
                               <Plus className="h-4 w-4 mr-2" />
-                              Add Your First Project
+                              {t("profile.addFirstProject")}
                             </Button>
                           </div>
                         </div>

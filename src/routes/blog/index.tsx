@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { getPublishedBlogPostsFn } from "~/fn/blog";
 import { queryOptions } from "@tanstack/react-query";
 import { Badge } from "~/components/ui/badge";
@@ -21,6 +22,7 @@ const blogPostsQuery = queryOptions({
 });
 
 function BlogIndex() {
+  const { t } = useTranslation();
   const { data: blogPosts, isLoading } = useQuery(blogPostsQuery);
 
   return (
@@ -28,11 +30,11 @@ function BlogIndex() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-foreground mb-4">
-          Our <span className="text-theme-600 dark:text-theme-400">Blog</span>
+          {t("blog.headingLine1")}{" "}
+          <span className="text-theme-600 dark:text-theme-400">{t("blog.headingLine2")}</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Insights, tutorials, and updates from our team. Stay up to date with
-          the latest in web development and programming.
+          {t("blog.description")}
         </p>
       </div>
 
@@ -120,14 +122,14 @@ function BlogIndex() {
                             ))}
                             {tags.length > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{tags.length - 3} more
+                                +{tags.length - 3} {t("blog.more", { count: tags.length - 3 })}
                               </Badge>
                             )}
                           </div>
                         )}
                         
                         <div className="flex items-center text-theme-600 dark:text-theme-400 text-sm font-medium group-hover:gap-2 transition-all ml-auto">
-                          Read more
+                          {t("blog.readMore")}
                           <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
@@ -141,10 +143,10 @@ function BlogIndex() {
       ) : (
         <div className="text-center py-12">
           <h3 className="text-lg font-medium text-muted-foreground mb-2">
-            No blog posts yet
+            {t("blog.noPosts")}
           </h3>
           <p className="text-sm text-muted-foreground">
-            Check back soon for new content!
+            {t("blog.noPostsDesc")}
           </p>
         </div>
       )}

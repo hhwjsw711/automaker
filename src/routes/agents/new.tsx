@@ -4,6 +4,7 @@ import { createAgentFn } from "~/fn/agents";
 import { AgentForm, type AgentFormValues } from "./-components/agent-form";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PageHeader } from "../admin/-components/page-header";
 import { Page } from "../admin/-components/page";
 import { assertFeatureEnabled } from "~/lib/feature-flags";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/agents/new")({
 function CreateAgentPage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async (values: AgentFormValues) => {
     setIsSubmitting(true);
@@ -49,15 +51,15 @@ function CreateAgentPage() {
   return (
     <Page>
       <PageHeader
-        title="Upload New Agent"
-        highlightedWord="New"
-        description="Share your agents, command, or hook with the community."
+        title={t("agents_public.uploadNew")}
+        highlightedWord={t("agents_public.highlightedNew")}
+        description={t("agents_public.uploadDescription")}
       />
 
       <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
         <AgentForm
-          buttonText="Create Agent"
-          loadingText="Creating Agent..."
+          buttonText={t("agents_public.createAgent")}
+          loadingText={t("agents_public.creatingAgent")}
           buttonIcon={Plus}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}

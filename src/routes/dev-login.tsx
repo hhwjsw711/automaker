@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -17,6 +18,7 @@ export const Route = createFileRoute("/dev-login")({
 
 function DevLoginPage() {
   const { redirect_uri: redirectUri } = Route.useSearch();
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ email: "premium@localhost.test", name: "Premium User", isAdmin: false, isPremium: true });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,31 +59,31 @@ function DevLoginPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <span className="bg-yellow-500 text-black px-2 py-0.5 rounded text-xs font-bold">DEV</span>
-            Dev Login
+            {t("devLogin.title")}
           </CardTitle>
-          <CardDescription>Bypass OAuth for local development.</CardDescription>
+          <CardDescription>{t("devLogin.description")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("devLogin.email")}</Label>
               <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="name">Display Name</Label>
+              <Label htmlFor="name">{t("devLogin.displayName")}</Label>
               <Input id="name" type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
             </div>
             <div className="flex items-center space-x-4 pt-2">
               <div className="flex items-center space-x-2">
                 <Checkbox id="isAdmin" checked={formData.isAdmin} onCheckedChange={(checked) => updateUserType(checked === true, formData.isPremium)} />
-                <Label htmlFor="isAdmin" className="cursor-pointer">Admin</Label>
+                <Label htmlFor="isAdmin" className="cursor-pointer">{t("devLogin.admin")}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="isPremium" checked={formData.isPremium} onCheckedChange={(checked) => updateUserType(formData.isAdmin, checked === true)} />
-                <Label htmlFor="isPremium" className="cursor-pointer">Premium</Label>
+                <Label htmlFor="isPremium" className="cursor-pointer">{t("devLogin.premium")}</Label>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>{isLoading ? "Logging in..." : "Login as Dev User"}</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>{isLoading ? t("devLogin.loggingIn") : t("devLogin.loginButton")}</Button>
           </form>
         </CardContent>
       </Card>

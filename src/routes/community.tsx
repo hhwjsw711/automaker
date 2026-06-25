@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { ScrollAnimation, ScrollScale } from "~/components/scroll-animation";
 import { Button } from "~/components/ui/button";
 import {
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/community")({
 });
 
 function CommunityPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -40,24 +43,22 @@ function CommunityPage() {
             <ScrollAnimation direction="down" delay={0}>
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-theme-50/50 dark:bg-background/20 backdrop-blur-sm border border-theme-200 dark:border-border/50 text-theme-600 dark:text-theme-400 text-sm font-medium mb-8">
                 <span className="w-2 h-2 bg-theme-500 dark:bg-theme-400 rounded-full mr-2 animate-pulse"></span>
-                Join the Revolution
+                {t("community.badge")}
               </div>
             </ScrollAnimation>
 
             <ScrollAnimation direction="up" delay={0.1}>
               <h1 className="text-6xl leading-tight mb-8">
-                Connect with{" "}
-                <span className="text-theme-400">AI Enthusiasts</span>
+                {t("community.headingLine1")}{" "}
+                <span className="text-theme-400">{t("community.headingLine2a")}</span>
                 <br />
-                <span className="text-theme-400">Worldwide</span>
+                <span className="text-theme-400">{t("community.headingLine2b")}</span>
               </h1>
             </ScrollAnimation>
 
             <ScrollAnimation direction="up" delay={0.2}>
               <p className="text-description mb-12 max-w-4xl mx-auto text-lg">
-                Join our thriving Discord community of AI developers, agentic
-                coding pioneers, and automation enthusiasts. Share knowledge,
-                get help, and shape the future of programming together.
+                {t("community.description")}
               </p>
             </ScrollAnimation>
 
@@ -70,7 +71,7 @@ function CommunityPage() {
               >
                 <Button size="lg" className="text-lg px-8 py-4 h-auto group">
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Join Discord Community
+                  {t("community.joinButton")}
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
@@ -90,11 +91,10 @@ function CommunityPage() {
           <div className="text-center mb-16">
             <ScrollAnimation direction="up" delay={0}>
               <h2 className="text-4xl font-bold mb-6">
-                Why Join Our <span className="text-theme-400">Community</span>?
+                Why Join Our <span className="text-theme-400">{t("community.whyJoin")}</span>?
               </h2>
               <p className="text-description text-lg max-w-3xl mx-auto">
-                Connect with like-minded developers who are pushing the
-                boundaries of what's possible with AI-powered development.
+                {t("community.whyJoinDesc")}
               </p>
             </ScrollAnimation>
           </div>
@@ -105,8 +105,8 @@ function CommunityPage() {
                 icon={
                   <Users className="w-8 h-8 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                 }
-                title="Expert Network"
-                description="Connect with experienced developers, AI researchers, and industry leaders who are pioneering agentic development practices."
+                title={t("community.expertNetwork")}
+                description={t("community.expertNetworkDesc")}
               />
             </ScrollScale>
 
@@ -115,8 +115,8 @@ function CommunityPage() {
                 icon={
                   <Code className="w-8 h-8 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                 }
-                title="Code Reviews"
-                description="Get feedback on your agentic coding projects and learn from real-world implementations shared by community members."
+                title={t("community.codeReviews")}
+                description={t("community.codeReviewsDesc")}
               />
             </ScrollScale>
 
@@ -125,8 +125,8 @@ function CommunityPage() {
                 icon={
                   <Lightbulb className="w-8 h-8 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                 }
-                title="Latest Insights"
-                description="Stay updated with the newest AI tools, techniques, and breakthrough discoveries in the rapidly evolving field."
+                title={t("community.latestInsights")}
+                description={t("community.latestInsightsDesc")}
               />
             </ScrollScale>
 
@@ -135,8 +135,8 @@ function CommunityPage() {
                 icon={
                   <Zap className="w-8 h-8 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                 }
-                title="Quick Help"
-                description="Get instant support when you're stuck. Our community is known for rapid, helpful responses to technical questions."
+                title={t("community.quickHelp")}
+                description={t("community.quickHelpDesc")}
               />
             </ScrollScale>
 
@@ -145,8 +145,8 @@ function CommunityPage() {
                 icon={
                   <Heart className="w-8 h-8 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                 }
-                title="Supportive Environment"
-                description="Whether you're a beginner or expert, our welcoming community celebrates learning and growth at every level."
+                title={t("community.supportiveEnvironment")}
+                description={t("community.supportiveDesc")}
               />
             </ScrollScale>
 
@@ -155,8 +155,8 @@ function CommunityPage() {
                 icon={
                   <MessageCircle className="w-8 h-8 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                 }
-                title="Active Discussions"
-                description="Engage in meaningful conversations about AI ethics, best practices, and the future of software development."
+                title={t("community.activeDiscussions")}
+                description={t("community.activeDiscussionsDesc")}
               />
             </ScrollScale>
           </div>
@@ -176,12 +176,10 @@ function CommunityPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-12 text-center">
           <ScrollAnimation direction="up" delay={0}>
             <h2 className="text-5xl font-bold mb-8">
-              Ready to Join the <span className="text-theme-400">Future</span>?
+              Ready to Join the <span className="text-theme-400">{t("community.ctaHeading")}</span>?
             </h2>
             <p className="text-description text-xl mb-12 max-w-3xl mx-auto">
-              Don't code alone. Join thousands of developers who are already
-              leveraging AI to build the impossible. Your next breakthrough is
-              just one conversation away.
+              {t("community.ctaDesc")}
             </p>
           </ScrollAnimation>
 
@@ -194,12 +192,12 @@ function CommunityPage() {
               >
                 <Button size="lg" className="text-lg px-8 py-4 h-auto group">
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  Join Discord Now
+                  {t("community.joinNow")}
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </a>
               <p className="text-sm text-muted-foreground">
-                100% Free • No Spam • Active Community
+                {t("community.freeOffer")}
               </p>
             </div>
           </ScrollAnimation>

@@ -23,6 +23,7 @@ import {
   Check,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { isAuthenticatedFn } from "~/fn/auth";
 import { Page } from "~/routes/admin/-components/page";
 import { Title } from "~/components/title";
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/agents/$slug")({
 function AgentDetailPage() {
   const { agent, isAuthenticated } = Route.useLoaderData();
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -88,7 +90,7 @@ function AgentDetailPage() {
           <Link to="/agents">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Agents
+              {t("agents_public.backToAgents")}
             </Button>
           </Link>
         </div>
@@ -110,7 +112,7 @@ function AgentDetailPage() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  Created {new Date(agent.createdAt).toLocaleDateString()}
+                  {t("agents_public.created")} {new Date(agent.createdAt).toLocaleDateString()}
                 </div>
               </div>
             </div>
@@ -132,23 +134,22 @@ function AgentDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code className="h-5 w-5" />
-              Agent Content
+              {t("agents_public.agentContent")}
             </CardTitle>
             <CardDescription>
-              Click the "Copy Markdown" button above to copy the agent content
-              to your clipboard.
+              {t("agents_public.agentContentDesc")}
             </CardDescription>
             <CardAction>
               <Button onClick={handleCopy} className="whitespace-nowrap">
                 {copied ? (
                   <>
                     <Check className="mr-2 h-4 w-4" />
-                    Copied!
+                    {t("agents_public.copied")}
                   </>
                 ) : (
                   <>
                     <Copy className="mr-2 h-4 w-4" />
-                    Copy Markdown
+                    {t("agents_public.copyMarkdown")}
                   </>
                 )}
               </Button>
@@ -170,12 +171,12 @@ function AgentDetailPage() {
         <ScrollAnimation direction="up" delay={0.4}>
           <div className="text-center">
             <p className="text-muted-foreground mb-4">
-              Inspired by this agent? Create your own!
+              {t("agents_public.inspired")}
             </p>
             <Link to="/agents/new">
               <Button size="lg">
                 <Bot className="mr-2 h-5 w-5" />
-                Create Your Agent
+                {t("agents_public.createYourAgent")}
               </Button>
             </Link>
           </div>

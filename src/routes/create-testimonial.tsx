@@ -13,6 +13,7 @@ import { cn } from "~/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Checkbox } from "~/components/ui/checkbox";
+import { useTranslation } from "react-i18next";
 
 const emojis = [
   "😊",
@@ -37,14 +38,17 @@ const emojis = [
   "🙏",
 ];
 
-const testimonialSchema = z.object({
-  displayName: z.string().min(1, "Display name is required"),
-  content: z.string().min(10, "Testimonial must be at least 10 characters"),
-  emojis: z.string().min(1, "Please select at least one emoji"),
-  permissionGranted: z.boolean().refine((val) => val === true, {
-    message: "You must agree to share your testimonial publicly",
-  }),
-});
+const testimonialSchemaFn = (tr: (key: string) => string = (k) => k) =>
+  z.object({
+    displayName: z.string().min(1, tr("testimonial.displayNameRequired")),
+    content: z.string().min(10, tr("testimonial.contentRequired")),
+    emojis: z.string().min(1, tr("testimonial.emojisRequired")),
+    permissionGranted: z.boolean().refine((val) => val === true, {
+      message: tr("testimonial.permissionRequired"),
+    }),
+  });
+
+const testimonialSchema = testimonialSchemaFn();
 
 type TestimonialFormValues = z.infer<typeof testimonialSchema>;
 
@@ -54,7 +58,7 @@ export const Route = createFileRoute("/create-testimonial")({
 
 export const createTestimonialFn = createServerFn()
   .middleware([authenticatedMiddleware])
-  .inputValidator(testimonialSchema)
+  .inputValidator(testimonialSchemaFn())
   .handler(async ({ data, context }) => {
     await createTestimonialUseCase({
       ...data,
@@ -63,19 +67,19 @@ export const createTestimonialFn = createServerFn()
   });
 
 function SuccessMessage() {
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-2xl mx-auto p-6 text-center space-y-6 mt-12">
-      <h1 className="text-3xl font-bold">Thank You for Your Testimonial!</h1>
-      <p className="text-muted-foreground">
-        Your feedback helps others understand the value of our platform.
-      </p>
+      <h1 className="text-3xl font-bold">{t("testimonial.thankYou")}</h1>
+      <p className="text-muted-foreground">{t("testimonial.feedbackValue")}</p>
       <div className="flex justify-center gap-4">
         <Link
           to="/"
           hash="testimonials"
           className={buttonVariants({ variant: "default" })}
         >
-          View Your Testimonial
+          {t("testimonial.viewYourTestimonial")}
         </Link>
       </div>
     </div>
@@ -84,12 +88,13 @@ function SuccessMessage() {
 
 function CreateTestimonial() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const form = useForm<TestimonialFormValues>({
-    resolver: zodResolver(testimonialSchema),
+    resolver: zodResolver(testimonialSchemaFn(t)),
     defaultValues: {
       displayName: "",
       content: "",
@@ -119,7 +124,7 @@ function CreateTestimonial() {
     if (selectedEmojis.length === 0) {
       form.setError("emojis", {
         type: "manual",
-        message: "Please select at least one emoji",
+        message: t("testimonial.emojisRequired"),
       });
       return;
     }
@@ -137,8 +142,8 @@ function CreateTestimonial() {
       setIsSubmitted(true);
     } catch (error) {
       console.error("Failed to submit testimonial:", error);
-      toast.error("Error", {
-        description: "Failed to submit testimonial. Please try again.",
+      toast.error(t("testimonial.submitError"), {
+        description: t("testimonial.submitErrorDesc"),
       });
     } finally {
       setIsSubmitting(false);
@@ -151,17 +156,17 @@ function CreateTestimonial() {
 
   return (
     <div className="max-w-2xl mx-auto p-6 my-12">
-      <h1 className="text-3xl font-bold mb-8">Share Your Experience</h1>
+      <h1 className="text-3xl font-bold mb-8">{t("testimonial.shareYourExperience")}</h1>
 
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-2">
           <label htmlFor="displayName" className="text-sm font-medium">
-            Display Name <span className="text-destructive">*</span>
+            {t("testimonial.displayName")} <span className="text-destructive">*</span>
           </label>
           <Input
             id="displayName"
             {...form.register("displayName")}
-            placeholder="How you'd like to be known"
+            placeholder={t("testimonial.displayNamePlaceholder")}
             className={cn(
               form.formState.errors.displayName &&
                 "border-destructive focus-visible:ring-destructive"
@@ -176,12 +181,12 @@ function CreateTestimonial() {
 
         <div className="space-y-2">
           <label htmlFor="content" className="text-sm font-medium">
-            Your Testimonial <span className="text-destructive">*</span>
+            {t("testimonial.yourTestimonial")} <span className="text-destructive">*</span>
           </label>
           <Textarea
             id="content"
             {...form.register("content")}
-            placeholder="Share your experience with our platform..."
+            placeholder={t("testimonial.testimonialPlaceholder")}
             className={cn(
               "min-h-[150px]",
               form.formState.errors.content &&
@@ -197,7 +202,7 @@ function CreateTestimonial() {
 
         <div className="space-y-2">
           <label className="text-sm font-medium">
-            Select up to 3 emojis (optional but fun!)
+            {t("testimonial.selectEmojis")}
           </label>
           <div className="flex flex-wrap gap-2">
             {emojis.map((emoji) => (
@@ -218,7 +223,7 @@ function CreateTestimonial() {
           </div>
           {selectedEmojis.length > 0 && (
             <p className="text-sm text-muted-foreground">
-              Selected: {selectedEmojis.join(" ")}
+              {t("testimonial.selected")}: {selectedEmojis.join(" ")}
             </p>
           )}
           {form.formState.errors.emojis && (
@@ -248,10 +253,10 @@ function CreateTestimonial() {
               htmlFor="permission"
               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Permission to Share <span className="text-destructive">*</span>
+              {t("testimonial.permissionLabel")} <span className="text-destructive">*</span>
             </label>
             <p className="text-sm text-muted-foreground">
-              I agree to let my testimonial be shared publicly on this site
+              {t("testimonial.permissionText")}
             </p>
             {form.formState.errors.permissionGranted && (
               <p className="text-sm text-destructive">
@@ -262,7 +267,7 @@ function CreateTestimonial() {
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit Testimonial"}
+          {isSubmitting ? t("testimonial.submitting") : t("testimonial.submitTestimonial")}
         </Button>
       </form>
     </div>

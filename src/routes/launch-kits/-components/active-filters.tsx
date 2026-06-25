@@ -1,6 +1,7 @@
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ActiveFiltersProps {
   searchTerm: string;
@@ -20,6 +21,7 @@ export function ActiveFilters({
   onRemoveTag,
 }: ActiveFiltersProps) {
   const hasActiveFilters = searchTerm || selectedTags.length > 0;
+  const { t } = useTranslation();
 
   if (!hasActiveFilters) return null;
 
@@ -27,7 +29,7 @@ export function ActiveFilters({
     <div className="bg-card rounded-lg border p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
-          Active Filters
+            {t("launchKits.activeFilters")}
         </h3>
         <Button
           variant="ghost"
@@ -35,15 +37,15 @@ export function ActiveFilters({
           onClick={onClearAll}
           className="h-6 px-2 text-xs"
         >
-          Clear All
+          {t("launchKits.clearAll")}
         </Button>
       </div>
       <div className="space-y-2">
         {searchTerm && (
           <div className="flex items-center gap-2">
             <Badge variant="secondary" className="text-xs">
-              Search: "{searchTerm}"
-            </Badge>
+                {t("launchKits.searchBadge", { term: searchTerm })}
+              </Badge>
             <Button
               variant="ghost"
               size="sm"

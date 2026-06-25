@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { getBlogPostBySlugFn, trackBlogPostViewFn } from "~/fn/blog";
 import { isAdminFn } from "~/fn/auth";
 import { queryOptions } from "@tanstack/react-query";
@@ -66,6 +67,7 @@ function hashIP() {
 }
 
 function BlogPost() {
+  const { t } = useTranslation();
   const { slug } = Route.useParams();
   const { data: blogPost, isLoading, error } = useQuery(blogPostQuery(slug));
   const { data: isAdmin } = useQuery(isAdminQuery());
@@ -143,7 +145,7 @@ function BlogPost() {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link to="/blog">Blog</Link>
+                <Link to="/blog">{t("blog.backToBlog")}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -157,7 +159,7 @@ function BlogPost() {
           <Link to="/admin/blog/$id/edit" params={{ id: blogPost.id.toString() }}>
             <Button variant="outline" size="sm" className="gap-2">
               <Edit className="h-4 w-4" />
-              Edit
+              {t("blog.edit")}
             </Button>
           </Link>
         )}
@@ -201,7 +203,7 @@ function BlogPost() {
               className="gap-1 ml-auto"
             >
               <Share2 className="h-4 w-4" />
-              Share
+              {t("blog.share")}
             </Button>
           </div>
           
@@ -236,12 +238,12 @@ function BlogPost() {
         <footer className="border-t pt-8">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Last updated: {new Date(blogPost.updatedAt).toLocaleDateString()}
+              {t("blog.lastUpdated")} {new Date(blogPost.updatedAt).toLocaleDateString()}
             </div>
             
             <Link to="/blog">
               <Button variant="outline" size="sm">
-                View All Posts
+                {t("blog.viewAllPosts")}
               </Button>
             </Link>
           </div>
