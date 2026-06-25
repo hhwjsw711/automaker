@@ -264,7 +264,7 @@ function MembersPage() {
 
                         <div className="flex-1 w-full">
                           <h3 className="font-bold text-lg truncate px-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-theme-500 group-hover:to-purple-500 transition-all duration-300">
-                            {member.publicName || "Anonymous"}
+                            {member.publicName || t("error.anonymousUser")}
                           </h3>
                           <p className="text-sm text-muted-foreground line-clamp-2 mt-2 min-h-[2.5rem] px-2">
                             {member.bio || t("members.memberOfCommunity")}
