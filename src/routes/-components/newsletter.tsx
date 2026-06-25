@@ -3,6 +3,7 @@ import { z } from "zod";
 import { env } from "~/utils/env";
 import { NewsletterForm } from "./newsletter-form";
 import { CircuitBoardPattern } from "~/components/ui/background-patterns";
+import { useTranslation } from "react-i18next";
 
 declare global {
   interface Window {
@@ -47,6 +48,7 @@ export const subscribeFn = createServerFn()
   });
 
 export function NewsletterSection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-16 md:py-20 overflow-hidden">
       {/* AI-themed background similar to hero */}
@@ -69,16 +71,13 @@ export function NewsletterSection() {
           {/* Header with improved typography */}
           <div className="mb-12">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-theme-500 to-theme-600 dark:from-theme-400 dark:to-theme-500 bg-clip-text text-transparent">
-              /subscribe
+              {t("home.newsletter.heading")}
             </h2>
             <p className="text-muted-foreground text-lg md:text-xl mb-4 max-w-2xl mx-auto">
-              Stay ahead of the agentic coding revolution
+              {t("home.newsletter.subheading")}
             </p>
             <p className="text-muted-foreground text-base max-w-3xl mx-auto">
-              Get weekly insights on new AI coding tools, advanced Claude Code
-              techniques, Cursor IDE tips, and exclusive updates on agentic
-              programming patterns. Join thousands of developers transforming
-              their workflow with AI-first development.
+              {t("home.newsletter.description")}
             </p>
           </div>
 
@@ -101,7 +100,7 @@ export function NewsletterSection() {
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                 />
               </svg>
-              <span>No spam ever</span>
+              <span>{t("home.newsletter.noSpam")}</span>
             </div>
             <div className="flex items-center gap-2">
               <svg
@@ -117,7 +116,7 @@ export function NewsletterSection() {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>Unsubscribe anytime</span>
+              <span>{t("home.newsletter.unsubscribe")}</span>
             </div>
           </div>
         </div>

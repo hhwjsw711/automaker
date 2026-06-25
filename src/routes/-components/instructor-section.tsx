@@ -1,7 +1,9 @@
 import { Play, Users, Award } from "lucide-react";
 import { GridPattern } from "~/components/ui/background-patterns";
+import { useTranslation } from "react-i18next";
 
 export function InstructorSection() {
+  const { t } = useTranslation();
   return (
     <section className="relative py-24 overflow-hidden">
       <div className="absolute inset-0 hero-background-ai opacity-50"></div>
@@ -26,7 +28,7 @@ export function InstructorSection() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-theme-50/50 dark:bg-background/20 backdrop-blur-sm border border-theme-200 dark:border-border/50 text-theme-600 dark:text-theme-400 text-sm font-medium mb-8">
             <span className="w-2 h-2 bg-theme-500 dark:bg-theme-400 rounded-full mr-2"></span>
-            Your Instructor
+            {t("home.instructor.badge")}
           </div>
 
           {/* Profile Picture with Gradient Background */}
@@ -36,7 +38,7 @@ export function InstructorSection() {
               <div className="relative bg-gradient-to-br from-theme-400 via-theme-500 to-theme-600 rounded-2xl p-1">
                 <img
                   src="/hugo.png"
-                  alt="Hugo - Your Instructor"
+                  alt={t("home.instructor.imgAlt")}
                   className="size-64 rounded-xl object-cover"
                   loading="lazy"
                 />
@@ -45,10 +47,10 @@ export function InstructorSection() {
           </div>
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Learn from{" "}
+            {t("home.instructor.headingLine1")}{" "}
             <span className="text-theme-400">
               <br />
-              Hugo
+              {t("home.instructor.headingLine2")}
             </span>
           </h2>
         </div>
@@ -57,33 +59,15 @@ export function InstructorSection() {
           <div className="bg-white/10 dark:bg-theme-500/10 backdrop-blur-md border border-theme-200/50 dark:border-theme-500/30 rounded-3xl p-6 md:p-8 lg:p-12 max-w-4xl mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h3 className="text-3xl font-bold mb-6">Hugo</h3>
+                <h3 className="text-3xl font-bold mb-6">{t("home.instructor.name")}</h3>
                 <p className="text-lg text-muted-foreground mb-6">
-                  Hugo is the creator behind{" "}
-                  <a
-                    href="https://youtube.com/@hhwjsw711"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-theme-500 hover:text-theme-400 underline"
-                  >
-                    hhwjsw711
-                  </a>
-                  , a programming education channel on YouTube with{" "}
-                  <span className="font-bold text-theme-500">10 videos</span>{" "}
-                  teaching coding concepts and growing steadily.
+                  {t("home.instructor.bio1")}
                 </p>
                 <p className="text-lg text-muted-foreground mb-6">
-                  As a full-stack web developer, Hugo has embraced the
-                  transformation from traditional coding to AI-assisted
-                  development. He's passionate about the agentic coding
-                  revolution, using tools like Cursor IDE and Claude to
-                  dramatically accelerate development workflows.
+                  {t("home.instructor.bio2")}
                 </p>
                 <p className="text-lg text-muted-foreground mb-8">
-                  Through hands-on teaching and real-world application of
-                  agentic coding techniques, Hugo helps developers build
-                  practical skills and become more productive with AI-powered
-                  tools.
+                  {t("home.instructor.bio3")}
                 </p>
                 <div className="flex gap-4">
                   <a
@@ -93,7 +77,7 @@ export function InstructorSection() {
                     className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                   >
                     <Play className="w-5 h-5" />
-                    YouTube Channel
+                    {t("home.instructor.youtubeChannel")}
                   </a>
                   <a
                     href="https://hugo.isllm.com"
@@ -101,7 +85,7 @@ export function InstructorSection() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-theme-600 hover:bg-theme-700 text-white rounded-lg transition-colors"
                   >
-                    Personal Website
+                    {t("home.instructor.personalWebsite")}
                   </a>
                 </div>
               </div>
@@ -112,7 +96,7 @@ export function InstructorSection() {
                     <Users className="w-6 h-6 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                   }
                   value="2"
-                  label="YouTube Subscribers"
+                   label={t("home.instructor.youtubeSubscribers")}
                   glyphColor="red"
                   glyphPath="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
                 />
@@ -122,7 +106,7 @@ export function InstructorSection() {
                     <Play className="w-6 h-6 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                   }
                   value="10"
-                  label="Videos"
+                   label={t("home.instructor.videos")}
                   glyphColor="theme"
                   glyphPath="M8 5v14l11-7z"
                   extraGlyph={null}
@@ -132,8 +116,8 @@ export function InstructorSection() {
                   icon={
                     <Award className="w-6 h-6 text-theme-500 group-hover:text-theme-400 group-hover:scale-110 transition-all duration-300" />
                   }
-                  value="Full-Stack"
-                  label="Web Development"
+                   value={t("home.instructor.fullStack")}
+                   label={t("home.instructor.webDevelopment")}
                   glyphColor="amber"
                   glyphPath="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
                 />
@@ -160,11 +144,10 @@ export function InstructorSection() {
 
                   <div className="relative z-10">
                     <p className="text-lg italic text-muted-foreground group-hover:text-foreground/90 group-hover:scale-105 transition-all duration-300">
-                      "The best way to learn is by building. Start small, stay
-                      consistent, and let the tools amplify your efforts."
+                      {t("home.instructor.quote")}
                     </p>
                     <p className="text-sm text-theme-500 mt-2 group-hover:text-theme-400 transition-colors duration-300">
-                      - Hugo
+                      {t("home.instructor.attribution")}
                     </p>
                   </div>
                 </div>

@@ -1,9 +1,11 @@
 import { MessageCircle, Users, Heart, ArrowRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { DISCORD_INVITE_LINK } from "~/config";
 import { GridPattern } from "~/components/ui/background-patterns";
 
 export function DiscordCommunitySection() {
+  const { t } = useTranslation();
   return (
     <section className="relative w-full py-24 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-theme-500/5 dark:via-theme-950/10 to-transparent"></div>
@@ -34,20 +36,20 @@ export function DiscordCommunitySection() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-green-50/50 dark:bg-green-950/20 backdrop-blur-sm border border-green-200 dark:border-green-800/50 text-green-600 dark:text-green-400 text-sm font-medium mb-8">
             <span className="w-2 h-2 bg-green-500 dark:bg-green-400 rounded-full mr-2"></span>
-            100% Free Community
+            {t("home.discord.badge")}
           </div>
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl leading-tight mb-6 md:mb-8">
-            Join Our <span className="text-theme-400">Discord Community</span>
+            {t("home.discord.headingLine1")}{" "}
+            <span className="text-theme-400">
+              {t("home.discord.headingLine2")}
+            </span>
             <br />
-            While You Wait
+            {t("home.discord.headingLine3")}
           </h2>
 
           <p className="text-sm md:text-base lg:text-lg text-description mb-8 md:mb-12 max-w-4xl mx-auto">
-            Connect with thousands of AI developers, share your projects, get
-            instant help, and stay updated on the latest agentic coding
-            techniques. Our community is active 24/7 and completely free to
-            join.
+            {t("home.discord.description")}
           </p>
         </div>
 
@@ -56,24 +58,24 @@ export function DiscordCommunitySection() {
             icon={
               <Users className="w-8 h-8 text-green-500 group-hover:text-green-400 group-hover:scale-110 transition-all duration-300" />
             }
-            title="203+ Members"
-            description="Join a thriving community of AI enthusiasts, from beginners to experts, all sharing knowledge and growing together."
+            title={t("home.discord.highlight1_title")}
+            description={t("home.discord.highlight1_desc")}
           />
 
           <CommunityHighlight
             icon={
               <MessageCircle className="w-8 h-8 text-green-500 group-hover:text-green-400 group-hover:scale-110 transition-all duration-300" />
             }
-            title="Daily Discussions"
-            description="Engage in active conversations about AI tools, coding challenges, project showcases, and industry insights."
+            title={t("home.discord.highlight2_title")}
+            description={t("home.discord.highlight2_desc")}
           />
 
           <CommunityHighlight
             icon={
               <Heart className="w-8 h-8 text-green-500 group-hover:text-green-400 group-hover:scale-110 transition-all duration-300" />
             }
-            title="Supportive Environment"
-            description="Get help when you're stuck, celebrate wins with fellow developers, and learn from real-world experiences."
+            title={t("home.discord.highlight3_title")}
+            description={t("home.discord.highlight3_desc")}
           />
         </div>
 
@@ -90,13 +92,13 @@ export function DiscordCommunitySection() {
                 className="text-lg px-8 py-4 h-auto group bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
               >
                 <MessageCircle className="mr-2 h-5 w-5" />
-                Join Discord Community
+                {t("home.discord.cta")}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </a>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-              Free Forever • No Spam • Instant Access
+              {t("home.discord.trust")}
             </div>
           </div>
         </div>

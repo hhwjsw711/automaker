@@ -2,12 +2,14 @@ import { createServerFn } from "@tanstack/react-start";
 import { getTestimonialsUseCase } from "~/use-cases/testimonials";
 import { useQuery } from "@tanstack/react-query";
 import { GridPattern } from "~/components/ui/background-patterns";
+import { useTranslation } from "react-i18next";
 
 export const getTestimonialsFn = createServerFn().handler(async () => {
   return await getTestimonialsUseCase();
 });
 
 export function TestimonialsSection() {
+  const { t } = useTranslation();
   const { data: testimonials } = useQuery({
     queryKey: ["testimonials"],
     queryFn: getTestimonialsFn,
@@ -42,11 +44,10 @@ export function TestimonialsSection() {
 
       <div className="relative max-w-5xl mx-auto">
         <h2 className="text-4xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-theme-500 to-theme-600 dark:from-theme-400 dark:to-theme-500">
-          Loved by AI-First Developers
+          {t("home.testimonials.heading")}
         </h2>
         <p className="text-muted-foreground/70 text-center mb-16 max-w-2xl mx-auto">
-          Join thousands of developers who have accelerated their workflow
-          and transformed their development process with AI-powered tools
+          {t("home.testimonials.description")}
         </p>
         <div className="grid md:grid-cols-3 gap-8">
           {testimonials?.map((testimonial, index) => (

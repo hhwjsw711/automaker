@@ -1,81 +1,77 @@
 import { DotPattern } from "~/components/ui/background-patterns";
-
-const researchSources = [
-  {
-    title: "GitHub's Game-Changing Study",
-    statistic: "26% productivity boost",
-    description:
-      "in a rigorous trial with 4,000+ developers. This isn't speculation—it's the new reality of coding with AI.",
-    link: "https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/",
-    linkText: "See the Research That Changed Everything →",
-    color: "green",
-    glyphPath: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
-  },
-  {
-    title: "McKinsey's Future Forecast",
-    statistic: "2x faster development",
-    description:
-      "while maintaining code quality. The consulting giant confirms: AI-powered coding is the competitive advantage.",
-    link: "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/unleashing-developer-productivity-with-generative-ai",
-    linkText: "McKinsey's AI Productivity Report →",
-    color: "blue",
-    glyphPath: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
-  },
-  {
-    title: "Developer Consensus 2024",
-    statistic: "76% of developers",
-    description:
-      "already use AI tools, with 81% reporting measurable productivity gains. The industry has spoken.",
-    link: "https://survey.stackoverflow.co/2024/ai",
-    linkText: "2024 Developer Survey Results →",
-    color: "purple",
-    glyphPath:
-      "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z",
-  },
-  {
-    title: "Amazon's Productivity Proof",
-    statistic: "57% faster task completion",
-    description:
-      "in controlled studies. When Amazon validates AI coding tools, you know they're here to stay.",
-    link: "https://aws.amazon.com/awstv/watch/f4551b7cb8c/",
-    linkText: "AWS Research Validation →",
-    color: "amber",
-    glyphPath:
-      "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
-  },
-  {
-    title: "Enterprise Success Stories",
-    statistic: "40% productivity gain",
-    description:
-      "at Palo Alto Networks with 2,000 developers. Real companies, real results, real competitive advantage.",
-    link: "https://aws.amazon.com/partners/success/palo-alto-networks-anthropic-sourcegraph/",
-    linkText: "Enterprise AI Success Cases →",
-    color: "red",
-    glyphPath: "M20 6L9 17l-5-5",
-    extraGlyph: (
-      <circle
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-      />
-    ),
-  },
-  {
-    title: "Claude's Massive Scale",
-    statistic: "115,000 developers",
-    description:
-      "processing 195 million lines weekly. This is the largest AI coding experiment in history—and it's working.",
-    link: "https://www.anthropic.com/research/impact-software-development",
-    linkText: "Anthropic's Economic Impact Study →",
-    color: "teal",
-    glyphPath: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export function ResearchSourcesSection() {
+  const { t } = useTranslation();
+
+  const researchSources = [
+    {
+      title: t("home.research.card1_title"),
+      statistic: t("home.research.card1_stat"),
+      description: t("home.research.card1_desc"),
+      link: "https://github.blog/news-insights/research/research-quantifying-github-copilots-impact-on-developer-productivity-and-happiness/",
+      linkText: t("home.research.card1_link"),
+      color: "green",
+      glyphPath: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+    },
+    {
+      title: t("home.research.card2_title"),
+      statistic: t("home.research.card2_stat"),
+      description: t("home.research.card2_desc"),
+      link: "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/unleashing-developer-productivity-with-generative-ai",
+      linkText: t("home.research.card2_link"),
+      color: "blue",
+      glyphPath: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+    },
+    {
+      title: t("home.research.card3_title"),
+      statistic: t("home.research.card3_stat"),
+      description: t("home.research.card3_desc"),
+      link: "https://survey.stackoverflow.co/2024/ai",
+      linkText: t("home.research.card3_link"),
+      color: "purple",
+      glyphPath:
+        "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z",
+    },
+    {
+      title: t("home.research.card4_title"),
+      statistic: t("home.research.card4_stat"),
+      description: t("home.research.card4_desc"),
+      link: "https://aws.amazon.com/awstv/watch/f4551b7cb8c/",
+      linkText: t("home.research.card4_link"),
+      color: "amber",
+      glyphPath:
+        "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+    },
+    {
+      title: t("home.research.card5_title"),
+      statistic: t("home.research.card5_stat"),
+      description: t("home.research.card5_desc"),
+      link: "https://aws.amazon.com/partners/success/palo-alto-networks-anthropic-sourcegraph/",
+      linkText: t("home.research.card5_link"),
+      color: "red",
+      glyphPath: "M20 6L9 17l-5-5",
+      extraGlyph: (
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="2"
+          fill="none"
+        />
+      ),
+    },
+    {
+      title: t("home.research.card6_title"),
+      statistic: t("home.research.card6_stat"),
+      description: t("home.research.card6_desc"),
+      link: "https://www.anthropic.com/research/impact-software-development",
+      linkText: t("home.research.card6_link"),
+      color: "teal",
+      glyphPath: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
+    },
+  ];
   return (
     <section className="relative py-16 bg-gradient-to-b from-background to-muted/20 overflow-hidden">
       {/* Background Pattern */}
@@ -93,12 +89,12 @@ export function ResearchSourcesSection() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-5">
-            The <span className="text-theme-400">Evidence</span> is Clear
+            {t("home.research.headingLine1")}{" "}
+            <span className="text-theme-400">{t("home.research.headingLine2")}</span>
+            {" "}{t("home.research.headingLine3")}
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Agentic coding isn't just hype—it's the proven future of software
-            development. Here's the research that shows why every developer
-            needs to adapt now.
+            {t("home.research.description")}
           </p>
         </div>
 
@@ -110,9 +106,7 @@ export function ResearchSourcesSection() {
 
         <div className="mt-12 text-center">
           <p className="text-base text-muted-foreground">
-            <strong className="text-lg">The future is here.</strong> These
-            aren't predictions—they're proven results from 2024. Developers who
-            adapt to agentic coding now will lead the industry tomorrow.
+            {t("home.research.closing")}
           </p>
         </div>
       </div>

@@ -10,6 +10,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { getNewsletterStatsFn } from "~/fn/newsletter";
 import { getFirstVideoSegmentFn } from "~/fn/segments";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 interface UnifiedHeroProps {
   isEarlyAccess: boolean;
@@ -24,6 +25,7 @@ export function UnifiedHero({
   waitlistCount: initialWaitlistCount,
   initialVideoData,
 }: UnifiedHeroProps) {
+  const { t } = useTranslation();
   const continueSlug = useContinueSlug();
   const user = useAuth();
   const [isMounted, setIsMounted] = useState(false);
@@ -87,27 +89,14 @@ export function UnifiedHero({
                 {/* Badge */}
 
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 text-slate-900 dark:text-white">
-                  Don't Write Code. <br className="hidden md:block" />
+                  {t("home.hero.headingLine1")} <br className="hidden md:block" />
                   <span className="text-cyan-600 dark:text-cyan-400">
-                    Direct It.
+                    {t("home.hero.headingLine2")}
                   </span>
                 </h1>
 
                 <p className="text-base md:text-xl text-slate-600 dark:text-slate-400 mb-8 md:mb-10 max-w-xl leading-relaxed">
-                  Stop typing every character manually. Master{" "}
-                  <strong className="text-slate-900 dark:text-white">
-                    Cursor
-                  </strong>
-                  ,{" "}
-                  <strong className="text-slate-900 dark:text-white">
-                    Claude
-                  </strong>
-                  , and{" "}
-                  <strong className="text-slate-900 dark:text-white">
-                    Agentic Workflows
-                  </strong>{" "}
-                  to build production-ready apps 10x faster. Become the
-                  architect, not just the typist.
+                  {t("home.hero.description")}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -130,7 +119,7 @@ export function UnifiedHero({
                         className="mr-2 h-5 w-5"
                         aria-hidden="true"
                       />
-                      Get Lifetime Access
+                      {t("home.hero.ctaPrimary")}
                     </Link>
                   )}
                   <Link
@@ -148,7 +137,7 @@ export function UnifiedHero({
                       }
                     }}
                   >
-                    View Curriculum
+                    {t("home.hero.ctaSecondary")}
                     <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
                   </Link>
                 </div>
@@ -156,15 +145,11 @@ export function UnifiedHero({
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                    <span>Lifetime Updates Included</span>
+                    <span>{t("home.hero.ctaBonus")}</span>
                   </div>
                   {waitlistCount !== undefined && waitlistCount > 0 && (
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Join{" "}
-                      <span className="font-semibold text-slate-900 dark:text-white">
-                        {waitlistCount.toLocaleString()}+
-                      </span>{" "}
-                      developers building with AI
+                      {t("home.hero.socialProof", { count: waitlistCount.toLocaleString() })}
                     </p>
                   )}
                 </div>
@@ -186,7 +171,7 @@ export function UnifiedHero({
                           {/* Server-rendered static thumbnail image - discoverable in initial HTML */}
                           <img
                             src="/hero-video-thumbnail.png"
-                            alt="Video thumbnail"
+                            alt={t("home.hero.videoThumbnail")}
                             className="absolute inset-0 w-full h-full object-cover z-0"
                             fetchPriority="high"
                             loading="eager"
@@ -206,7 +191,7 @@ export function UnifiedHero({
                         /* Placeholder that matches video dimensions to prevent layout shift */
                         <div className="w-full h-full flex items-center justify-center glass rounded-xl">
                           <div className="text-sm text-slate-600 dark:text-slate-400">
-                            Loading video...
+                            {t("home.hero.loadingVideo")}
                           </div>
                         </div>
                       )}

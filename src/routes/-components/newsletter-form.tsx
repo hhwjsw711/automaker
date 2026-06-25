@@ -1,4 +1,5 @@
 import { useNewsletterSubscription } from "~/hooks/use-newsletter-subscription";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 
 interface NewsletterFormProps {
@@ -8,6 +9,7 @@ interface NewsletterFormProps {
 export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
   const { email, setEmail, isSubmitted, isLoading, handleSubmit, containerRef } =
     useNewsletterSubscription();
+  const { t } = useTranslation();
 
   return (
     <div ref={containerRef}>
@@ -39,10 +41,10 @@ export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
                   </div>
                 </div>
                 <h3 className="text-2xl font-semibold text-theme-600 dark:text-theme-400 mb-2">
-                  You're on the list!
+                  {t("home.newsletterForm.success")}
                 </h3>
                 <p className="text-muted-foreground">
-                  We'll notify you as soon as we're ready to launch.
+                  {t("home.newsletterForm.successDesc")}
                 </p>
               </div>
             </div>
@@ -57,7 +59,7 @@ export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t("home.newsletterForm.placeholder")}
                 className="flex-1 px-6 py-3 h-14 text-lg rounded-lg bg-white/80 dark:bg-background/80 backdrop-blur-sm text-foreground border border-theme-200/50 dark:border-border/50 focus:outline-none focus:border-theme-500 focus:ring-2 focus:ring-theme-500/30 transition-all duration-300 hover:border-theme-400/50"
                 required
               />
@@ -66,31 +68,31 @@ export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
                 className="px-8 h-14 text-lg font-medium bg-gradient-to-r from-theme-500 to-theme-600 hover:from-theme-600 hover:to-theme-700 transition-all duration-300 shadow-lg hover:shadow-theme-500/25"
                 disabled={isLoading}
               >
-                {isLoading ? "Joining..." : "Join Waitlist"}
+                {isLoading ? t("home.newsletterForm.joining") : t("home.newsletterForm.join")}
               </Button>
             </div>
             
             {/* reCAPTCHA disclaimer */}
             <p className="mt-3 text-xs text-muted-foreground text-center">
-              This site is protected by reCAPTCHA and the Google{" "}
+              {t("home.newsletterForm.recaptchaPrefix")}{" "}
               <a
                 href="https://policies.google.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-theme-500 hover:text-theme-600 transition-colors"
               >
-                Privacy Policy
-              </a>{" "}
-              and{" "}
+                {t("home.newsletterForm.privacyPolicy")}
+              </a>
+              {t("home.newsletterForm.recaptchaConjunction")}
               <a
                 href="https://policies.google.com/terms"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-theme-500 hover:text-theme-600 transition-colors"
               >
-                Terms of Service
-              </a>{" "}
-              apply.
+                {t("home.newsletterForm.termsOfService")}
+              </a>
+              {t("home.newsletterForm.recaptchaClosing")}
             </p>
           </form>
       )}
@@ -145,7 +147,7 @@ export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
                     500+
                   </div>
                   <div className="text-sm sm:text-base group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                    People waiting
+                    {t("home.newsletterForm.statsWaiting")}
                   </div>
                 </div>
                 <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-border to-transparent group-hover:via-theme-400 transition-colors duration-300" />
@@ -155,7 +157,7 @@ export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
                     Q3 2025
                   </div>
                   <div className="text-sm sm:text-base group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                    Expected launch
+                    {t("home.newsletterForm.statsLaunch")}
                   </div>
                 </div>
                 <div className="hidden sm:block w-px h-12 bg-gradient-to-b from-transparent via-border to-transparent group-hover:via-theme-400 transition-colors duration-300" />
@@ -165,7 +167,7 @@ export function NewsletterForm({ showStats = true }: NewsletterFormProps) {
                     100%
                   </div>
                   <div className="text-sm sm:text-base group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                    Worth the wait
+                    {t("home.newsletterForm.statsWorth")}
                   </div>
                 </div>
               </div>

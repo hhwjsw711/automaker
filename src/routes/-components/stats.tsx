@@ -4,12 +4,14 @@ import { GlassPanel } from "~/components/ui/glass-panel";
 import { DotPattern } from "~/components/ui/background-patterns";
 import { useQuery } from "@tanstack/react-query";
 import { getCourseStatsFn } from "~/fn/stats";
+import { useTranslation } from "react-i18next";
 
 interface StatsProps {
   stats?: CourseStats;
 }
 
 export function StatsSection({ stats: initialStats }: StatsProps) {
+  const { t } = useTranslation();
   const { data: stats, isLoading } = useQuery({
     queryKey: ["course-stats"],
     queryFn: () => getCourseStatsFn(),
@@ -31,20 +33,20 @@ export function StatsSection({ stats: initialStats }: StatsProps) {
     {
       icon: BookOpen,
       value: stats.totalModules,
-      label: "Modules",
-      description: "Comprehensive learning modules",
+      label: t("home.stats.modulesLabel"),
+      description: t("home.stats.modulesDesc"),
     },
     {
       icon: Play,
       value: stats.totalSegments,
-      label: "Video Segments",
-      description: "Bite-sized video lessons",
+      label: t("home.stats.segmentsLabel"),
+      description: t("home.stats.segmentsDesc"),
     },
     {
       icon: Clock,
       value: stats.totalVideoLength,
-      label: "Total Content",
-      description: "Hours of premium content",
+      label: t("home.stats.hoursLabel"),
+      description: t("home.stats.hoursDesc"),
     },
   ];
 
@@ -68,11 +70,10 @@ export function StatsSection({ stats: initialStats }: StatsProps) {
           {/* Section header */}
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">
-              Course <span className="text-cyan-600 dark:text-cyan-400">Overview</span>
+              {t("home.stats.headingLine1")} <span className="text-cyan-600 dark:text-cyan-400">{t("home.stats.headingLine2")}</span>
             </h2>
             <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
-              Comprehensive agentic coding curriculum designed to transform
-              your development workflow
+              {t("home.stats.description")}
             </p>
           </div>
 
@@ -122,9 +123,9 @@ export function StatsSection({ stats: initialStats }: StatsProps) {
           {/* Marketing Keywords Section - SEO Optimized */}
           <div className="mt-16 text-center">
             <h3 className="text-2xl font-semibold mb-8 text-slate-900 dark:text-white">
-              Master the Latest{" "}
-              <span className="text-cyan-600 dark:text-cyan-400">AI Coding Tools</span> &
-              Technologies
+              {t("home.stats.ctaHeading1")}{" "}
+              <span className="text-cyan-600 dark:text-cyan-400">{t("home.stats.ctaHeading2")}</span>{" "}
+              {t("home.stats.ctaHeading3")}
             </h3>
 
             {/* Keywords Grid */}
@@ -167,17 +168,7 @@ export function StatsSection({ stats: initialStats }: StatsProps) {
 
             {/* Call to Action Text */}
             <p className="mt-10 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-              Join the{" "}
-              <span className="font-semibold text-cyan-600 dark:text-cyan-400">
-                best agentic coding course
-              </span>{" "}
-              available and learn how to leverage cutting-edge AI models to
-              build applications
-              <span className="font-semibold text-slate-900 dark:text-white"> 10x faster</span> than
-              traditional programming. Perfect for developers ready to master{" "}
-              <span className="font-semibold text-slate-900 dark:text-white">AI-augmented development</span>{" "}
-              and stay ahead in the rapidly evolving world of{" "}
-              <span className="font-semibold text-slate-900 dark:text-white">AI coding assistants</span>.
+              {t("home.stats.ctaDesc")}
             </p>
           </div>
         </div>

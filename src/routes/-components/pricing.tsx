@@ -7,12 +7,14 @@ import { CircuitBoardPattern } from "~/components/ui/background-patterns";
 import { useAuth } from "~/hooks/use-auth";
 import { useContinueSlug } from "~/hooks/use-continue-slug";
 import { PRICING_CONFIG } from "~/config";
+import { useTranslation } from "react-i18next";
 
 export function PricingSection() {
   const cardRef = useRef<HTMLDivElement>(null);
   const user = useAuth();
   const continueSlug = useContinueSlug();
   const [isMounted, setIsMounted] = useState(false);
+  const { t } = useTranslation();
 
   // Prevent hydration mismatch by only applying auth-based conditionals after mount
   useEffect(() => {
@@ -52,27 +54,24 @@ export function PricingSection() {
               <GlassPanel variant="cyan" padding="sm" className="inline-block mb-8">
                 <div className="inline-flex items-center text-sm font-medium text-slate-700 dark:text-cyan-400">
                   <span className="w-2 h-2 bg-cyan-600 dark:bg-cyan-400 rounded-full mr-2"></span>
-                  Limited Time Offer
+                  {t("home.pricing.badge")}
                 </div>
               </GlassPanel>
 
               <h2 className="text-3xl md:text-4xl lg:text-6xl leading-tight mb-6 md:mb-8 text-slate-900 dark:text-white">
-                Master AI-First Development{" "}
-                <span className="text-cyan-600 dark:text-cyan-400">With AI Agents</span>
+                {t("home.pricing.headingLine1")}{" "}
+                <span className="text-cyan-600 dark:text-cyan-400">{t("home.pricing.headingLine2")}</span>
               </h2>
 
               <p className="text-sm md:text-base lg:text-lg text-slate-600 dark:text-slate-400 mb-8 md:mb-12 max-w-2xl mx-auto">
-                Transform your coding workflow with advanced AI tools and
-                techniques. Learn to build applications 10x faster using Cursor
-                IDE, Claude Code CLI, and cutting-edge agentic programming
-                methods.
+                {t("home.pricing.description")}
               </p>
 
               <div ref={cardRef} className="relative max-w-lg mx-auto">
                 <GlassPanel variant="cyan" padding="lg" className="relative">
                   <div className="relative z-10">
                     <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-cyan-600 dark:text-cyan-400">
-                      Agentic Coding Mastery
+                      {t("home.pricing.courseName")}
                     </h3>
                     <div className="mb-6 md:mb-8">
                       <div className="text-slate-600 dark:text-slate-400 mb-2">
@@ -80,13 +79,13 @@ export function PricingSection() {
                           {PRICING_CONFIG.FORMATTED_ORIGINAL_PRICE}
                         </span>
                         <span className="ml-2 text-sm text-cyan-600 dark:text-cyan-400 font-medium">
-                          Save {PRICING_CONFIG.DISCOUNT_PERCENTAGE}%
+                          {t("home.pricing.savePercentage", { percentage: PRICING_CONFIG.DISCOUNT_PERCENTAGE })}
                         </span>
                       </div>
                       <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white">
                         {PRICING_CONFIG.FORMATTED_CURRENT_PRICE}
                         <span className="text-lg text-slate-600 dark:text-slate-400 font-normal">
-                          /lifetime access
+                          {t("home.pricing.lifetimeAccess")}
                         </span>
                       </div>
                     </div>
@@ -94,29 +93,25 @@ export function PricingSection() {
                       <li className="flex items-center text-slate-600 dark:text-slate-400 group">
                         <Check className="w-6 h-6 mr-3 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />
                         <span className="group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                          Master Cursor IDE with AI pair programming and code
-                          generation
+                          {t("home.pricing.featureCursor")}
                         </span>
                       </li>
                       <li className="flex items-center text-slate-600 dark:text-slate-400 group">
                         <Check className="w-6 h-6 mr-3 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />
                         <span className="group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                          Learn Claude Code CLI for seamless AI-assisted
-                          development
+                          {t("home.pricing.featureClaude")}
                         </span>
                       </li>
                       <li className="flex items-center text-slate-600 dark:text-slate-400 group">
                         <Check className="w-6 h-6 mr-3 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />
                         <span className="group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                          Advanced prompting techniques for Claude Sonnet and
-                          Opus
+                          {t("home.pricing.featurePrompting")}
                         </span>
                       </li>
                       <li className="flex items-center text-slate-600 dark:text-slate-400 group">
                         <Check className="w-6 h-6 mr-3 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform flex-shrink-0" />
                         <span className="group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                          Build real-world projects using AI agents and
-                          automation
+                          {t("home.pricing.featureAgents")}
                         </span>
                       </li>
                     </ul>
@@ -130,14 +125,14 @@ export function PricingSection() {
                           className: "w-full rounded-xl px-6 py-2.5 text-sm font-bold",
                         })}
                       >
-                        Continue with Course
+                        {t("home.pricing.ctaContinue")}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     ) : (
                       <Link to="/purchase" className="block">
                         <Button variant="cyan" size="lg" className="w-full rounded-xl px-6 py-2.5 text-sm font-bold">
                           <ShoppingCart className="mr-2 h-4 w-4" />
-                          Buy Now
+                          {t("home.pricing.ctaBuyNow")}
                         </Button>
                       </Link>
                     )}
