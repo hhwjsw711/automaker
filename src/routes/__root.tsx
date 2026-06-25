@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         ...seo({
-          title: "Automaker | by WebDevCody",
+          title: "Automaker | by Hugo",
           description:
             "A course to help you learn agentic coding and build real-world projects using AI agents and automation.",
           image: getOgImageUrl(),

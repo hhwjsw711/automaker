@@ -69,10 +69,10 @@ function CourseCompleted() {
           <p className="text-muted-foreground">
             Have questions or feedback? Feel free to reach out to me at{" "}
             <a
-              href="mailto:webdevcody@gmail.com"
+              href="mailto:hhwjsw711@gmail.com"
               className="text-theme-400 hover:text-theme-300 transition-colors"
             >
-              webdevcody@gmail.com
+              hhwjsw711@gmail.com
             </a>
           </p>
         </div>
@@ -156,7 +156,7 @@ function CourseCompleted() {
               asChild
             >
               <a
-                href="https://discord.gg/webdevcody"
+                href="https://discord.gg/ffVjn26Cfd"
                 target="_blank"
                 rel="noopener noreferrer"
               >

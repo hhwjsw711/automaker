@@ -223,7 +223,7 @@ function RouteComponent() {
         </p>
         <p>
           By email:{" "}
-          <a href="mailto:webdevcody@gmail.com">webdevcody@gmail.com</a>
+          <a href="mailto:hhwjsw711@gmail.com">hhwjsw711@gmail.com</a>
         </p>
       </article>
     </div>

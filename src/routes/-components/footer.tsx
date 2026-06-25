@@ -76,11 +76,11 @@ export function FooterSection() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="mailto:webdevcody@gmail.com"
+                  href="mailto:hhwjsw711@gmail.com"
                   className="hover:text-foreground transition-colors break-all"
                   style={{ wordBreak: "break-all" }}
                 >
-                  webdevcody@gmail.com
+                  hhwjsw711@gmail.com
                 </a>
               </li>
               <li>

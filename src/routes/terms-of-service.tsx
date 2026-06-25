@@ -270,7 +270,7 @@ function RouteComponent() {
           If you have any questions about these Terms and Conditions, You can
           contact us:
         </p>
-        <p>By email: webdevcody@gmail.com</p>
+        <p>By email: hhwjsw711@gmail.com</p>
       </article>
     </div>
   );

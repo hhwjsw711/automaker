@@ -235,7 +235,7 @@ function SettingsPage() {
             <div className="text-sm">
               <p className="font-medium mb-1">Contact Support:</p>
               <p className="text-muted-foreground">
-                Email: webdevcody@gmail.com
+                Email: hhwjsw711@gmail.com
               </p>
             </div>
           </CardContent>

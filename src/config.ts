@@ -1,4 +1,4 @@
-export const DISCORD_INVITE_LINK = "https://discord.gg/JUDWZDN3VT";
+export const DISCORD_INVITE_LINK = "https://discord.gg/ffVjn26Cfd";
 
 // Pricing configuration - update prices in one place
 export const PRICING_CONFIG = {

@@ -156,10 +156,10 @@ const faqData: FAQData = {
         <p className="text-muted-foreground">
           You can reach out in our Discord community or email me directly at{" "}
           <a
-            href="mailto:webdevcody@gmail.com"
+            href="mailto:hhwjsw711@gmail.com"
             className="text-theme-400 hover:text-theme-300 underline transition-colors"
           >
-            webdevcody@gmail.com
+            hhwjsw711@gmail.com
           </a>
           . I typically respond within 24 hours with personalized help.
         </p>

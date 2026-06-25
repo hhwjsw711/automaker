@@ -12,7 +12,7 @@ By contributing code, documentation, or other materials to this project, you agr
 
 ### 1. Assignment of Rights
 
-You hereby **assign and transfer to Cody Seibert** (webdevcody@gmail.com) all right, title, and interest in and to your contributions, including all copyright, patent, trade secret, and other intellectual property rights, worldwide.
+You hereby **assign and transfer to Cody Seibert** (hhwjsw711@gmail.com) all right, title, and interest in and to your contributions, including all copyright, patent, trade secret, and other intellectual property rights, worldwide.
 
 ### 2. Exclusive Ownership
 
@@ -70,4 +70,4 @@ If you do NOT agree to these terms, **DO NOT SUBMIT A PULL REQUEST**.
 
 If you have questions about contributing, please contact:
 Cody Seibert
-Email: webdevcody@gmail.com
+Email: hhwjsw711@gmail.com
