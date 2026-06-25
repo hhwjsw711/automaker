@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Badge } from "~/components/ui/badge";
 import { ArrowRight, CheckCircle, Lock } from "lucide-react";
 import { type Segment } from "~/db/schema";
@@ -13,6 +14,7 @@ interface UpgradePlaceholderProps {
 export function UpgradePlaceholder({
   currentSegment,
 }: UpgradePlaceholderProps) {
+  const { t } = useTranslation();
   return (
     <div className="relative">
       <GlassPanel
@@ -30,7 +32,7 @@ export function UpgradePlaceholder({
               variant="outline"
               className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 px-4 py-2 text-sm font-semibold"
             >
-              PREMIUM CONTENT
+              {t("learn.premiumContentBadge")}
             </Badge>
           </div>
 
@@ -40,7 +42,7 @@ export function UpgradePlaceholder({
               {currentSegment.title}
             </h1>
             <p className="text-lg text-muted-foreground">
-              This lesson is part of our premium curriculum
+              {t("learn.premiumLessonDesc")}
             </p>
           </div>
 
@@ -50,19 +52,19 @@ export function UpgradePlaceholder({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle className="h-4 w-4 text-theme-500" />
-                <span>Advanced content</span>
+                <span>{t("learn.advancedContent")}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle className="h-4 w-4 text-theme-500" />
-                <span>Downloadable resources</span>
+                <span>{t("learn.downloadableResources")}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle className="h-4 w-4 text-theme-500" />
-                <span>Priority support</span>
+                <span>{t("learn.prioritySupport")}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle className="h-4 w-4 text-theme-500" />
-                <span>All future updates</span>
+                <span>{t("learn.allFutureUpdates")}</span>
               </div>
             </div>
           </div>
@@ -73,7 +75,7 @@ export function UpgradePlaceholder({
               to="/purchase"
               className={cn(buttonVariants({ variant: "default" }), "w-fit")}
             >
-              Upgrade to Premium
+              {t("learn.upgradeToPremium")}
               <ArrowRight className="h-5 w-5" />
             </Link>
           </div>

@@ -13,6 +13,7 @@ import { VideoPlayer } from "~/routes/learn/-components/video-player";
 import { unauthenticatedMiddleware } from "~/lib/auth";
 import { isAdminFn, isUserPremiumFn } from "~/fn/auth";
 import { getAllProgressForUserUseCase } from "~/use-cases/progress";
+import { useTranslation } from "react-i18next";
 import { useSegment } from "../-components/segment-context";
 import { setLastWatchedSegment } from "~/utils/local-storage";
 
@@ -130,6 +131,7 @@ function ViewSegment({
   progress: Progress[];
   thumbnailUrl?: string | null;
 }) {
+  const { t } = useTranslation();
   const { setCurrentSegmentId, markSegmentAsLocallyCompleted } = useSegment();
 
   useEffect(() => {
@@ -194,11 +196,10 @@ function ViewSegment({
                 <div className="text-6xl opacity-20">🚀</div>
                 <div>
                   <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-                    Coming Soon
+                    {t("learn.comingSoonTitle")}
                   </h3>
                   <p className="text-slate-500 dark:text-slate-400">
-                    This video content is currently being prepared and will be
-                    available soon.
+                    {t("learn.comingSoonDesc")}
                   </p>
                 </div>
               </div>
@@ -223,7 +224,7 @@ function ViewSegment({
                   {/* Thumbnail image positioned absolutely behind content */}
                   <img
                     src={thumbnailUrl}
-                    alt="Video thumbnail"
+                    alt={t("learn.videoThumbnail")}
                     className="absolute inset-0 z-0 w-full h-full object-cover"
                     loading="eager"
                     decoding="async"

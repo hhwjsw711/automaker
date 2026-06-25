@@ -5,6 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { useRef } from "react";
 import { useSegment } from "./segment-context";
+import { useTranslation } from "react-i18next";
 
 interface ModuleWithSegments extends Module {
   segments: Segment[];
@@ -37,6 +38,7 @@ export function ModulePanel({
   const contentRef = useRef<HTMLDivElement>(null);
   const { locallyCompletedSegmentIds, locallyUncompletedSegmentIds } =
     useSegment();
+  const { t } = useTranslation();
 
   const isSegmentCompleted = (segmentId: number) => {
     // Check local uncompleted state first (takes precedence)
@@ -121,7 +123,7 @@ export function ModulePanel({
                     <div className="flex items-center justify-center w-5 h-5 rounded bg-slate-200/60 dark:bg-white/5 group-hover/add:bg-cyan-500/20 transition">
                       <Plus className="h-3 w-3" />
                     </div>
-                    <span>New segment</span>
+                    <span>{t("learn.newSegment")}</span>
                   </button>
                 </div>
               )}

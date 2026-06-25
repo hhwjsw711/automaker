@@ -17,6 +17,7 @@ import { adminMiddleware } from "~/lib/auth";
 import { deleteModuleUseCase } from "~/use-cases/modules";
 import { toast } from "sonner";
 import { useRouter } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 export const deleteModuleFn = createServerFn()
   .middleware([adminMiddleware])
@@ -35,20 +36,21 @@ export function DeleteModuleButton({
   moduleTitle,
 }: DeleteModuleButtonProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleDeleteModule = async () => {
     try {
       await deleteModuleFn({ data: { moduleId } });
 
-      toast.success("Module deleted successfully!", {
-        description: `"${moduleTitle}" has been permanently deleted.`,
+      toast.success(t("learn.moduleDeleted"), {
+        description: t("learn.moduleDeletedDesc", { title: moduleTitle }),
       });
 
       // Refresh the page to update the module list
       router.invalidate();
     } catch (error) {
-      toast.error("Failed to delete module", {
-        description: "Please try again.",
+      toast.error(t("learn.failedDeleteModule"), {
+        description: t("learn.tryAgain"),
       });
     }
   };
@@ -75,26 +77,24 @@ export function DeleteModuleButton({
               <Trash2 className="h-5 w-5 text-destructive" />
             </div>
             <AlertDialogTitle className="text-xl font-semibold text-foreground leading-tight">
-              Delete Module
+              {t("learn.deleteModule")}
             </AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed">
-            Are you sure you want to delete the module{" "}
-            <strong>"{moduleTitle}"</strong>? This action cannot be undone and
-            will permanently delete the module and all its associated segments.
+            {t("learn.deleteModuleConfirm", { title: moduleTitle })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex gap-3 p-6 pt-0">
           <AlertDialogCancel
             className={buttonVariants({ variant: "gray-outline" })}
           >
-            Cancel
+            {t("learn.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDeleteModule}
             className={buttonVariants({ variant: "destructive" })}
           >
-            Delete Module
+            {t("learn.deleteModule")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

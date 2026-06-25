@@ -3,6 +3,7 @@ import { Trash2 } from "lucide-react";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "@tanstack/react-router";
 import { Route } from "../_layout.index";
 import { useQueryClient } from "@tanstack/react-query";
@@ -37,6 +38,7 @@ interface DeleteVideoButtonProps {
 export function DeleteSegmentButton({
   currentSegmentId,
 }: DeleteVideoButtonProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -125,23 +127,23 @@ export function DeleteSegmentButton({
           replace: true, // Replace history entry to prevent back navigation to deleted segment
         });
 
-        toast.success("Content deleted successfully!", {
+        toast.success(t("learn.contentDeleted"), {
           description: `Redirected to: ${fallbackSegment.title}`,
         });
       } else {
         // If no fallback segment exists, navigate to the main learning page
         navigate({ to: "/learn", replace: true });
 
-        toast.success("Content deleted successfully!", {
-          description: "Redirected to content list.",
+        toast.success(t("learn.contentDeleted"), {
+          description: t("learn.contentDeletedRedirect"),
         });
       }
 
       // close the dialog manually
       setOpen(false);
     } catch (error) {
-      toast.error("Failed to delete content", {
-        description: "Please try again.",
+      toast.error(t("learn.contentDeleteFail"), {
+        description: t("learn.tryAgain"),
       });
     }
   };
@@ -151,7 +153,7 @@ export function DeleteSegmentButton({
       <AlertDialogTrigger asChild>
         <button className="cursor-pointer inline-flex items-center gap-1.5 rounded-xl bg-red-50/50 dark:bg-white/[0.03] border border-red-500/30 px-4 py-2 text-xs font-bold text-red-600 dark:text-red-400 backdrop-blur-[24px] transition-all hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300 whitespace-nowrap">
           <Trash2 className="w-3.5 h-3.5" />
-          Delete
+          {t("learn.delete")}
         </button>
       </AlertDialogTrigger>
       <AlertDialogContent
@@ -164,25 +166,24 @@ export function DeleteSegmentButton({
               <Trash2 className="h-5 w-5 text-destructive" />
             </div>
             <AlertDialogTitle className="text-xl font-semibold text-foreground leading-tight">
-              Are you absolutely sure?
+              {t("learn.contentDeleteConfirmTitle")}
             </AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed">
-            This action cannot be undone. This will permanently delete this
-            content and all its associated files and attachments.
+            {t("learn.contentDeleteConfirmDesc")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex gap-3 p-6 pt-0">
           <AlertDialogCancel
             className={buttonVariants({ variant: "gray-outline" })}
           >
-            Cancel
+            {t("learn.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDeleteSegment}
             className={buttonVariants({ variant: "destructive" })}
           >
-            Delete
+            {t("learn.delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

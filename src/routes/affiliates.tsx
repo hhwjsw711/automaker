@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -43,12 +44,13 @@ import {
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 
-const affiliateFormSchema = z.object({
-  paymentLink: z.url("Please provide a valid URL"),
-  agreedToTerms: z.boolean().refine((val) => val === true, {
-    message: "You must agree to the terms of service",
-  }),
-});
+const affiliateFormSchema = (t: ReturnType<typeof useTranslation>["t"]) =>
+  z.object({
+    paymentLink: z.url(t("affiliates.invalidUrl")),
+    agreedToTerms: z.boolean().refine((val) => val === true, {
+      message: t("affiliates.mustAgree"),
+    }),
+  });
 
 type AffiliateFormValues = z.infer<typeof affiliateFormSchema>;
 
@@ -65,6 +67,7 @@ export const Route = createFileRoute("/affiliates")({
 });
 
 function AffiliatesPage() {
+  const { t } = useTranslation();
   const user = useAuth();
   const router = useRouter();
   const [termsOpen, setTermsOpen] = useState(false);
@@ -74,7 +77,7 @@ function AffiliatesPage() {
   });
 
   const form = useForm<AffiliateFormValues>({
-    resolver: zodResolver(affiliateFormSchema),
+    resolver: zodResolver(affiliateFormSchema(t)),
     defaultValues: {
       paymentLink: "",
       agreedToTerms: false,
@@ -84,17 +87,15 @@ function AffiliatesPage() {
   const registerMutation = useMutation({
     mutationFn: registerAffiliateFn,
     onSuccess: () => {
-      toast.success("Welcome to the Affiliate Program!", {
-        description:
-          "You can now access your affiliate dashboard to get your unique link.",
+      toast.success(t("affiliates.welcomeTitle"), {
+        description: t("affiliates.welcomeDesc"),
       });
       router.navigate({ to: "/affiliate-dashboard" });
     },
     onError: (error) => {
-      toast.error("Registration Failed", {
+      toast.error(t("affiliates.registerFailed"), {
         description:
-          error.message ||
-          "Failed to register as an affiliate. Please try again.",
+          error.message || t("affiliates.registerFailedDesc"),
       });
     },
   });
@@ -130,42 +131,41 @@ function AffiliatesPage() {
             {/* Badge */}
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-theme-50/50 dark:bg-background/20 backdrop-blur-sm border border-theme-200 dark:border-border/50 text-theme-600 dark:text-theme-400 text-sm font-medium mb-8">
               <span className="w-2 h-2 bg-theme-500 dark:bg-theme-400 rounded-full mr-2 animate-pulse"></span>
-              Earn {AFFILIATE_CONFIG.COMMISSION_RATE}% Commission
+              {t("affiliates.badge", { rate: AFFILIATE_CONFIG.COMMISSION_RATE })}
             </div>
 
             {/* Hero title with gradient text */}
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-theme-500 to-theme-600 dark:from-theme-400 dark:to-theme-500 bg-clip-text text-transparent animate-gradient leading-normal pb-1">
-              Join Our Affiliate Program
+              {t("affiliates.heading")}
             </h1>
 
             {/* Subtitle */}
             <p className="text-xl md:text-2xl text-muted-foreground mb-4">
-              Partner with us and earn generous commissions
+              {t("affiliates.subtitle")}
             </p>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-12">
-              Join our exclusive affiliate program and start earning $60 per
-              sale by sharing our AI coding mastery course with your audience.
+              {t("affiliates.description")}
             </p>
 
             {/* Benefits preview */}
             <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
               <div className="video-wrapper p-6 text-center">
                 <DollarSign className="h-10 w-10 text-theme-500 dark:text-theme-400 mx-auto mb-3" />
-                <h3 className="font-semibold mb-2">{AFFILIATE_CONFIG.COMMISSION_RATE}% Commission</h3>
-                <p className="text-sm text-muted-foreground">$60 per sale</p>
+                <h3 className="font-semibold mb-2">{t("affiliates.commission", { rate: AFFILIATE_CONFIG.COMMISSION_RATE })}</h3>
+                <p className="text-sm text-muted-foreground">{t("affiliates.commissionAmount")}</p>
               </div>
               <div className="video-wrapper p-6 text-center">
                 <Clock className="h-10 w-10 text-theme-500 dark:text-theme-400 mx-auto mb-3" />
-                <h3 className="font-semibold mb-2">30-Day Cookie</h3>
+                <h3 className="font-semibold mb-2">{t("affiliates.cookieDays")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Long attribution window
+                  {t("affiliates.cookieDesc")}
                 </p>
               </div>
               <div className="video-wrapper p-6 text-center">
                 <TrendingUp className="h-10 w-10 text-theme-500 dark:text-theme-400 mx-auto mb-3" />
-                <h3 className="font-semibold mb-2">Real-Time Tracking</h3>
+                <h3 className="font-semibold mb-2">{t("affiliates.tracking")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Monitor your earnings
+                  {t("affiliates.trackingDesc")}
                 </p>
               </div>
             </div>
@@ -180,11 +180,11 @@ function AffiliatesPage() {
                 )}
               >
                 <Zap className="mr-2 h-5 w-5" />
-                Login to Join Program
+                {t("affiliates.loginJoin")}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
               <p className="text-sm text-muted-foreground">
-                Sign in with Google to access the affiliate program
+                {t("affiliates.loginDesc")}
               </p>
             </div>
           </div>
@@ -200,16 +200,16 @@ function AffiliatesPage() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-4xl font-bold mb-4">
-          You're Already an Affiliate!
+          {t("affiliates.alreadyAffiliate")}
         </h1>
         <p className="text-muted-foreground mb-8">
-          Access your dashboard to view your stats and get your affiliate link
+          {t("affiliates.alreadyDesc")}
         </p>
         <Link
           to="/affiliate-dashboard"
           className={buttonVariants({ variant: "default", size: "lg" })}
         >
-          Go to Dashboard
+          {t("affiliates.goDashboard")}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
       </div>
@@ -235,18 +235,15 @@ function AffiliatesPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center px-4 py-2 rounded-full bg-theme-50/50 dark:bg-background/20 backdrop-blur-sm border border-theme-200 dark:border-border/50 text-theme-600 dark:text-theme-400 text-sm font-medium mb-8">
               <span className="w-2 h-2 bg-theme-500 dark:bg-theme-400 rounded-full mr-2 animate-pulse"></span>
-              Earn {AFFILIATE_CONFIG.COMMISSION_RATE}% Commission
+              {t("affiliates.badge", { rate: AFFILIATE_CONFIG.COMMISSION_RATE })}
             </div>
 
             <h1 className="text-6xl font-bold mb-6">
-              Partner With{" "}
-              <span className="text-theme-400">Automaker</span>
+              {t("affiliates.partnerHeading")}{" "}
+              <span className="text-theme-400">{t("affiliates.partnerBrand")}</span>
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
-              Join our affiliate program and earn generous commissions by
-              sharing our AI coding mastery course with your audience. Help
-              developers transform their workflow while building a sustainable
-              income stream.
+              {t("affiliates.partnerDesc")}
             </p>
           </div>
 
@@ -254,55 +251,49 @@ function AffiliatesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             <div className="video-wrapper p-6">
               <DollarSign className="h-12 w-12 text-theme-500 dark:text-theme-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{AFFILIATE_CONFIG.COMMISSION_RATE}% Commission</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("affiliates.commissionTitle", { rate: AFFILIATE_CONFIG.COMMISSION_RATE })}</h3>
               <p className="text-muted-foreground">
-                Earn $60 for every sale you refer. One of the highest commission
-                rates in the industry.
+                {t("affiliates.commissionDesc")}
               </p>
             </div>
 
             <div className="video-wrapper p-6">
               <Clock className="h-12 w-12 text-theme-500 dark:text-theme-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">30-Day Cookie</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("affiliates.cookieTitle")}</h3>
               <p className="text-muted-foreground">
-                Long attribution window ensures you get credit for purchases
-                made within 30 days.
+                {t("affiliates.cookieDesc2")}
               </p>
             </div>
 
             <div className="video-wrapper p-6">
               <TrendingUp className="h-12 w-12 text-theme-500 dark:text-theme-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Real-Time Tracking</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("affiliates.trackingTitle")}</h3>
               <p className="text-muted-foreground">
-                Monitor your clicks, conversions, and earnings in real-time from
-                your dashboard.
+                {t("affiliates.trackingDesc2")}
               </p>
             </div>
 
             <div className="video-wrapper p-6">
               <Users className="h-12 w-12 text-theme-500 dark:text-theme-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Marketing Support</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("affiliates.marketingTitle")}</h3>
               <p className="text-muted-foreground">
-                Access promotional materials, email templates, and social media
-                content.
+                {t("affiliates.marketingDesc")}
               </p>
             </div>
 
             <div className="video-wrapper p-6">
               <Shield className="h-12 w-12 text-theme-500 dark:text-theme-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Trusted Platform</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("affiliates.trustedTitle")}</h3>
               <p className="text-muted-foreground">
-                Promote a high-quality course that delivers real value to
-                developers.
+                {t("affiliates.trustedDesc")}
               </p>
             </div>
 
             <div className="video-wrapper p-6">
               <Award className="h-12 w-12 text-theme-500 dark:text-theme-400 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Monthly Payouts</h3>
+              <h3 className="text-xl font-semibold mb-2">{t("affiliates.payoutsTitle")}</h3>
               <p className="text-muted-foreground">
-                Receive monthly payments via your preferred payment method. $50
-                minimum payout.
+                {t("affiliates.payoutsDesc")}
               </p>
             </div>
           </div>
@@ -310,7 +301,7 @@ function AffiliatesPage() {
           {/* How It Works */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold text-center mb-12">
-              How It Works
+              {t("affiliates.howItWorks")}
             </h2>
             <div className="grid md:grid-cols-4 gap-8">
               <div className="text-center">
@@ -319,9 +310,9 @@ function AffiliatesPage() {
                     1
                   </span>
                 </div>
-                <h3 className="font-semibold mb-2">Sign Up</h3>
+                <h3 className="font-semibold mb-2">{t("affiliates.step1Title")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Register with your payment link
+                  {t("affiliates.step1Desc")}
                 </p>
               </div>
               <div className="text-center">
@@ -330,9 +321,9 @@ function AffiliatesPage() {
                     2
                   </span>
                 </div>
-                <h3 className="font-semibold mb-2">Get Your Link</h3>
+                <h3 className="font-semibold mb-2">{t("affiliates.step2Title")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Receive your unique affiliate link
+                  {t("affiliates.step2Desc")}
                 </p>
               </div>
               <div className="text-center">
@@ -341,9 +332,9 @@ function AffiliatesPage() {
                     3
                   </span>
                 </div>
-                <h3 className="font-semibold mb-2">Share & Promote</h3>
+                <h3 className="font-semibold mb-2">{t("affiliates.step3Title")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Share with your audience
+                  {t("affiliates.step3Desc")}
                 </p>
               </div>
               <div className="text-center">
@@ -352,9 +343,9 @@ function AffiliatesPage() {
                     4
                   </span>
                 </div>
-                <h3 className="font-semibold mb-2">Earn Commissions</h3>
+                <h3 className="font-semibold mb-2">{t("affiliates.step4Title")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Get paid monthly for referrals
+                  {t("affiliates.step4Desc")}
                 </p>
               </div>
             </div>
@@ -364,7 +355,7 @@ function AffiliatesPage() {
           <div className="max-w-2xl mx-auto">
             <div className="video-wrapper p-8">
               <h2 className="text-2xl font-bold mb-6 text-center">
-                Join the Program
+                {t("affiliates.joinHeading")}
               </h2>
 
               <Form {...form}>
@@ -377,17 +368,16 @@ function AffiliatesPage() {
                     name="paymentLink"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Payment Link</FormLabel>
+                        <FormLabel>{t("affiliates.paymentLink")}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="https://paypal.me/yourname"
+                            placeholder={t("affiliates.paymentPlaceholder")}
                             {...field}
                             className="bg-background/50"
                           />
                         </FormControl>
                         <FormDescription>
-                          Enter your PayPal, Venmo, or other payment link where
-                          you'd like to receive affiliate payouts.
+                          {t("affiliates.paymentDesc")}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -407,7 +397,7 @@ function AffiliatesPage() {
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel>
-                            I agree to the{" "}
+                            {t("affiliates.agreePart1")}{" "}
                             <Dialog
                               open={termsOpen}
                               onOpenChange={setTermsOpen}
@@ -417,7 +407,7 @@ function AffiliatesPage() {
                                   type="button"
                                   className="text-theme-600 dark:text-theme-400 underline"
                                 >
-                                  Terms of Service
+                                  {t("affiliates.termsOfService")}
                                 </button>
                               </DialogTrigger>
                               <DialogContent
@@ -435,16 +425,15 @@ function AffiliatesPage() {
                                       {/* Badge */}
                                       <div className="inline-flex items-center px-4 py-2 rounded-full bg-theme-50/50 dark:bg-background/30 backdrop-blur-sm border border-theme-200 dark:border-border/50 text-theme-600 dark:text-theme-400 text-sm font-medium mb-4 mx-auto">
                                         <span className="w-2 h-2 bg-theme-500 dark:bg-theme-400 rounded-full mr-2 animate-pulse"></span>
-                                        Legal Agreement
+                                        {t("affiliates.legalAgreement")}
                                       </div>
 
                                       <DialogTitle className="text-3xl font-bold text-center bg-gradient-to-r from-theme-500 to-theme-600 dark:from-theme-400 dark:to-theme-500 bg-clip-text text-transparent">
-                                        Affiliate Program Terms of Service
+                                        {t("affiliates.termsTitle")}
                                       </DialogTitle>
 
                                       <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-                                        Please review these terms carefully
-                                        before joining our affiliate program
+                                        {t("affiliates.termsDesc")}
                                       </p>
                                     </DialogHeader>
 
@@ -457,14 +446,11 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Commission Structure
+                                            {t("affiliates.termsCommissionTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed">
-                                          Affiliates earn {AFFILIATE_CONFIG.COMMISSION_RATE}% commission on all
-                                          referred sales. Commissions are
-                                          calculated based on the net sale price
-                                          after any discounts.
+                                          {t("affiliates.termsCommission", { rate: AFFILIATE_CONFIG.COMMISSION_RATE })}
                                         </p>
                                       </div>
                                       <div className="bg-background/30 backdrop-blur-sm rounded-lg p-6 border border-theme-200/20 dark:border-border/20">
@@ -475,14 +461,11 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Payment Terms
+                                            {t("affiliates.termsPaymentTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed">
-                                          Payments are processed monthly with a
-                                          minimum payout threshold of $50.
-                                          Payments are made via the payment link
-                                          provided during registration.
+                                          {t("affiliates.termsPayment")}
                                         </p>
                                       </div>
                                       <div className="bg-background/30 backdrop-blur-sm rounded-lg p-6 border border-theme-200/20 dark:border-border/20">
@@ -493,14 +476,11 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Cookie Duration
+                                            {t("affiliates.termsCookieTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed">
-                                          Affiliate links have a 30-day cookie
-                                          duration. You will receive credit for
-                                          any purchases made within 30 days of a
-                                          user clicking your affiliate link.
+                                          {t("affiliates.termsCookie")}
                                         </p>
                                       </div>
                                       <div className="bg-background/30 backdrop-blur-sm rounded-lg p-6 border border-theme-200/20 dark:border-border/20">
@@ -511,29 +491,18 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Prohibited Activities
+                                            {t("affiliates.termsProhibitedTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed mb-3">
-                                          The following activities are strictly
-                                          prohibited:
+                                          {t("affiliates.termsProhibited")}
                                         </p>
                                         <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-4">
-                                          <li>Spam or unsolicited emails</li>
-                                          <li>
-                                            Misleading or false advertising
-                                          </li>
-                                          <li>
-                                            Self-referrals or fraudulent
-                                            purchases
-                                          </li>
-                                          <li>
-                                            Trademark or brand misrepresentation
-                                          </li>
-                                          <li>
-                                            Paid search advertising on
-                                            trademarked terms
-                                          </li>
+                                          <li>{t("affiliates.termsProhibited1")}</li>
+                                          <li>{t("affiliates.termsProhibited2")}</li>
+                                          <li>{t("affiliates.termsProhibited3")}</li>
+                                          <li>{t("affiliates.termsProhibited4")}</li>
+                                          <li>{t("affiliates.termsProhibited5")}</li>
                                         </ul>
                                       </div>
                                       <div className="bg-background/30 backdrop-blur-sm rounded-lg p-6 border border-theme-200/20 dark:border-border/20">
@@ -544,15 +513,11 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Termination
+                                            {t("affiliates.termsTerminationTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed">
-                                          We reserve the right to terminate
-                                          affiliate accounts that violate these
-                                          terms or engage in fraudulent
-                                          activity. Pending commissions may be
-                                          forfeited in cases of violation.
+                                          {t("affiliates.termsTermination")}
                                         </p>
                                       </div>
                                       <div className="bg-background/30 backdrop-blur-sm rounded-lg p-6 border border-theme-200/20 dark:border-border/20">
@@ -563,14 +528,11 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Modifications
+                                            {t("affiliates.termsModificationsTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed">
-                                          We may modify these terms at any time.
-                                          Continued participation in the program
-                                          constitutes acceptance of any
-                                          modifications.
+                                          {t("affiliates.termsModifications")}
                                         </p>
                                       </div>
                                       <div className="bg-background/30 backdrop-blur-sm rounded-lg p-6 border border-theme-200/20 dark:border-border/20">
@@ -581,14 +543,11 @@ function AffiliatesPage() {
                                             </span>
                                           </div>
                                           <h3 className="text-lg font-semibold text-theme-700 dark:text-theme-300">
-                                            Liability
+                                            {t("affiliates.termsLiabilityTitle")}
                                           </h3>
                                         </div>
                                         <p className="text-muted-foreground leading-relaxed">
-                                          We are not liable for indirect,
-                                          special, or consequential damages
-                                          arising from your participation in the
-                                          affiliate program.
+                                          {t("affiliates.termsLiability")}
                                         </p>
                                       </div>
                                     </div>
@@ -610,11 +569,11 @@ function AffiliatesPage() {
                     disabled={registerMutation.isPending}
                   >
                     {registerMutation.isPending ? (
-                      "Registering..."
+                      t("affiliates.registering")
                     ) : (
                       <>
                         <Zap className="mr-2 h-4 w-4" />
-                        Join Affiliate Program
+                        {t("affiliates.joinButton")}
                       </>
                     )}
                   </Button>

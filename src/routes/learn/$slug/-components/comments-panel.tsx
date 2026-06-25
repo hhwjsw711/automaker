@@ -5,6 +5,7 @@ import { getCommentsQuery } from "~/lib/queries/comments";
 import { CommentForm } from "./comment-form";
 import { CommentList } from "./comment-list";
 import { useCommentFormVisibility } from "~/hooks/use-comment-form-visibility";
+import { useTranslation } from "react-i18next";
 
 interface CommentsPanelProps {
   currentSegmentId: number;
@@ -56,15 +57,17 @@ function CommentsLoadingSkeleton() {
  * Header section for the comment form
  */
 function CommentFormHeader({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex items-center justify-between">
       <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
         <MessageSquare className="h-5 w-5 text-theme-600 dark:text-theme-400" />
-        Join the Discussion
+        {t("learn.joinDiscussion")}
       </h3>
       {isLoggedIn && (
         <div className="text-sm text-muted-foreground">
-          Share your thoughts
+          {t("learn.shareThoughts")}
         </div>
       )}
     </div>

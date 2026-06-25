@@ -34,6 +34,7 @@ import { deleteSegmentFn } from "../$slug/-components/delete-segment-button";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { modulesQueryOptions } from "../$slug/_layout";
+import { useTranslation } from "react-i18next";
 
 function isNewSegment(createdAt: Date | null): boolean {
   if (!createdAt) return false;
@@ -69,6 +70,7 @@ export function SegmentItem({
 }: SegmentItemProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   // Get the icon component for the segment
@@ -80,15 +82,15 @@ export function SegmentItem({
     try {
       await deleteSegmentFn({ data: { segmentId: segment.id } });
       queryClient.invalidateQueries(modulesQueryOptions);
-      toast.success("Segment deleted successfully");
+      toast.success(t("learn.segmentDeleted"));
       setDeleteDialogOpen(false);
       // Navigate to learn page if we're on the deleted segment
       if (isActive) {
         navigate({ to: "/learn" });
       }
     } catch (error) {
-      toast.error("Failed to delete segment", {
-        description: "Please try again.",
+      toast.error(t("learn.failedDeleteSegment"), {
+        description: t("learn.tryAgain"),
       });
     }
   };
@@ -141,7 +143,7 @@ export function SegmentItem({
               className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20"
             >
               <Sparkles className="h-2.5 w-2.5" />
-              NEW
+              {t("learn.new")}
             </span>
           )}
         {segment.isComingSoon && (
@@ -149,13 +151,13 @@ export function SegmentItem({
             data-testid="coming-soon-badge"
             className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/15 text-blue-400 border border-blue-500/20"
           >
-            SOON
+            {t("learn.soon")}
           </span>
         )}
         {segment.isPremium && !isPremium && !isAdmin && (
           <span className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20">
             <Lock className="h-2.5 w-2.5" />
-            PRO
+            {t("learn.pro")}
           </span>
         )}
       </div>
@@ -195,7 +197,7 @@ export function SegmentItem({
             // The Link will handle the actual navigation
             onSegmentClick(segment.id);
           }}
-          aria-label={`Select segment ${segment.title}`}
+          aria-label={t("learn.selectSegment", { title: segment.title })}
           className="cursor-pointer flex items-center gap-3 flex-1 text-left min-w-0"
         >
           {segmentContent}
@@ -212,7 +214,7 @@ export function SegmentItem({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <MoreVertical className="h-3.5 w-3.5" />
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">{t("learn.openMenu")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -223,7 +225,7 @@ export function SegmentItem({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Edit2 className="mr-2 h-4 w-4" />
-                    Edit
+                    {t("learn.edit")}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -234,7 +236,7 @@ export function SegmentItem({
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  {t("learn.delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -276,25 +278,24 @@ export function SegmentItem({
                   <Trash2 className="h-5 w-5 text-destructive" />
                 </div>
                 <AlertDialogTitle className="text-xl font-semibold text-foreground leading-tight">
-                  Are you absolutely sure?
+                  {t("learn.deleteSegmentConfirm")}
                 </AlertDialogTitle>
               </div>
               <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed">
-                This action cannot be undone. This will permanently delete this
-                segment and all its associated files and attachments.
+                {t("learn.deleteSegmentDesc")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex gap-3 p-6 pt-0">
               <AlertDialogCancel
                 className={buttonVariants({ variant: "gray-outline" })}
               >
-                Cancel
+                {t("learn.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteSegment}
                 className={buttonVariants({ variant: "destructive" })}
               >
-                Delete
+                {t("learn.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

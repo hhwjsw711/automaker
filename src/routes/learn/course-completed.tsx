@@ -8,6 +8,7 @@ import { useWindowSize } from "~/hooks/use-window-size";
 import Confetti from "react-confetti";
 import { Twitter, Github, MessageCircle } from "lucide-react";
 import { useNewsletterSubscription } from "~/hooks/use-newsletter-subscription";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/learn/course-completed")({
   component: CourseCompleted,
@@ -18,6 +19,7 @@ function CourseCompleted() {
   const { width, height } = useWindowSize();
   const { email, setEmail, isSubmitted, isLoading, handleSubmit } =
     useNewsletterSubscription();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -28,7 +30,7 @@ function CourseCompleted() {
   }, []);
 
   const handleNewsletterSuccess = () => {
-    toast.success("Thank you!", { description: "We'll be in touch soon." });
+    toast.success(t("learn.thankYou"), { description: t("learn.thankYouDesc") });
   };
 
   return (
@@ -56,18 +58,17 @@ function CourseCompleted() {
             </svg>
           </div>
           <h1 className="text-5xl sm:text-6xl font-bold text-foreground">
-            Congratulations! <span className="text-theme-400">🎉</span>
+            {t("learn.courseCompleted")}
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            You've completed the course! We hope you learned a lot and enjoyed
-            the experience.
+            {t("learn.courseCompletedDesc")}
           </p>
         </div>
 
         <div className="bg-card/30 backdrop-blur-sm rounded-lg border border-theme-400/20 shadow-[0_0_15px_rgb(var(--color-theme-500-rgb)/0.1)] p-6 space-y-4">
-          <h2 className="text-2xl font-semibold text-foreground">Get in Touch</h2>
+          <h2 className="text-2xl font-semibold text-foreground">{t("learn.getInTouch")}</h2>
           <p className="text-muted-foreground">
-            Have questions or feedback? Feel free to reach out to me at{" "}
+            {t("learn.getInTouchDesc")}{" "}
             <a
               href="mailto:hhwjsw711@gmail.com"
               className="text-theme-400 hover:text-theme-300 transition-colors"
@@ -78,20 +79,19 @@ function CourseCompleted() {
         </div>
 
         <div className="bg-card/30 backdrop-blur-sm rounded-lg border border-theme-400/20 shadow-[0_0_15px_rgb(var(--color-theme-500-rgb)/0.1)] p-6 space-y-4">
-          <h2 className="text-2xl font-semibold text-foreground">Stay Updated</h2>
+          <h2 className="text-2xl font-semibold text-foreground">{t("learn.stayUpdated")}</h2>
           <p className="text-muted-foreground">
-            Sign up for our newsletter to get notified about new courses,
-            updates, and exclusive content.
+            {t("learn.stayUpdatedDesc")}
           </p>
 
           {isSubmitted ? (
             <div className="max-w-xl mx-auto">
               <div className="bg-theme-500/10 border border-theme-500/20 rounded-lg p-6">
                 <h3 className="text-2xl font-semibold text-theme-400 mb-2">
-                  Thank you for subscribing!
+                  {t("learn.thankYou")}
                 </h3>
                 <p className="text-muted-foreground/70">
-                  We'll keep you updated with new courses and exclusive content.
+                  {t("learn.thankYouDesc")}
                 </p>
               </div>
             </div>
@@ -99,12 +99,12 @@ function CourseCompleted() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">
-                  Email
+                  {t("learn.email")}
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t("learn.enterEmail")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -116,14 +116,14 @@ function CourseCompleted() {
                 className="w-full bg-theme-400 hover:bg-theme-500 text-primary-foreground font-semibold"
                 disabled={isLoading}
               >
-                {isLoading ? "Subscribing..." : "Subscribe to Newsletter"}
+                {isLoading ? t("learn.subscribing") : t("learn.subscribeToNewsletter")}
               </Button>
             </form>
           )}
         </div>
 
         <div className="bg-card/30 backdrop-blur-sm rounded-lg border border-theme-400/20 shadow-[0_0_15px_rgb(var(--color-theme-500-rgb)/0.1)] p-6 space-y-4">
-          <h2 className="text-2xl font-semibold text-foreground">Connect With Me</h2>
+          <h2 className="text-2xl font-semibold text-foreground">{t("learn.connectWithMe")}</h2>
           <div className="flex gap-4 justify-center">
             <Button
               variant="glass"
@@ -135,7 +135,7 @@ function CourseCompleted() {
                 rel="noopener noreferrer"
               >
                 <Twitter className="mr-2 h-4 w-4" />
-                Twitter
+                {t("learn.twitter")}
               </a>
             </Button>
             <Button
@@ -148,7 +148,7 @@ function CourseCompleted() {
                 rel="noopener noreferrer"
               >
                 <Github className="mr-2 h-4 w-4" />
-                GitHub
+                {t("learn.github")}
               </a>
             </Button>
             <Button
@@ -161,7 +161,7 @@ function CourseCompleted() {
                 rel="noopener noreferrer"
               >
                 <MessageCircle className="mr-2 h-4 w-4" />
-                Discord
+                {t("learn.discord")}
               </a>
             </Button>
           </div>

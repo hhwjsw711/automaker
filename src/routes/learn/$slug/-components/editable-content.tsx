@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { MarkdownContent } from "~/routes/learn/-components/markdown-content";
 import { useUpdateSegmentContent } from "~/hooks/mutations/use-update-segment-content";
+import { useTranslation } from "react-i18next";
 
 interface EditableContentProps {
   segmentId: number;
@@ -24,6 +25,7 @@ export function EditableContent({
 }: EditableContentProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(content || "");
+  const { t } = useTranslation();
   const { mutate: updateContent, isPending } = useUpdateSegmentContent();
 
   const handleEdit = () => {
@@ -54,7 +56,7 @@ export function EditableContent({
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
           className="min-h-[300px] font-mono text-sm"
-          placeholder={`Enter ${field} content (supports Markdown)...`}
+          placeholder={t("learn.enterFieldContent", { field })}
           autoFocus
         />
         <div className="flex gap-2">
@@ -62,12 +64,12 @@ export function EditableContent({
             {isPending ? (
               <>
                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white/70 mr-2" />
-                Saving...
+                {t("learn.saving")}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-3 w-3" />
-                Save
+                {t("learn.saveChanges")}
               </>
             )}
           </Button>
@@ -78,7 +80,7 @@ export function EditableContent({
             disabled={isPending}
           >
             <X className="mr-2 h-3 w-3" />
-            Cancel
+            {t("learn.cancel")}
           </Button>
         </div>
       </div>
@@ -96,7 +98,7 @@ export function EditableContent({
             className="text-muted-foreground hover:text-foreground"
           >
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            {t("learn.edit")}
           </Button>
         </div>
       )}

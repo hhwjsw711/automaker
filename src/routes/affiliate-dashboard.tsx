@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { assertFeatureEnabled } from "~/lib/feature-flags";
+import { useTranslation } from "react-i18next";
 import {
   useSuspenseQuery,
   useMutation,
@@ -65,9 +66,10 @@ import { publicEnv } from "~/utils/env-public";
 import { assertAuthenticatedFn } from "~/fn/auth";
 import { motion } from "framer-motion";
 
-const paymentLinkSchema = z.object({
-  paymentLink: z.url("Please provide a valid URL"),
-});
+const paymentLinkSchema = (t: ReturnType<typeof useTranslation>["t"]) =>
+  z.object({
+    paymentLink: z.url(t("affiliateDashboard.invalidUrl")),
+  });
 
 type PaymentLinkFormValues = z.infer<typeof paymentLinkSchema>;
 
@@ -152,6 +154,7 @@ export const Route = createFileRoute("/affiliate-dashboard")({
 });
 
 function AffiliateDashboard() {
+  const { t } = useTranslation();
   const loaderData = Route.useLoaderData();
 
   // If user is not an affiliate, show error message
@@ -168,7 +171,7 @@ function AffiliateDashboard() {
   const dashboard = loaderData.dashboard;
 
   const form = useForm<PaymentLinkFormValues>({
-    resolver: zodResolver(paymentLinkSchema),
+    resolver: zodResolver(paymentLinkSchema(t)),
     defaultValues: {
       paymentLink: dashboard.affiliate.paymentLink,
     },
@@ -178,14 +181,14 @@ function AffiliateDashboard() {
     mutationFn: updateAffiliatePaymentLinkFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["affiliate", "dashboard"] });
-      toast.success("Payment Link Updated", {
-        description: "Your payment link has been successfully updated.",
+      toast.success(t("affiliateDashboard.paymentUpdated"), {
+        description: t("affiliateDashboard.paymentUpdatedDesc"),
       });
       setEditPaymentOpen(false);
     },
     onError: (error) => {
-      toast.error("Update Failed", {
-        description: error.message || "Failed to update payment link.",
+      toast.error(t("affiliateDashboard.updateFailed"), {
+        description: error.message || t("affiliateDashboard.updateFailedDesc"),
       });
     },
   });
@@ -199,8 +202,8 @@ function AffiliateDashboard() {
   const copyToClipboard = () => {
     navigator.clipboard.writeText(affiliateLink);
     setCopied(true);
-    toast.success("Link Copied!", {
-      description: "Your affiliate link has been copied to clipboard.",
+    toast.success(t("affiliateDashboard.linkCopied"), {
+      description: t("affiliateDashboard.linkCopiedDesc"),
     });
     setTimeout(() => setCopied(false), 2000);
   };
@@ -246,15 +249,14 @@ function AffiliateDashboard() {
             <div className="text-center mb-12">
               <div className="inline-flex items-center px-4 py-2 rounded-full bg-theme-50/50 dark:bg-background/20 backdrop-blur-sm border border-theme-200 dark:border-border/50 text-theme-600 dark:text-theme-400 text-sm font-medium mb-8">
                 <span className="w-2 h-2 bg-theme-500 dark:bg-theme-400 rounded-full mr-2 animate-pulse"></span>
-                Affiliate Dashboard
+                {t("affiliateDashboard.badge")}
               </div>
               <h1 className="text-5xl font-bold mb-4">
-                Track Your{" "}
-                <span className="text-theme-400">Affiliate Success</span>
+                {t("affiliateDashboard.headingLine1")}{" "}
+                <span className="text-theme-400">{t("affiliateDashboard.headingLine2")}</span>
               </h1>
               <p className="text-description max-w-2xl mx-auto">
-                Monitor your referrals, earnings, and manage your affiliate
-                account with comprehensive analytics
+                {t("affiliateDashboard.description")}
               </p>
             </div>
           </div>
@@ -278,9 +280,9 @@ function AffiliateDashboard() {
             {/* Glow effect on hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <CardHeader>
-              <CardTitle>Your Affiliate Link</CardTitle>
+              <CardTitle>{t("affiliateDashboard.yourLink")}</CardTitle>
               <CardDescription>
-                Share this link to earn commissions on referrals
+                {t("affiliateDashboard.yourLinkDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -301,11 +303,11 @@ function AffiliateDashboard() {
               <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
-                  <span>30-day cookie duration</span>
+                  <span>{t("affiliateDashboard.cookieDuration")}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <DollarSign className="h-4 w-4" />
-                  <span>{dashboard.affiliate.commissionRate}% commission</span>
+                  <span>{t("affiliateDashboard.commissionRate", { rate: dashboard.affiliate.commissionRate })}</span>
                 </div>
               </div>
             </CardContent>
@@ -325,7 +327,7 @@ function AffiliateDashboard() {
               <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                 <CardTitle className="text-sm font-medium text-foreground group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                  Total Earnings
+                  {t("affiliateDashboard.totalEarnings")}
                 </CardTitle>
                 <div className="w-12 h-12 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30 transition-colors duration-300">
                   <DollarSign className="h-6 w-6 text-theme-500 dark:text-theme-400 group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-colors duration-300" />
@@ -336,7 +338,7 @@ function AffiliateDashboard() {
                   {formatCurrency(dashboard.stats.totalEarnings)}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Lifetime earnings
+                  {t("affiliateDashboard.lifetimeEarnings")}
                 </p>
               </CardContent>
 
@@ -351,7 +353,7 @@ function AffiliateDashboard() {
               <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                 <CardTitle className="text-sm font-medium text-foreground group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                  Unpaid Balance
+                  {t("affiliateDashboard.unpaidBalance")}
                 </CardTitle>
                 <div className="w-12 h-12 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30 transition-colors duration-300">
                   <CreditCard className="h-6 w-6 text-theme-500 dark:text-theme-400 group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-colors duration-300" />
@@ -362,7 +364,7 @@ function AffiliateDashboard() {
                   {formatCurrency(dashboard.stats.unpaidEarnings)}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Pending payment
+                  {t("affiliateDashboard.pendingPayment")}
                 </p>
               </CardContent>
 
@@ -377,7 +379,7 @@ function AffiliateDashboard() {
               <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                 <CardTitle className="text-sm font-medium text-foreground group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                  Total Referrals
+                  {t("affiliateDashboard.totalReferrals")}
                 </CardTitle>
                 <div className="w-12 h-12 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30 transition-colors duration-300">
                   <Users className="h-6 w-6 text-theme-500 dark:text-theme-400 group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-colors duration-300" />
@@ -388,7 +390,7 @@ function AffiliateDashboard() {
                   {dashboard.stats.totalReferrals}
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Successful conversions
+                  {t("affiliateDashboard.successfulConversions")}
                 </p>
               </CardContent>
 
@@ -403,7 +405,7 @@ function AffiliateDashboard() {
               <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
                 <CardTitle className="text-sm font-medium text-foreground group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                  Paid Out
+                  {t("affiliateDashboard.paidOut")}
                 </CardTitle>
                 <div className="w-12 h-12 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center group-hover:bg-theme-500/20 dark:group-hover:bg-theme-400/30 transition-colors duration-300">
                   <TrendingUp className="h-6 w-6 text-theme-500 dark:text-theme-400 group-hover:text-theme-600 dark:group-hover:text-theme-300 transition-colors duration-300" />
@@ -413,7 +415,7 @@ function AffiliateDashboard() {
                 <div className="text-3xl font-bold text-foreground group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
                   {formatCurrency(dashboard.stats.paidEarnings)}
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">Total paid</p>
+                <p className="text-sm text-muted-foreground mt-2">                {t("affiliateDashboard.totalPaid")}</p>
               </CardContent>
 
               {/* Decorative elements */}
@@ -430,9 +432,9 @@ function AffiliateDashboard() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Payment Information</CardTitle>
+                  <CardTitle>{t("affiliateDashboard.paymentInfo")}</CardTitle>
                   <CardDescription>
-                    Your payment details for receiving commissions
+                    {t("affiliateDashboard.paymentInfoDesc")}
                   </CardDescription>
                 </div>
                 <Dialog
@@ -442,15 +444,14 @@ function AffiliateDashboard() {
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Edit2 className="h-4 w-4 mr-2" />
-                      Edit
+                      {t("affiliateDashboard.edit")}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Update Payment Link</DialogTitle>
+                      <DialogTitle>{t("affiliateDashboard.updatePaymentLink")}</DialogTitle>
                       <DialogDescription>
-                        Enter your new payment link for receiving affiliate
-                        payouts
+                        {t("affiliateDashboard.updatePaymentLinkDesc")}
                       </DialogDescription>
                     </DialogHeader>
                     <Form {...form}>
@@ -463,15 +464,15 @@ function AffiliateDashboard() {
                           name="paymentLink"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Payment Link</FormLabel>
+                              <FormLabel>{t("affiliateDashboard.paymentLinkLabel")}</FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="https://paypal.me/yourname"
+                                  placeholder={t("affiliateDashboard.paymentPlaceholder")}
                                   {...field}
                                 />
                               </FormControl>
                               <FormDescription>
-                                PayPal, Venmo, or other payment link
+                                {t("affiliateDashboard.paymentLinkDesc")}
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -483,8 +484,8 @@ function AffiliateDashboard() {
                           disabled={updatePaymentMutation.isPending}
                         >
                           {updatePaymentMutation.isPending
-                            ? "Updating..."
-                            : "Update Payment Link"}
+                            ? t("affiliateDashboard.updating")
+                            : t("affiliateDashboard.updateButton")}
                         </Button>
                       </form>
                     </Form>
@@ -495,7 +496,7 @@ function AffiliateDashboard() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">
-                  Payment Link:
+                  {t("affiliateDashboard.paymentLinkLabel")}
                 </span>
                 <a
                   href={dashboard.affiliate.paymentLink}
@@ -509,7 +510,7 @@ function AffiliateDashboard() {
               </div>
               <div className="mt-2">
                 <span className="text-sm text-muted-foreground">
-                  Minimum Payout:{" "}
+                  {t("affiliateDashboard.minimumPayout")}{" "}
                 </span>
                 <span className="text-sm font-medium">$50.00</span>
               </div>
@@ -525,10 +526,10 @@ function AffiliateDashboard() {
               <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               <CardHeader>
                 <CardTitle className="text-2xl font-bold mb-2 group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                  Monthly Earnings
+                  {t("affiliateDashboard.monthlyEarnings")}
                 </CardTitle>
                 <CardDescription className="text-lg">
-                  Your earnings performance over the last 6 months
+                  {t("affiliateDashboard.monthlyEarningsDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="relative z-10">
@@ -565,7 +566,7 @@ function AffiliateDashboard() {
                               </span>
                               <span className="text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
                                 {month.referrals}{" "}
-                                {month.referrals === 1 ? "sale" : "sales"}
+                                {month.referrals === 1 ? t("affiliateDashboard.sale") : t("affiliateDashboard.sales")}
                               </span>
                             </div>
                           </div>
@@ -586,10 +587,10 @@ function AffiliateDashboard() {
             <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
             <CardHeader className="relative z-10">
               <CardTitle className="text-2xl font-bold mb-2 group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                Recent Referrals
+                {t("affiliateDashboard.recentReferrals")}
               </CardTitle>
               <CardDescription className="text-lg">
-                Your latest successful conversions
+                {t("affiliateDashboard.recentReferralsDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent className="relative z-10">
@@ -598,9 +599,9 @@ function AffiliateDashboard() {
                   <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-theme-500/10 dark:bg-theme-400/20 flex items-center justify-center">
                     <Users className="h-10 w-10 text-theme-500 dark:text-theme-400 opacity-60" />
                   </div>
-                  <p className="text-lg font-medium mb-2">No referrals yet</p>
+                  <p className="text-lg font-medium mb-2">{t("affiliateDashboard.noReferrals")}</p>
                   <p className="text-sm">
-                    Share your affiliate link to start earning commissions!
+                    {t("affiliateDashboard.noReferralsDesc")}
                   </p>
                 </div>
               ) : (
@@ -613,7 +614,7 @@ function AffiliateDashboard() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <span className="font-semibold text-lg group-hover/ref:text-theme-600 dark:group-hover/ref:text-theme-400 transition-colors duration-300">
-                            {referral.purchaserName || "Anonymous"}
+                            {referral.purchaserName || t("error.anonymousUser")}
                           </span>
                           {referral.isPaid ? (
                             <Badge
@@ -621,14 +622,14 @@ function AffiliateDashboard() {
                               className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                             >
                               <Check className="h-3 w-3 mr-1" />
-                              Paid
+                              {t("affiliateDashboard.paid")}
                             </Badge>
                           ) : (
                             <Badge
                               variant="outline"
                               className="border-orange-300 text-orange-600 dark:border-orange-600 dark:text-orange-400"
                             >
-                              Pending
+                              {t("affiliateDashboard.pending")}
                             </Badge>
                           )}
                         </div>
@@ -641,7 +642,7 @@ function AffiliateDashboard() {
                           {formatCurrency(referral.commission)}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          from {formatCurrency(referral.amount)}
+                          {t("affiliateDashboard.from")} {formatCurrency(referral.amount)}
                         </div>
                       </div>
                     </div>
@@ -660,10 +661,10 @@ function AffiliateDashboard() {
               <div className="absolute inset-0 bg-gradient-to-br from-theme-500/5 to-theme-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
               <CardHeader className="relative z-10">
                 <CardTitle className="text-2xl font-bold mb-2 group-hover:text-theme-600 dark:group-hover:text-theme-400 transition-colors duration-300">
-                  Payout History
+                  {t("affiliateDashboard.payoutHistory")}
                 </CardTitle>
                 <CardDescription className="text-lg">
-                  Your complete payment history
+                  {t("affiliateDashboard.payoutHistoryDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="relative z-10">
@@ -682,7 +683,7 @@ function AffiliateDashboard() {
                         </div>
                         {payout.transactionId && (
                           <div className="text-xs text-muted-foreground font-mono bg-muted/50 px-2 py-1 rounded">
-                            Transaction: {payout.transactionId}
+                            {t("affiliateDashboard.transaction")}: {payout.transactionId}
                           </div>
                         )}
                       </div>
@@ -691,8 +692,7 @@ function AffiliateDashboard() {
                         className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-4 py-2"
                       >
                         <Check className="h-4 w-4 mr-2" />
-                        Paid
-                      </Badge>
+                        {t("affiliateDashboard.paid")}</Badge>
                     </div>
                   ))}
                 </div>
@@ -706,6 +706,7 @@ function AffiliateDashboard() {
 }
 
 function NotAffiliateError() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="max-w-md mx-auto text-center px-6">
@@ -719,12 +720,12 @@ function NotAffiliateError() {
           </div>
 
           <h1 className="text-3xl font-bold mb-4">
-            Not an <span className="text-theme-400">Affiliate</span>
+            {t("affiliateDashboard.notAffiliateHeading1")}{" "}
+            <span className="text-theme-400">{t("affiliateDashboard.notAffiliateHeading2")}</span>
           </h1>
 
           <p className="text-muted-foreground mb-8 text-lg">
-            You are not registered as an affiliate. You need to join our
-            affiliate program to access this dashboard.
+            {t("affiliateDashboard.notAffiliateDesc")}
           </p>
 
           <div className="space-y-4">
@@ -735,7 +736,7 @@ function NotAffiliateError() {
                 "w-full"
               )}
             >
-              Return Home
+              {t("affiliateDashboard.returnHome")}
             </Link>
 
             <Link
@@ -745,7 +746,7 @@ function NotAffiliateError() {
                 "w-full"
               )}
             >
-              Join Affiliate Program
+              {t("affiliateDashboard.joinAffiliate")}
             </Link>
           </div>
         </motion.div>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { useAuth } from "~/hooks/use-auth";
@@ -9,6 +10,7 @@ import { Send, MessageSquarePlus, Sparkles } from "lucide-react";
 import { useProfile } from "~/hooks/use-profile";
 
 export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
+  const { t } = useTranslation();
   const [commentText, setCommentText] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -54,14 +56,13 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
         onSuccess: () => {
           setCommentText("");
           setIsFocused(false);
-          toast.success("Comment posted! 🎉", {
-            description: "Your comment has been added to the discussion.",
+          toast.success(t("learn.commentPosted"), {
+            description: t("learn.commentPostedDesc"),
           });
         },
         onError: () => {
-          toast.error("Something went wrong", {
-            description:
-              "We couldn't post your comment. Please try again or contact support.",
+          toast.error(t("learn.commentPostFail"), {
+            description: t("learn.commentPostFailDesc"),
           });
         },
       }
@@ -94,10 +95,10 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
             </div>
           </div>
           <h4 className="font-medium text-foreground mb-1">
-            Join the conversation
+            {t("learn.joinConversation")}
           </h4>
           <p className="text-sm text-muted-foreground">
-            Sign in to share your thoughts and connect with other learners
+            {t("learn.joinConversationDesc")}
           </p>
         </div>
       </div>
@@ -128,7 +129,7 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
                     profile?.image ??
                     `https://api.dicebear.com/9.x/initials/svg?seed=${(profile?.useDisplayName === false && profile?.realName) ? profile.realName : (profile?.displayName || "user")}&backgroundColor=6366f1&textColor=ffffff`
                   }
-                  alt="Your avatar"
+                  alt={t("learn.userAvatar")}
                   onError={(e) => {
                     e.currentTarget.onerror = null; // Prevent infinite loop
                     e.currentTarget.src = `https://api.dicebear.com/9.x/initials/svg?seed=${(profile?.useDisplayName === false && profile?.realName) ? profile.realName : (profile?.displayName || "user")}&backgroundColor=6366f1&textColor=ffffff`;
@@ -143,7 +144,7 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
                     ref={textareaRef}
                     placeholder={
                       isFocused
-                        ? "Share your thoughts, ask a question, or help others understand..."
+                        ? t("learn.commentPlaceholderFocused")
                         : ""
                     }
                     value={commentText}
@@ -161,7 +162,7 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
                   {!isFocused && !commentText && (
                     <div className="absolute left-0 top-3 flex items-center gap-2 text-muted-foreground/60 pointer-events-none transition-opacity duration-200">
                       <MessageSquarePlus className="h-4 w-4" />
-                      <span className="text-base">Add a comment</span>
+                      <span className="text-base">{t("learn.commentPlaceholder")}</span>
                     </div>
                   )}
 
@@ -171,22 +172,15 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
                       <div className="text-xs text-muted-foreground space-y-1">
                         <div className="flex items-center gap-3">
                           <span>
-                            Press{" "}
-                            <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted/60 rounded border">
-                              Enter
-                            </kbd>{" "}
-                            to post
+                            {t("learn.pressEnterPost")}
                           </span>
                           <span>
-                            <kbd className="px-1.5 py-0.5 text-xs font-mono bg-muted/60 rounded border">
-                              Shift+Enter
-                            </kbd>{" "}
-                            for new line
+                            {t("learn.shiftEnterNewLine")}
                           </span>
                         </div>
                         {commentText.length > 0 && (
                           <div className="text-xs text-muted-foreground/80">
-                            {commentText.length} characters
+                            {t("learn.characters", { n: commentText.length })}
                           </div>
                         )}
                       </div>
@@ -198,7 +192,7 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
                           onClick={handleCancel}
                           className="text-muted-foreground hover:text-foreground transition-colors"
                         >
-                          Cancel
+                          {t("learn.cancel")}
                         </Button>
                         <Button
                           size="sm"
@@ -209,12 +203,12 @@ export function CommentForm({ autoFocus = false }: { autoFocus?: boolean }) {
                           {isPending ? (
                             <div className="flex items-center gap-2">
                               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white/70"></div>
-                              <span>Posting...</span>
+                              <span>{t("learn.posting")}</span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
                               <Send className="h-3 w-3" />
-                              <span>Comment</span>
+                              <span>{t("learn.commentBtn")}</span>
                               {commentText.trim() && (
                                 <Sparkles className="h-3 w-3" />
                               )}

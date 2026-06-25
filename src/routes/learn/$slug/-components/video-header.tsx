@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Link } from "@tanstack/react-router";
 import { DeleteSegmentButton } from "./delete-segment-button";
 import { useSegment } from "~/routes/learn/-components/segment-context";
+import { useTranslation } from "react-i18next";
 
 interface VideoHeaderProps {
   currentSegment: Segment;
@@ -32,6 +33,8 @@ export function VideoHeader({
     unmarkSegmentAsLocallyCompleted,
   } = useSegment();
 
+  const { t } = useTranslation();
+
   // Check both server progress and locally completed segments (for immediate UI feedback)
   const isCompleted = locallyUncompletedSegmentIds.has(currentSegmentId)
     ? false
@@ -47,10 +50,10 @@ export function VideoHeader({
       markAsCompletedFn({ data: { segmentId } }),
     onSuccess: () => {
       markSegmentAsLocallyCompleted(currentSegmentId);
-      toast.success("Video marked as complete");
+      toast.success(t("learn.videoCompleted"));
     },
     onError: () => {
-      toast.error("Failed to mark video as complete");
+      toast.error(t("learn.failedVideoComplete"));
     },
   });
 
@@ -59,10 +62,10 @@ export function VideoHeader({
       unmarkAsCompletedFn({ data: { segmentId } }),
     onSuccess: () => {
       unmarkSegmentAsLocallyCompleted(currentSegmentId);
-      toast.success("Video marked as incomplete");
+      toast.success(t("learn.videoIncomplete"));
     },
     onError: () => {
-      toast.error("Failed to mark video as incomplete");
+      toast.error(t("learn.failedVideoIncomplete"));
     },
   });
 
@@ -89,7 +92,7 @@ export function VideoHeader({
               className="bg-amber-50 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800 flex items-center gap-1"
             >
               <Lock className="w-3 h-3" />
-              PREMIUM
+              {t("learn.premium")}
             </Badge>
           )}
         </div>
@@ -114,12 +117,12 @@ export function VideoHeader({
             {isCompleted ? (
               <>
                 <CheckCircle className="w-3.5 h-3.5" />
-                Completed
+                {t("learn.completed")}
               </>
             ) : (
               <>
                 <Circle className="w-3.5 h-3.5" />
-                Mark as Complete
+                {t("learn.markComplete")}
               </>
             )}
           </button>
@@ -133,7 +136,7 @@ export function VideoHeader({
               className="btn-cyan px-6 py-2 rounded-xl text-xs font-black flex items-center gap-2 shadow-lg shadow-cyan-500/20"
             >
               <Edit className="w-4 h-4 stroke-[3.5px]" />
-              Edit
+              {t("learn.edit")}
             </Link>
             <DeleteSegmentButton currentSegmentId={currentSegmentId} />
           </>

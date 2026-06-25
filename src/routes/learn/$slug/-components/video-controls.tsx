@@ -7,6 +7,7 @@ import { type Segment } from "~/db/schema";
 import { authenticatedMiddleware } from "~/lib/auth";
 import { markAsWatchedUseCase } from "~/use-cases/progress";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 export const markedAsWatchedFn = createServerFn()
   .middleware([authenticatedMiddleware])
@@ -35,6 +36,7 @@ export function VideoControls({
   isAdmin,
 }: VideoControlsProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const nextSegment = useMemo(() => {
     // Add safety check for segments
@@ -165,7 +167,7 @@ export function VideoControls({
         }}
       >
         <ArrowRight className="h-4 w-4 rotate-180" />
-        Previous Lesson
+        {t("learn.previousLesson")}
       </Button>
 
       <Button
@@ -190,12 +192,12 @@ export function VideoControls({
       >
         {isLastSegment ? (
           <>
-            Complete Course
+            {t("learn.completeCourse")}
             <CheckCircle className="ml-2 h-4 w-4 stroke-[2.5px]" />
           </>
         ) : (
           <>
-            Next Video
+            {t("learn.nextVideo")}
             <ArrowRight className="ml-2 h-4 w-4 stroke-[2.5px]" />
           </>
         )}

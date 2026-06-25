@@ -1,6 +1,7 @@
 import { Button } from "~/components/ui/button";
 import { FileText, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { type Segment } from "~/db/schema";
 import { toast } from "sonner";
 import { generateTranscriptFn } from "~/fn/transcripts";
@@ -25,6 +26,7 @@ interface GenerateTranscriptButtonProps {
 export function GenerateTranscriptButton({
   currentSegment,
 }: GenerateTranscriptButtonProps) {
+  const { t } = useTranslation();
   const [isGenerating, setIsGenerating] = useState(false);
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -34,8 +36,8 @@ export function GenerateTranscriptButton({
 
   const handleGenerateTranscript = async () => {
     if (!hasVideo) {
-      toast.error("No video attached", {
-        description: "This segment needs a video before generating a transcript.",
+      toast.error(t("learn.noVideoAttached"), {
+        description: t("learn.noVideoDesc"),
       });
       return;
     }
@@ -44,26 +46,26 @@ export function GenerateTranscriptButton({
       setIsGenerating(true);
       setOpen(false);
 
-      toast.info("Generating transcript...", {
-        description: "This may take a few minutes depending on the video length.",
+      toast.info(t("learn.generatingTranscript"), {
+        description: t("learn.generatingTranscriptDesc"),
         duration: 10000,
       });
 
       await generateTranscriptFn({ data: { segmentId: currentSegment.id } });
 
-      toast.success("Transcript generated!", {
-        description: "The video transcript has been created and saved.",
+      toast.success(t("learn.transcriptGenerated"), {
+        description: t("learn.transcriptGeneratedDesc"),
       });
 
       // Refresh the page to show the new transcript
       router.invalidate();
     } catch (error) {
       console.error("Failed to generate transcript:", error);
-      toast.error("Failed to generate transcript", {
+      toast.error(t("learn.transcriptFailed"), {
         description:
           error instanceof Error
             ? error.message
-            : "Please check that ffmpeg is installed and try again.",
+            : t("learn.transcriptFailedDesc"),
       });
     } finally {
       setIsGenerating(false);
@@ -83,12 +85,12 @@ export function GenerateTranscriptButton({
             {isGenerating ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Generating...
+                {t("learn.generating")}
               </>
             ) : (
               <>
                 <FileText className="h-4 w-4" />
-                Regenerate Transcript
+                {t("learn.regenerateTranscript")}
               </>
             )}
           </Button>
@@ -103,26 +105,24 @@ export function GenerateTranscriptButton({
                 <FileText className="h-5 w-5 text-amber-500" />
               </div>
               <AlertDialogTitle className="text-xl font-semibold text-foreground leading-tight">
-                Regenerate Transcript?
+                {t("learn.regenerateTranscriptTitle")}
               </AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed">
-              This segment already has a transcript. Regenerating will replace
-              the existing transcript with a new one generated from the video.
-              This action cannot be undone.
+              {t("learn.regenerateTranscriptDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3 p-6 pt-0">
             <AlertDialogCancel
               className={buttonVariants({ variant: "gray-outline" })}
             >
-              Cancel
+              {t("learn.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleGenerateTranscript}
               className={buttonVariants({ variant: "default" })}
             >
-              Regenerate
+              {t("learn.regenerate")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -136,12 +136,12 @@ export function GenerateTranscriptButton({
       {isGenerating ? (
         <>
           <Loader2 className="h-4 w-4 animate-spin" />
-          Generating...
+          {t("learn.generating")}
         </>
       ) : (
         <>
           <FileText className="h-4 w-4" />
-          Generate Transcript
+          {t("learn.generateTranscript")}
         </>
       )}
     </Button>

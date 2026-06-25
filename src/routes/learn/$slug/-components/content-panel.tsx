@@ -1,6 +1,7 @@
 import { FileText, Clock } from "lucide-react";
 import { type Segment } from "~/db/schema";
 import { EditableContent } from "./editable-content";
+import { useTranslation } from "react-i18next";
 
 interface ContentPanelProps {
   currentSegment: Segment;
@@ -8,11 +9,13 @@ interface ContentPanelProps {
 }
 
 export function ContentPanel({ currentSegment, isAdmin }: ContentPanelProps) {
+  const { t } = useTranslation();
+
   if (currentSegment.isComingSoon && !isAdmin) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>This lesson content is coming soon.</p>
+        <p>{t("learn.contentComingSoon")}</p>
       </div>
     );
   }

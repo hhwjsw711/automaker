@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { deleteModuleFn } from "./delete-module-button";
 import { useSegment } from "./segment-context";
+import { useTranslation } from "react-i18next";
 
 interface ModuleWithSegments extends Module {
   segments: Segment[];
@@ -59,6 +60,7 @@ export function ModuleAccordionHeader({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const { locallyCompletedSegmentIds, locallyUncompletedSegmentIds } =
     useSegment();
 
@@ -106,15 +108,15 @@ export function ModuleAccordionHeader({
     try {
       await deleteModuleFn({ data: { moduleId: module.id } });
 
-      toast.success("Module deleted successfully!", {
-        description: `"${module.title}" has been permanently deleted.`,
+      toast.success(t("learn.moduleDeleted"), {
+        description: t("learn.moduleDeletedDesc", { title: module.title }),
       });
 
       await queryClient.invalidateQueries({ queryKey: ["modules"] });
       setDeleteDialogOpen(false);
     } catch (error) {
-      toast.error("Failed to delete module", {
-        description: "Please try again.",
+      toast.error(t("learn.failedDeleteModule"), {
+        description: t("learn.tryAgain"),
       });
     }
   };
@@ -123,7 +125,7 @@ export function ModuleAccordionHeader({
     <div className="group">
       <div className="relative">
         <button
-          aria-label={`Toggle module ${module.title}`}
+          aria-label={t("learn.toggleModule", { title: module.title })}
           onClick={onToggle}
           className={cn(
             "cursor-pointer w-full flex items-center justify-between px-6 py-3 text-sm transition",
@@ -170,7 +172,7 @@ export function ModuleAccordionHeader({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <MoreVertical className="h-3.5 w-3.5" />
-                  <span className="sr-only">Open menu</span>
+                  <span className="sr-only">{t("learn.openMenu")}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -181,7 +183,7 @@ export function ModuleAccordionHeader({
                   }}
                 >
                   <Edit2 className="mr-2 h-4 w-4" />
-                  Edit
+                  {t("learn.edit")}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={(e) => {
@@ -191,7 +193,7 @@ export function ModuleAccordionHeader({
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  {t("learn.delete")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -218,27 +220,24 @@ export function ModuleAccordionHeader({
                 <Trash2 className="h-5 w-5 text-destructive" />
               </div>
               <AlertDialogTitle className="text-xl font-semibold text-foreground leading-tight">
-                Delete Module
+                {t("learn.deleteModule")}
               </AlertDialogTitle>
             </div>
             <AlertDialogDescription className="text-muted-foreground text-sm leading-relaxed">
-              Are you sure you want to delete the module{" "}
-              <strong>"{module.title}"</strong>? This action cannot be undone
-              and will permanently delete the module and all its associated
-              segments.
+              {t("learn.deleteModuleConfirm", { title: module.title })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex gap-3 p-6 pt-0">
             <AlertDialogCancel
               className={buttonVariants({ variant: "gray-outline" })}
             >
-              Cancel
+              {t("learn.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteModule}
               className={buttonVariants({ variant: "destructive" })}
             >
-              Delete Module
+              {t("learn.deleteModule")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

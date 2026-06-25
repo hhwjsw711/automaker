@@ -9,6 +9,7 @@ import {
 import { Container } from "../-components/container";
 import { SegmentForm } from "../-components/segment-form";
 import { Edit } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/learn/$slug/edit")({
   component: RouteComponent,
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/learn/$slug/edit")({
 
 function RouteComponent() {
   const { segment, moduleNames } = Route.useLoaderData();
+  const { t } = useTranslation();
   const { onSubmit, isSubmitting, uploadProgress } = useEditSegment(segment);
 
   return (
@@ -29,10 +31,10 @@ function RouteComponent() {
       <EditSegmentHeader />
       <Container>
         <SegmentForm
-          headerTitle="Edit Content"
-          headerDescription="Update your course segment with rich content and media"
-          buttonText="Update Content"
-          loadingText="Updating..."
+          headerTitle={t("learn.editContent")}
+          headerDescription={t("learn.editContentDesc")}
+          buttonText={t("learn.updateContent")}
+          loadingText={t("learn.updating")}
           buttonIcon={Edit}
           moduleNames={moduleNames}
           onSubmit={onSubmit}

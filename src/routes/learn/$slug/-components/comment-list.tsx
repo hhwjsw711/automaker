@@ -35,6 +35,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useDeleteComment } from "~/hooks/mutations/use-delete-comment";
 import { toast } from "sonner";
 import { useEditComment } from "~/hooks/mutations/use-edit-comment";
@@ -47,6 +48,7 @@ interface CommentItemProps {
 }
 
 function CommentItem({ comment, level = 0 }: CommentItemProps) {
+  const { t } = useTranslation();
   const user = useAuth();
   const { segment } = useLoaderData({ from: "/learn/$slug/_layout/" });
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
@@ -81,14 +83,13 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
           onSuccess: () => {
             setEditingCommentId(null);
             setEditContent("");
-            toast.success("Comment updated", {
-              description: "Your comment has been updated.",
+            toast.success(t("learn.commentUpdated"), {
+              description: t("learn.commentUpdatedDesc"),
             });
           },
           onError: () => {
-            toast.error("Error", {
-              description:
-                "Something went wrong, please try again later or contact support.",
+            toast.error(t("learn.errorGeneric"), {
+              description: t("learn.errorTryAgain"),
             });
           },
         }
@@ -112,14 +113,13 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
         {
           onSuccess: () => {
             setDeleteCommentId(null);
-            toast.success("Comment deleted", {
-              description: "Your comment has been deleted.",
+            toast.success(t("learn.commentDeleted"), {
+              description: t("learn.commentDeletedDesc"),
             });
           },
           onError: () => {
-            toast.error("Error", {
-              description:
-                "Something went wrong, please try again later or contact support.",
+            toast.error(t("learn.errorGeneric"), {
+              description: t("learn.errorTryAgain"),
             });
           },
         }
@@ -151,8 +151,8 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
           onSuccess: () => {
             setReplyingToCommentId(null);
             setReplyContent("");
-            toast.success("Reply posted", {
-              description: "Your reply has been posted.",
+            toast.success(t("learn.replyPosted"), {
+              description: t("learn.replyPostedDesc"),
             });
           },
         }
@@ -195,7 +195,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                     comment.profile.image ??
                     `https://api.dicebear.com/9.x/initials/svg?seed=${comment.profile.publicName || "User"}&backgroundColor=6366f1&textColor=ffffff`
                   }
-                  alt="User avatar"
+                  alt={t("learn.userAvatar")}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     e.currentTarget.src = `https://api.dicebear.com/9.x/initials/svg?seed=${comment.profile.publicName || "User"}&backgroundColor=6366f1&textColor=ffffff`;
@@ -231,7 +231,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                         <div className="flex items-center gap-1">
                           <Reply className="h-3 w-3 text-muted-foreground/60" />
                           <span className="text-xs text-muted-foreground">
-                            replying to{" "}
+                            {t("learn.replyingTo")}{" "}
                             <Link
                               to="/profile/$userId"
                               params={{
@@ -270,7 +270,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                           className="cursor-pointer"
                         >
                           <Edit className="mr-2 h-3 w-3" />
-                          Edit
+                          {t("learn.edit")}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeleteClick(comment.id)}
@@ -278,7 +278,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                           disabled={isDeleting}
                         >
                           <Trash2 className="mr-2 h-3 w-3" />
-                          Delete
+                          {t("learn.delete")}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -295,7 +295,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                         className="w-full p-3 border rounded-lg resize-none text-sm bg-background focus:ring-2 focus:ring-theme-500/30 focus:border-theme-300 dark:focus:border-theme-700 transition-all duration-200 min-h-[80px]"
                         rows={3}
                         autoFocus
-                        placeholder="Edit your comment..."
+                        placeholder={t("learn.editComment")}
                       />
                     </div>
                     <div className="flex gap-2">
@@ -308,12 +308,12 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                         {isEditing ? (
                           <>
                             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white/70 mr-2"></div>
-                            Saving...
+                            {t("learn.saving")}
                           </>
                         ) : (
                           <>
                             <Check className="mr-2 h-3 w-3" />
-                            Save
+                            {t("learn.saveChanges")}
                           </>
                         )}
                       </Button>
@@ -324,7 +324,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                         disabled={isEditing}
                       >
                         <X className="mr-2 h-3 w-3" />
-                        Cancel
+                        {t("learn.cancel")}
                       </Button>
                     </div>
                   </div>
@@ -346,7 +346,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                         className="h-6 px-2 text-xs text-muted-foreground hover:text-theme-600 dark:hover:text-theme-400 transition-colors hover:bg-theme-50 dark:hover:bg-theme-950/50"
                       >
                         <Reply className="mr-1 h-3 w-3" />
-                        Reply
+                        {t("learn.replyButton")}
                       </Button>
                     </div>
 
@@ -363,7 +363,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                                     comment.profile.image ??
                                     `https://api.dicebear.com/9.x/initials/svg?seed=${user?.id || "user"}&backgroundColor=6366f1&textColor=ffffff`
                                   }
-                                  alt="Your avatar"
+                                  alt={t("learn.userAvatar")}
                                   onError={(e) => {
                                     e.currentTarget.onerror = null;
                                     e.currentTarget.src = `https://api.dicebear.com/9.x/initials/svg?seed=${user?.id || "user"}&backgroundColor=6366f1&textColor=ffffff`;
@@ -372,7 +372,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                               </div>
                               <div className="flex-1">
                                 <Textarea
-                                  placeholder="Write a thoughtful reply..."
+                                  placeholder={t("learn.replyPlaceholder")}
                                   value={replyContent}
                                   onChange={(e) =>
                                     setReplyContent(e.target.value)
@@ -384,11 +384,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                             </div>
                             <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/60">
                               <div className="text-xs text-muted-foreground">
-                                Press{" "}
-                                <kbd className="px-1 py-0.5 text-xs font-mono bg-muted/60 rounded">
-                                  Enter
-                                </kbd>{" "}
-                                to reply
+                                {t("learn.pressEnterReply")}
                               </div>
                               <div className="flex gap-2">
                                 <Button
@@ -397,7 +393,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                                   onClick={handleCancelReply}
                                   className="text-muted-foreground hover:text-foreground"
                                 >
-                                  Cancel
+                                  {t("learn.cancel")}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -408,12 +404,12 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                                   {isReplying ? (
                                     <>
                                       <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white/70 mr-2"></div>
-                                      Posting...
+                                      {t("learn.posting")}
                                     </>
                                   ) : (
                                     <>
                                       <Send className="mr-2 h-3 w-3" />
-                                      Reply
+                                      {t("learn.replyButton")}
                                     </>
                                   )}
                                 </Button>
@@ -440,23 +436,22 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Trash2 className="h-5 w-5 text-destructive" />
-              Delete Comment
+              {t("learn.deleteComment")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-muted-foreground">
-              Are you sure you want to delete this comment? This action cannot
-              be undone and will remove the comment from the discussion.
+              {t("learn.deleteCommentConfirm")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancelDelete}>
-              Cancel
+              {t("learn.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-elevation-1"
             >
               <Trash2 className="mr-2 h-3 w-3" />
-              Delete Comment
+              {t("learn.deleteComment")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -470,6 +465,7 @@ export function CommentList({
 }: {
   onStartDiscussion?: () => void;
 }) {
+  const { t } = useTranslation();
   const { segment } = useLoaderData({ from: "/learn/$slug/_layout/" });
   const { data: comments } = useSuspenseQuery(getCommentsQuery(segment.id));
   const user = useAuth();
@@ -498,12 +494,11 @@ export function CommentList({
           {/* Content */}
           <div className="space-y-3">
             <h3 className="text-xl font-semibold text-white">
-              Start the Discussion
+              {t("learn.startDiscussion")}
             </h3>
             <div className="space-y-2 text-slate-400">
               <p className="leading-relaxed">
-                Be the first to share your thoughts on this lesson! Ask
-                questions, share insights, or help others learn.
+                {t("learn.startDiscussionDesc")}
               </p>
             </div>
           </div>
@@ -518,17 +513,17 @@ export function CommentList({
                 size="lg"
               >
                 <MessageSquare className="mr-2 h-4 w-4" />
-                Start Discussion
+                {t("learn.startDiscussionBtn")}
               </Button>
             </div>
           ) : (
             <div className="pt-2">
               <div className="p-3 rounded-xl glass border border-white/10">
                 <p className="text-sm font-medium text-white mb-1">
-                  Join the community
+                  {t("learn.joinCommunity")}
                 </p>
                 <p className="text-xs text-slate-400">
-                  Sign in to share your thoughts and connect with other learners
+                  {t("learn.joinCommunityDesc")}
                 </p>
               </div>
             </div>
@@ -563,9 +558,9 @@ export function CommentList({
       <div className="flex items-center justify-between">
         <h4 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <MessageSquare className="h-5 w-5 text-theme-600 dark:text-theme-400" />
-          {comments.length === 1 ? "1 Comment" : `${comments.length} Comments`}
+          {comments.length === 1 ? t("learn.commentsCount", { count: 1 }) : t("learn.commentsCount", { count: comments.length })}
         </h4>
-        <div className="text-sm text-muted-foreground">Latest activity</div>
+        <div className="text-sm text-muted-foreground">{t("learn.latestActivity")}</div>
       </div>
 
       <div className="space-y-4">{renderCommentTree(comments)}</div>

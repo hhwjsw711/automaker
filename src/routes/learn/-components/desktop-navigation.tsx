@@ -19,6 +19,7 @@ import { ModeToggle } from "~/components/ModeToggle";
 import { useSegment } from "./segment-context";
 import { CourseProgressSearch } from "./course-progress-search";
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ModuleWithSegments extends Module {
   segments: Segment[];
@@ -45,6 +46,7 @@ export function DesktopNavigation({
 }: DesktopNavigationProps) {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
 
   // Filter modules based on search query
   const filteredModules = useMemo(() => {
@@ -152,7 +154,7 @@ export function DesktopNavigation({
                 <div className="bg-cyan-600/10 dark:bg-cyan-500/10 p-1.5 rounded-lg border border-cyan-600/30 dark:border-cyan-500/30">
                   <img
                     src="/logo.png"
-                    alt="Automaker Logo"
+                    alt={t("learn.automakerLogo")}
                     className="w-5 h-5"
                   />
                 </div>
@@ -161,7 +163,7 @@ export function DesktopNavigation({
                 <Link
                   to="/admin/analytics"
                   className="cursor-pointer p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-                  title="Admin Panel"
+                  title={t("learn.adminPanel")}
                 >
                   <ShieldCheck className="w-4 h-4" />
                 </Link>
@@ -169,7 +171,7 @@ export function DesktopNavigation({
               <button
                 onClick={onToggleCollapse}
                 className="cursor-pointer p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-                aria-label="Expand sidebar"
+                aria-label={t("learn.expandSidebar")}
               >
                 <PanelLeft className="w-4 h-4" />
               </button>
@@ -210,14 +212,14 @@ export function DesktopNavigation({
               <Link
                 to="/"
                 className="p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-                title="Home"
+                title={t("learn.home")}
               >
                 <Home className="w-4 h-4" />
               </Link>
               <a
                 href="/api/logout"
                 className="p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-                title="Logout"
+                title={t("learn.logout")}
               >
                 <LogOut className="w-4 h-4" />
               </a>
@@ -235,12 +237,12 @@ export function DesktopNavigation({
                 <div className="bg-cyan-600/10 dark:bg-cyan-500/10 p-1.5 rounded-lg border border-cyan-600/30 dark:border-cyan-500/30">
                   <img
                     src="/logo.png"
-                    alt="Automaker Logo"
+                    alt={t("learn.automakerLogo")}
                     className="w-5 h-5"
                   />
                 </div>
                 <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                  Automaker
+                  {t("learn.automaker")}
                 </h1>
               </Link>
               <div className="flex items-center gap-2">
@@ -248,7 +250,7 @@ export function DesktopNavigation({
                   <Link
                     to="/admin/analytics"
                     className="cursor-pointer p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-                    title="Admin Panel"
+                    title={t("learn.adminPanel")}
                   >
                     <ShieldCheck className="w-4 h-4" />
                   </Link>
@@ -257,7 +259,7 @@ export function DesktopNavigation({
                 <button
                   onClick={onToggleCollapse}
                   className="cursor-pointer p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-                  aria-label="Collapse sidebar"
+                  aria-label={t("learn.collapseSidebar")}
                 >
                   <PanelLeftClose className="w-4 h-4" />
                 </button>
@@ -276,7 +278,7 @@ export function DesktopNavigation({
             <nav className="flex-1 space-y-8 overflow-y-auto custom-scrollbar px-0">
               <div>
                 <p className="px-6 text-[10px] font-black text-slate-500 dark:text-slate-600 uppercase tracking-[0.2em] mb-3">
-                  Course Content
+                  {t("learn.courseContent")}
                 </p>
                 <SidebarGroup className="py-0">
                   <SidebarGroupContent>

@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useAuth } from "~/hooks/use-auth";
 import { useProfile } from "~/hooks/use-profile";
 import { cn } from "~/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface UserMenuProps {
   className?: string;
@@ -11,6 +12,7 @@ interface UserMenuProps {
 export function UserMenu({ className }: UserMenuProps) {
   const user = useAuth();
   const { data: profile } = useProfile();
+  const { t } = useTranslation();
 
   if (!user) {
     return (
@@ -20,7 +22,7 @@ export function UserMenu({ className }: UserMenuProps) {
           className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
         >
           <User className="w-4 h-4" />
-          Login
+          {t("learn.login")}
         </a>
       </div>
     );
@@ -33,14 +35,14 @@ export function UserMenu({ className }: UserMenuProps) {
         className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
       >
         <Home className="w-4 h-4" />
-        Back to Home
+        {t("learn.userBackToHome")}
       </Link>
       <a
         href="/api/logout"
         className="flex items-center gap-3 px-3 py-2 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
       >
         <LogOut className="w-4 h-4" />
-        Logout
+        {t("learn.logout")}
       </a>
     </div>
   );

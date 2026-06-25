@@ -15,15 +15,13 @@ import { adminMiddleware } from "~/lib/auth";
 import { getOrCreateModuleUseCase } from "~/use-cases/modules";
 import { useRouter } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 const createModuleFn = createServerFn()
   .middleware([adminMiddleware])
   .inputValidator(
     z.object({
-      title: z
-        .string()
-        .min(1, "Module title is required")
-        .max(100, "Module title must be less than 100 characters"),
+      title: z.string().min(1).max(100),
     })
   )
   .handler(async ({ data }) => {
@@ -37,6 +35,7 @@ export function NewModuleButton() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +64,7 @@ export function NewModuleButton() {
         className="cursor-pointer w-full flex items-center gap-3 px-6 py-3 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
       >
         <Plus className="w-4 h-4" />
-        <span className="font-medium">New Module</span>
+        <span className="font-medium">{t("learn.newModule")}</span>
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -75,7 +74,7 @@ export function NewModuleButton() {
         >
           <DialogHeader>
             <DialogTitle className="text-slate-900 dark:text-white">
-              Create New Module
+              {t("learn.createNewModule")}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -84,13 +83,13 @@ export function NewModuleButton() {
                 htmlFor="module-title"
                 className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
               >
-                Module Title
+                {t("learn.moduleTitle")}
               </label>
               <Input
                 id="module-title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter module title..."
+                placeholder={t("learn.moduleTitlePlaceholder")}
                 disabled={isLoading}
                 autoFocus
                 className="glass border-slate-300/60 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
@@ -104,7 +103,7 @@ export function NewModuleButton() {
                 onClick={() => setOpen(false)}
                 disabled={isLoading}
               >
-                Cancel
+                {t("learn.cancel")}
               </Button>
               <Button
                 type="submit"
@@ -112,7 +111,7 @@ export function NewModuleButton() {
                 className="rounded-xl px-5 py-2.5 text-xs font-black shadow-lg shadow-cyan-500/20"
                 disabled={!title.trim() || isLoading}
               >
-                {isLoading ? "Creating..." : "Create Module"}
+                {isLoading ? t("learn.creating") : t("learn.createButton")}
               </Button>
             </DialogFooter>
           </form>

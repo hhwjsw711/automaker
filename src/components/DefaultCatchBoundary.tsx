@@ -6,9 +6,11 @@ import {
   useRouter,
 } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
+import { useTranslation } from "react-i18next";
 
 export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
   const router = useRouter()
+  const { t } = useTranslation();
   const isRoot = useMatch({
     strict: false,
     select: (state) => state.id === rootRouteId,
@@ -26,14 +28,14 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
           }}
           className={`px-2 py-1 bg-muted text-muted-foreground rounded uppercase font-extrabold`}
         >
-          Try Again
+          {t("error.tryAgain")}
         </button>
         {isRoot ? (
           <Link
             to="/"
             className={`px-2 py-1 bg-muted text-muted-foreground rounded uppercase font-extrabold`}
           >
-            Home
+            {t("error.home")}
           </Link>
         ) : (
           <Link
@@ -44,7 +46,7 @@ export function DefaultCatchBoundary({ error }: ErrorComponentProps) {
               window.history.back()
             }}
           >
-            Go Back
+            {t("error.goBack")}
           </Link>
         )}
       </div>

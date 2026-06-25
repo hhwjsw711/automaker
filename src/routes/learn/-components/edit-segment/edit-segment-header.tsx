@@ -1,8 +1,10 @@
 import { useRouter } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { ChevronLeft, Edit, Sparkles } from "lucide-react";
 
 export function EditSegmentHeader() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -18,7 +20,7 @@ export function EditSegmentHeader() {
             className="text-theme-600 dark:text-theme-400"
           >
             <ChevronLeft className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform duration-200" />
-            Back to Course
+            {t("learn.backToCourse")}
           </Button>
 
           <div className="h-8 w-px bg-gradient-to-b from-transparent via-border to-transparent" />
@@ -33,12 +35,12 @@ export function EditSegmentHeader() {
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold text-gradient">
-                  Edit Content
+                  {t("learn.editContentHeader")}
                 </h2>
                 <Sparkles className="h-4 w-4 text-theme-500 animate-pulse" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Update and enhance your learning segment
+                {t("learn.editContentSubtitle")}
               </p>
             </div>
           </div>

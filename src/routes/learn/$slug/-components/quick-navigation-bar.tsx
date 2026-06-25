@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ChevronDown,
   ChevronRight,
@@ -141,7 +142,7 @@ function SegmentDropdownItem({
             <Lock className="w-3 h-3 text-amber-400" />
           )}
           {segment.isComingSoon && (
-            <span className="text-[9px] text-slate-500 uppercase">Soon</span>
+            <span className="text-[9px] text-slate-500 uppercase">{t("learn.soon")}</span>
           )}
         </div>
       </DropdownMenuItem>
@@ -174,7 +175,7 @@ function SegmentDropdownItem({
             <Lock className="w-3 h-3 text-amber-400" />
           )}
           {segment.isComingSoon && (
-            <span className="text-[9px] text-slate-500 uppercase">Soon</span>
+            <span className="text-[9px] text-slate-500 uppercase">{t("learn.soon")}</span>
           )}
         </div>
       </Link>
@@ -261,6 +262,7 @@ export function QuickNavigationBar({
   isPremium,
   isAdmin,
 }: QuickNavigationBarProps) {
+  const { t } = useTranslation();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -296,7 +298,7 @@ export function QuickNavigationBar({
     return (
       <div className="relative z-50 flex items-center justify-center gap-2 px-4 py-2 bg-white/60 dark:bg-[#0b101a]/60 border-b border-slate-200/60 dark:border-white/5 backdrop-blur-sm">
         <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-        <span className="text-xs text-slate-500">Loading navigation...</span>
+        <span className="text-xs text-slate-500">{t("learn.loadingNavigation")}</span>
       </div>
     );
   }
@@ -341,7 +343,7 @@ export function QuickNavigationBar({
                 className="truncate"
                 style={{ maxWidth: `${MAX_MODULE_TITLE_WIDTH}px` }}
               >
-                {currentModule?.title || "Select Module"}
+                {currentModule?.title || t("learn.selectModule")}
               </span>
               <ChevronDown className="w-3.5 h-3.5" />
             </button>
@@ -389,7 +391,7 @@ export function QuickNavigationBar({
                 className="truncate"
                 style={{ maxWidth: `${MAX_SEGMENT_TITLE_WIDTH}px` }}
               >
-                {currentSegment?.title || "Select Segment"}
+                {currentSegment?.title || t("learn.selectSegment")}
               </span>
               <ChevronDown className="w-3.5 h-3.5" />
             </button>
@@ -444,7 +446,7 @@ export function QuickNavigationBar({
             "flex items-center justify-center w-6 h-6 rounded-full bg-slate-200/80 dark:bg-white/10 hover:bg-slate-300/80 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 transition-all shadow-sm shrink-0",
             !canScrollLeft && "opacity-0 pointer-events-none"
           )}
-          aria-label="Scroll left"
+          aria-label={t("learn.scrollLeft")}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -499,7 +501,7 @@ export function QuickNavigationBar({
             "flex items-center justify-center w-6 h-6 rounded-full bg-slate-200/80 dark:bg-white/10 hover:bg-slate-300/80 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 transition-all shadow-sm shrink-0",
             !canScrollRight && "opacity-0 pointer-events-none"
           )}
-          aria-label="Scroll right"
+          aria-label={t("learn.scrollRight")}
         >
           <ChevronRight className="w-4 h-4" />
         </button>

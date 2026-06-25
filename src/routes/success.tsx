@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useFirstSegment } from "~/hooks/use-first-segment";
 import Confetti from "react-confetti";
 import { Button } from "~/components/ui/button";
@@ -17,6 +18,7 @@ declare global {
 }
 
 function RouteComponent() {
+  const { t } = useTranslation();
   const [cofettiPieces, setCofettiPieces] = useState(100);
   const { data: firstSegment, isLoading } = useFirstSegment();
   const { width, height } = useWindowSize();
@@ -69,10 +71,10 @@ function RouteComponent() {
               </svg>
             </div>
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              Payment Successful!
+              {t("success.heading")}
             </h1>
             <p className="text-muted-foreground mb-8">
-              Thank you for your purchase. Your order has been confirmed.
+              {t("success.description")}
             </p>
             <Button
               asChild
@@ -80,9 +82,9 @@ function RouteComponent() {
               className="w-full bg-theme-400 hover:bg-theme-500 text-primary-foreground font-semibold"
             >
               {isLoading || !firstSegment ? (
-                "Loading..."
+                t("success.loading")
               ) : (
-                <a href={`/learn/${firstSegment.slug}`}>Start Learning</a>
+                <a href={`/learn/${firstSegment.slug}`}>{t("success.startLearning")}</a>
               )}
             </Button>
           </div>

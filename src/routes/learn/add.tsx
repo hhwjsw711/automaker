@@ -9,6 +9,7 @@ import {
 import { Container } from "./-components/container";
 import { SegmentForm } from "./-components/segment-form";
 import { Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const addSegmentSearchSchema = z.object({
   moduleTitle: z.string().optional(),
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/learn/add")({
 function RouteComponent() {
   const { moduleNames } = Route.useLoaderData();
   const search = Route.useSearch();
+  const { t } = useTranslation();
   const { onSubmit, isSubmitting, uploadProgress } = useAddSegment();
 
   return (
@@ -34,10 +36,10 @@ function RouteComponent() {
       <AddSegmentHeader />
       <Container>
         <SegmentForm
-          headerTitle="Create New Segment"
-          headerDescription="Add a new segment to your course with rich content and media"
-          buttonText="Create Segment"
-          loadingText="Creating..."
+          headerTitle={t("learn.createNewSegment")}
+          headerDescription={t("learn.createNewSegmentDesc")}
+          buttonText={t("learn.createSegment")}
+          loadingText={t("learn.creating")}
           buttonIcon={Plus}
           moduleNames={moduleNames}
           onSubmit={onSubmit}

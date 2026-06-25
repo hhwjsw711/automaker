@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
 import type { Module, Progress, Segment } from "~/db/schema";
+import { useTranslation } from "react-i18next";
 
 interface ModuleWithSegments extends Module {
   segments: Segment[];
@@ -18,6 +19,7 @@ export function CourseProgressSearch({
   searchQuery,
   onSearchChange,
 }: CourseProgressSearchProps) {
+  const { t } = useTranslation();
   // Calculate total segments and completed segments
   const totalSegments = modules.reduce(
     (acc, module) => acc + (module.segments?.length || 0),
@@ -33,7 +35,7 @@ export function CourseProgressSearch({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            Your Progress
+            {t("learn.yourProgress")}
           </span>
           <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
             {completedSegments}/{totalSegments}
@@ -54,7 +56,7 @@ export function CourseProgressSearch({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search lessons..."
+          placeholder={t("learn.searchLessons")}
           className="w-full h-10 pl-10 pr-4 rounded-full bg-transparent border border-slate-300/60 dark:border-white/10 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/20 transition-all"
         />
       </div>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { stripe } from "~/lib/stripe";
@@ -119,44 +120,10 @@ const checkoutFn = createServerFn()
     return { sessionId: session.id };
   });
 
-const features = [
-  {
-    title: "Master Cursor IDE",
-    description:
-      "Learn AI pair programming and code generation with Cursor's advanced features",
-    icon: Code,
-  },
-  {
-    title: "Claude Code CLI Mastery",
-    description:
-      "Seamless AI-assisted development with Claude's command-line interface",
-    icon: Sparkles,
-  },
-  {
-    title: "Advanced Prompting Techniques",
-    description:
-      "Optimize Opus 4.5, Composer1, and GPT-5.1 Codex for maximum coding efficiency",
-    icon: Star,
-  },
-  {
-    title: "Agentic Development",
-    description: "Build real-world projects by practing agentic coding",
-    icon: Users,
-  },
-  {
-    title: "10x Development Speed",
-    description:
-      "Transform your workflow with cutting-edge AI programming methods",
-    icon: Trophy,
-  },
-  {
-    title: "Lifetime Access",
-    description: "Access all training modules and future AI tool updates",
-    icon: RefreshCcw,
-  },
-];
+const features = [Code, Sparkles, Star, Users, Trophy, RefreshCcw];
 
 function RouteComponent() {
+  const { t } = useTranslation();
   const user = useAuth();
   const continueSlug = useContinueSlug();
   const { ref, checkout } = Route.useSearch();
@@ -243,22 +210,19 @@ function RouteComponent() {
               >
                 <div className="inline-flex items-center text-sm font-medium text-slate-700 dark:text-cyan-400">
                   <span className="w-2 h-2 bg-cyan-600 dark:bg-cyan-400 rounded-full mr-2 animate-pulse"></span>
-                  Limited Time Offer - {PRICING_CONFIG.DISCOUNT_PERCENTAGE}% OFF
+                  {t("purchase.badge", { percentage: PRICING_CONFIG.DISCOUNT_PERCENTAGE })}
                 </div>
               </GlassPanel>
 
               <h1 className="text-6xl leading-tight mb-8 text-slate-900 dark:text-white">
-                Agentic Coding{" "}
+                {t("purchase.headingLine1")}{" "}
                 <span className="text-cyan-600 dark:text-cyan-400">
-                  Mastery Course
+                  {t("purchase.headingLine2")}
                 </span>
               </h1>
 
               <p className="text-slate-600 dark:text-slate-400 text-xl mb-12 max-w-3xl mx-auto">
-                Transform your development workflow with AI-first programming.
-                Master Cursor IDE, Claude Code CLI, and advanced AI models to
-                build applications 10x faster than traditional methods. Get
-                lifetime access to cutting-edge techniques.
+                {t("purchase.description")}
               </p>
 
               <GlassPanel
@@ -269,32 +233,32 @@ function RouteComponent() {
                 <div className="relative z-10">
                   <div className="text-center mb-8">
                     <h2 className="text-4xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">
-                      Complete Learning Package
+                      {t("purchase.completePackage")}
                     </h2>
                     <p className="text-slate-600 dark:text-slate-400">
-                      Everything you need to master AI-first development
+                      {t("purchase.packageDesc")}
                     </p>
                   </div>
 
                   {/* Features Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                    {features.map((feature) => (
+                    {features.map((FeatureIcon, i) => (
                       <GlassPanel
-                        key={feature.title}
+                        key={i}
                         variant="default"
                         padding="md"
                         className="group transition-all duration-200 hover:border-cyan-600/30 dark:hover:border-cyan-500/30"
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
-                            <feature.icon className="h-6 w-6 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
+                            <FeatureIcon className="h-6 w-6 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
                           </div>
                           <div className="text-left">
                             <p className="text-slate-900 dark:text-white font-medium group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
-                              {feature.title}
+                              {t(`purchase.features.${i}.title`)}
                             </p>
                             <p className="text-slate-600 dark:text-slate-400 text-sm">
-                              {feature.description}
+                              {t(`purchase.features.${i}.desc`)}
                             </p>
                           </div>
                         </div>
@@ -306,7 +270,7 @@ function RouteComponent() {
                   <div className="text-center space-y-6">
                     <div>
                       <div className="text-slate-600 dark:text-slate-400 mb-2">
-                        Regular price{" "}
+                        {t("purchase.regularPrice")}{" "}
                         <span className="line-through">
                           {PRICING_CONFIG.FORMATTED_ORIGINAL_PRICE}
                         </span>
@@ -315,10 +279,10 @@ function RouteComponent() {
                         {PRICING_CONFIG.FORMATTED_CURRENT_PRICE}
                       </div>
                       <div className="text-cyan-600 dark:text-cyan-400 font-medium">
-                        Limited Time Offer
+                        {t("purchase.limitedOffer")}
                       </div>
                       <div className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                        One-time payment, lifetime access
+                        {t("purchase.oneTimePayment")}
                       </div>
                     </div>
 
@@ -332,7 +296,7 @@ function RouteComponent() {
                             className="rounded-xl px-6 py-2.5 text-sm font-bold"
                           >
                             <ShoppingCart className="mr-2 h-4 w-4" />
-                            Get Instant Access
+                            {t("purchase.getAccess")}
                           </Button>
                         ) : (
                           <Link
@@ -345,7 +309,7 @@ function RouteComponent() {
                                 "rounded-xl px-5 py-2.5 text-xs font-bold",
                             })}
                           >
-                            Continue with Course
+                            {t("purchase.continueCourse")}
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         )
@@ -376,7 +340,7 @@ function RouteComponent() {
                             className="rounded-xl px-6 py-2.5 text-sm font-bold"
                           >
                             <User className="mr-2 h-4 w-4" />
-                            Login to Purchase
+                            {t("purchase.loginPurchase")}
                           </Button>
                         </a>
                       )}
@@ -384,7 +348,7 @@ function RouteComponent() {
                       <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                         <Lock className="h-4 w-4" />
                         <span className="text-sm">
-                          Secure payment with Stripe
+                          {t("purchase.secureStripe")}
                         </span>
                       </div>
                     </div>

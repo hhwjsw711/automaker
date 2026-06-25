@@ -13,6 +13,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { CourseProgressSearch } from "./course-progress-search";
+import { useTranslation } from "react-i18next";
 
 interface ModuleWithSegments extends Module {
   segments: Segment[];
@@ -36,6 +37,7 @@ export function MobileNavigation({
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
 
   // Filter modules based on search query
   const filteredModules = useMemo(() => {
@@ -77,12 +79,12 @@ export function MobileNavigation({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="outline" className="lg:hidden ml-6 mt-4 glass border-slate-200/60 dark:border-white/10">
-          <Menu className="size-5" /> Navigation
-          <span className="sr-only">Toggle Menu</span>
+          <Menu className="size-5" /> {t("learn.navigation")}
+          <span className="sr-only">{t("learn.toggleMenu")}</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="p-0 flex flex-col sidebar-glass w-96 border-r border-slate-200/60 dark:border-white/[0.04]">
-        <SheetTitle className="sr-only">Course Navigation</SheetTitle>
+        <SheetTitle className="sr-only">{t("learn.courseNavigation")}</SheetTitle>
         {/* Brand Header */}
         <div className="p-6 pb-4 pr-14 flex items-center justify-between gap-2.5">
           <Link
@@ -93,19 +95,19 @@ export function MobileNavigation({
             <div className="bg-cyan-600/10 dark:bg-cyan-500/10 p-1.5 rounded-lg border border-cyan-600/30 dark:border-cyan-500/30">
               <img
                 src="/logo.png"
-                alt="Automaker Logo"
+                alt={t("learn.automakerLogo")}
                 className="w-5 h-5"
               />
             </div>
             <h1 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-              Automaker
+              {t("learn.automaker")}
             </h1>
           </Link>
           {isAdmin && (
             <Link
               to="/admin/analytics"
               className="cursor-pointer p-2 rounded-lg glass hover:bg-slate-100 dark:hover:bg-white/10 transition-colors text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white flex-shrink-0"
-              title="Admin Panel"
+              title={t("learn.adminPanel")}
               onClick={() => setOpen(false)}
             >
               <ShieldCheck className="w-4 h-4" />
@@ -125,7 +127,7 @@ export function MobileNavigation({
         <nav className="flex-1 px-0 space-y-8 overflow-y-auto custom-scrollbar">
           <div>
             <p className="px-6 text-[10px] font-black text-slate-500 dark:text-slate-600 uppercase tracking-[0.2em] mb-3">
-              Course Content
+              {t("learn.courseContent")}
             </p>
             <div className="space-y-0.5">
               <NavigationItems
@@ -146,7 +148,7 @@ export function MobileNavigation({
                   className="cursor-pointer w-full flex items-center gap-3 px-6 py-3 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition"
                 >
                   <Plus className="w-4 h-4" />
-                  <span className="font-medium">Add Segment</span>
+                  <span className="font-medium">{t("learn.addSegment")}</span>
                 </button>
               )}
             </div>

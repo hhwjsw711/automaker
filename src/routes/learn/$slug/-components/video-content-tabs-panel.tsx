@@ -6,6 +6,7 @@ import { ContentPanel } from "./content-panel";
 import { CommentsPanel } from "./comments-panel";
 import { EditableContent } from "./editable-content";
 import { GlassPanel } from "~/components/ui/glass-panel";
+import { useTranslation } from "react-i18next";
 
 type TabType = "summary" | "content" | "transcripts" | "comments";
 
@@ -26,6 +27,8 @@ export function VideoContentTabsPanel({
   isAdmin,
   showContentTabs,
 }: VideoContentTabsPanelProps) {
+  const { t } = useTranslation();
+
   // Default to summary tab, fall back to comments if content tabs are disabled and trying to access content
   const effectiveDefaultTab =
     !showContentTabs && defaultTab === "content"
@@ -60,7 +63,7 @@ export function VideoContentTabsPanel({
           )}
         >
           <BookOpen className="h-4 w-4" />
-          Summary
+          {t("learn.summary")}
         </button>
         <button
           onClick={() => setActiveTab("comments")}
@@ -72,7 +75,7 @@ export function VideoContentTabsPanel({
           )}
         >
           <MessageSquare className="h-4 w-4" />
-          Discussion
+          {t("learn.discussion")}
         </button>
         {showContentTabs && (
           <button
@@ -85,7 +88,7 @@ export function VideoContentTabsPanel({
             )}
           >
             <FileText className="h-4 w-4" />
-            Lesson Content
+            {t("learn.lessonContentTab")}
           </button>
         )}
         <button
@@ -98,7 +101,7 @@ export function VideoContentTabsPanel({
           )}
         >
           <FileText className="h-4 w-4" />
-          Transcripts
+          {t("learn.transcriptsTab")}
         </button>
       </div>
 

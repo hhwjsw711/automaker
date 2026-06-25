@@ -1,8 +1,10 @@
 import { useRouter } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 import { ChevronLeft, Plus } from "lucide-react";
 
 export function AddSegmentHeader() {
+  const { t } = useTranslation();
   const router = useRouter();
 
   return (
@@ -16,7 +18,7 @@ export function AddSegmentHeader() {
             className="gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Back to Course
+            {t("learn.backToCourse")}
           </Button>
 
           <div className="h-6 w-px bg-border" />
@@ -26,9 +28,9 @@ export function AddSegmentHeader() {
               <Plus className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <h2 className="text-sm font-semibold">New Segment</h2>
+              <h2 className="text-sm font-semibold">{t("learn.newSegmentHeader")}</h2>
               <p className="text-xs text-muted-foreground">
-                Create a learning segment
+                {t("learn.newSegmentSubtitle")}
               </p>
             </div>
           </div>

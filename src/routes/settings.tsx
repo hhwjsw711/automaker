@@ -33,6 +33,7 @@ import {
   updateEmailPreferencesFn,
 } from "~/fn/user-settings";
 import { assertAuthenticatedFn } from "~/fn/auth";
+import { useTranslation } from "react-i18next";
 
 // Form validation schema
 const emailPreferencesSchema = z.object({
@@ -61,6 +62,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data: emailPreferences } = useSuspenseQuery(
     emailPreferencesQueryOptions
@@ -81,12 +83,12 @@ function SettingsPage() {
       updateEmailPreferencesFn({ data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", "emailPreferences"] });
-      toast.success("Settings saved!", {
-        description: "Your email preferences have been updated.",
+      toast.success(t("settings.savedTitle"), {
+        description: t("settings.savedDesc"),
       });
     },
     onError: (error) => {
-      toast.error("Failed to save settings", {
+      toast.error(t("settings.saveFailed"), {
         description: error.message,
       });
     },
@@ -101,9 +103,9 @@ function SettingsPage() {
       <div className="flex items-center gap-3 mb-8">
         <Settings className="h-8 w-8 text-theme-600" />
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">{t("settings.heading")}</h1>
           <p className="text-muted-foreground">
-            Manage your account preferences and notifications
+            {t("settings.description")}
           </p>
         </div>
       </div>
@@ -114,10 +116,10 @@ function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              Email Preferences
+              {t("settings.emailPreferences")}
             </CardTitle>
             <CardDescription>
-              Choose which emails you'd like to receive from us
+              {t("settings.emailPreferencesDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,12 +135,10 @@ function SettingsPage() {
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
                         <FormLabel className="text-base font-medium">
-                          Course Updates
+                          {t("settings.courseUpdates")}
                         </FormLabel>
                         <FormDescription>
-                          Receive notifications when new course content is
-                          released, important announcements, and course-related
-                          updates.
+                          {t("settings.courseUpdatesDesc")}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -158,11 +158,10 @@ function SettingsPage() {
                     <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                       <div className="space-y-0.5">
                         <FormLabel className="text-base font-medium">
-                          Promotional Emails
+                          {t("settings.promotionalEmails")}
                         </FormLabel>
                         <FormDescription>
-                          Receive emails about new courses, special offers,
-                          discounts, and other promotional content.
+                          {t("settings.promotionalEmailsDesc")}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -189,10 +188,10 @@ function SettingsPage() {
                       <Save className="h-4 w-4" />
                     )}
                     {updatePreferences.isPending
-                      ? "Saving..."
+                      ? t("settings.saving")
                       : updatePreferences.isSuccess
-                        ? "Saved!"
-                        : "Save Preferences"}
+                        ? t("settings.saved")
+                        : t("settings.savePreferences")}
                   </Button>
                 </div>
               </form>
@@ -205,16 +204,16 @@ function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Notification Preferences
+              {t("settings.notificationPreferences")}
             </CardTitle>
             <CardDescription>
-              More notification settings coming soon
+              {t("settings.notificationComingSoon")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8 text-muted-foreground">
               <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Additional notification preferences will be available soon.</p>
+              <p>{t("settings.additionalSoon")}</p>
             </div>
           </CardContent>
         </Card>
@@ -222,20 +221,19 @@ function SettingsPage() {
         {/* Account Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Need Help?</CardTitle>
+            <CardTitle>{t("settings.needHelp")}</CardTitle>
             <CardDescription>
-              Questions about your account or course access
+              {t("settings.needHelpDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              If you need to completely unsubscribe from all emails or have
-              questions about your account, please contact support.
+              {t("settings.contactInfo")}
             </p>
             <div className="text-sm">
-              <p className="font-medium mb-1">Contact Support:</p>
+              <p className="font-medium mb-1">{t("settings.contactSupport")}</p>
               <p className="text-muted-foreground">
-                Email: hhwjsw711@gmail.com
+                {t("settings.contactSupport")} hhwjsw711@gmail.com
               </p>
             </div>
           </CardContent>

@@ -27,6 +27,7 @@ import { updateModuleUseCase } from "~/use-cases/modules";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { IconPicker, renderIcon } from "~/components/icon-picker";
+import { useTranslation } from "react-i18next";
 
 const editModuleSchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title is too long"),
@@ -67,6 +68,7 @@ export function EditModuleDialog({
   onOpenChange,
 }: EditModuleDialogProps) {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<EditModuleFormData>({
@@ -94,15 +96,15 @@ export function EditModuleDialog({
         data: { moduleId, title: data.title, icon: data.icon },
       });
 
-      toast.success("Module updated successfully!", {
-        description: `Module title has been updated to "${data.title}".`,
+      toast.success(t("learn.moduleUpdated"), {
+        description: t("learn.moduleUpdatedDesc", { title: data.title }),
       });
 
       await queryClient.invalidateQueries({ queryKey: ["modules"] });
       onOpenChange(false);
     } catch (error) {
-      toast.error("Failed to update module", {
-        description: "Please try again.",
+      toast.error(t("learn.failedUpdateModule"), {
+        description: t("learn.tryAgain"),
       });
     } finally {
       setIsSubmitting(false);
@@ -117,11 +119,10 @@ export function EditModuleDialog({
             <div className="p-2 rounded-lg bg-theme-500/10">
               <Edit2 className="h-5 w-5 text-theme-600 dark:text-theme-400" />
             </div>
-            <DialogTitle>Edit Module</DialogTitle>
+            <DialogTitle>{t("learn.editModule")}</DialogTitle>
           </div>
           <DialogDescription>
-            Update the title and icon for this module. These will be displayed
-            in the course outline.
+            {t("learn.editModuleDesc")}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -131,10 +132,10 @@ export function EditModuleDialog({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Module Title</FormLabel>
+                  <FormLabel>{t("learn.moduleTitle")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter module title"
+                      placeholder={t("learn.moduleTitlePlaceholder")}
                       {...field}
                       autoFocus
                     />
@@ -148,7 +149,7 @@ export function EditModuleDialog({
               name="icon"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Module Icon</FormLabel>
+                  <FormLabel>{t("learn.moduleIcon")}</FormLabel>
                   <FormControl>
                     <IconPicker value={field.value} onChange={field.onChange} />
                   </FormControl>
@@ -163,10 +164,10 @@ export function EditModuleDialog({
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
               >
-                Cancel
+                {t("learn.cancel")}
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? t("learn.saving") : t("learn.saveChanges")}
               </Button>
             </DialogFooter>
           </form>
