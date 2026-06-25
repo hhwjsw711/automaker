@@ -391,7 +391,7 @@ export function QuickNavigationBar({
                 className="truncate"
                 style={{ maxWidth: `${MAX_SEGMENT_TITLE_WIDTH}px` }}
               >
-                {currentSegment?.title || t("learn.selectSegment")}
+                {currentSegment?.title || t("learn.selectSegmentFallback")}
               </span>
               <ChevronDown className="w-3.5 h-3.5" />
             </button>
