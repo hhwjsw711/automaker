@@ -43,8 +43,7 @@ function RouteComponent() {
           </li>
           <li>
             <strong>Company</strong> (referred to as either "the Company", "We",
-            "Us" or "Our" in this Agreement) refers to Seibert Software
-            Solutions, LLC.
+            "Us" or "Our" in this Agreement) refers to Hugo.
           </li>
           <li>
             <strong>Device</strong> means any device that can access the Service

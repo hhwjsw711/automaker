@@ -130,7 +130,7 @@ function CourseCompleted() {
               asChild
             >
               <a
-                href="https://twitter.com/webdevcody"
+                href="https://twitter.com/hhwjsw711"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -143,7 +143,7 @@ function CourseCompleted() {
               asChild
             >
               <a
-                href="https://github.com/webdevcody"
+                href="https://github.com/hhwjsw711"
                 target="_blank"
                 rel="noopener noreferrer"
               >

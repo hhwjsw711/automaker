@@ -51,8 +51,7 @@ function RouteComponent() {
           </li>
           <li>
             <strong>Company</strong> (referred to as either "the Company", "We",
-            "Us" or "Our" in this Agreement) refers to Seibert Software
-            Solutions, LLC.
+            "Us" or "Our" in this Agreement) refers to Hugo.
           </li>
           <li>
             <strong>Cookies</strong> are small files that are placed on Your
@@ -89,8 +88,8 @@ function RouteComponent() {
             infrastructure itself.
           </li>
           <li>
-            <strong>Website</strong> refers to Beginner React Challenges from
-            beginner-react-challenges.webdevcody.com
+            <strong>Website</strong> refers to Hugo from
+            hugo.isllm.com
           </li>
           <li>
             <strong>You</strong> means the individual accessing or using the

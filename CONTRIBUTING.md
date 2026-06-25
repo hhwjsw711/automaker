@@ -12,11 +12,11 @@ By contributing code, documentation, or other materials to this project, you agr
 
 ### 1. Assignment of Rights
 
-You hereby **assign and transfer to Cody Seibert** (hhwjsw711@gmail.com) all right, title, and interest in and to your contributions, including all copyright, patent, trade secret, and other intellectual property rights, worldwide.
+You hereby **assign and transfer to Hugo** (hhwjsw711@gmail.com) all right, title, and interest in and to your contributions, including all copyright, patent, trade secret, and other intellectual property rights, worldwide.
 
 ### 2. Exclusive Ownership
 
-All contributions become the **exclusive property of Cody Seibert**. You acknowledge that you:
+All contributions become the **exclusive property of Hugo**. You acknowledge that you:
 
 - Forfeit all rights to the code you write for this project.
 - Have no right to use the code you contributed for commercial purposes independent of this project's license.
@@ -29,7 +29,7 @@ To the fullest extent permitted by applicable law, you hereby waive all "moral r
 
 ### 4. Retained Rights by Maintainer
 
-Cody Seibert retains 100% control over:
+Hugo retains 100% control over:
 
 - How the code is used.
 - Licensing decisions (including commercial licensing and dual-licensing).
@@ -62,12 +62,12 @@ This assignment of rights is irrevocable. You cannot withdraw your contribution 
 3. Make your changes
 4. Submit a pull request
 
-**By submitting a pull request, you explicitly acknowledge that you have read, understood, and agreed to this Contributor License Agreement, and you assign all rights in your contribution to Cody Seibert.**
+**By submitting a pull request, you explicitly acknowledge that you have read, understood, and agreed to this Contributor License Agreement, and you assign all rights in your contribution to Hugo.**
 
 If you do NOT agree to these terms, **DO NOT SUBMIT A PULL REQUEST**.
 
 ### Questions
 
 If you have questions about contributing, please contact:
-Cody Seibert
+Hugo
 Email: hhwjsw711@gmail.com

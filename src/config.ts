@@ -35,7 +35,7 @@ export const APP_SETTING_KEYS = {
 
 // Company information for marketing emails
 export const COMPANY_ADDRESS = {
-  NAME: "Seibert Software Solutions, LLC",
+  NAME: "Hugo",
   LINE1: "PO Box 913",
   CITY: "Harrison",
   STATE: "TN",
