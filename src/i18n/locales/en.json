@@ -52,7 +52,7 @@
       },
       {
         "title": "Agentic Development",
-        "desc": "Build real-world projects by practing agentic coding"
+        "desc": "Build real-world projects by practicing agentic coding"
       },
       {
         "title": "10x Development Speed",
@@ -156,7 +156,7 @@
     "registerFailed": "Registration Failed",
     "registerFailedDesc": "Failed to register as an affiliate. Please try again.",
     "invalidUrl": "Please provide a valid URL",
-    "mustAgree": "You must agree to the terms of service",
+    "mustAgree": "You must agree to the Terms of Service",
     "termsCommissionTitle": "Commission Structure",
     "termsPaymentTitle": "Payment Terms",
     "termsCookieTitle": "Cookie Duration",
@@ -559,7 +559,7 @@
       "headingLine2": "Questions",
       "description": "Get quick answers to common questions about our agentic coding course, AI tools, and development techniques. Still have questions? Reach out anytime.",
       "q1": "What AI tools will I learn to use?",
-      "a1": "You'll master Cursor IDE, Cursor CLI, Claude Code CLI, ChatGPT, and other cutting-edge AI development tools. The course showing you how to maximize your productivity with each one.",
+      "a1": "You'll master Cursor IDE, Cursor CLI, Claude Code CLI, ChatGPT, and other cutting-edge AI development tools. The course shows you how to maximize your productivity with each one.",
       "q2": "How is Cursor IDE different from VS Code for AI development?",
       "a2": "Cursor IDE is built specifically for AI-first development with advanced context understanding, multi-file editing capabilities, and native AI integration. Unlike VS Code which requires extensions, Cursor has AI features built into its core, providing superior code generation and intelligent refactoring capabilities.",
       "q3": "What is Claude Code CLI and how does it compare to GitHub Copilot?",
