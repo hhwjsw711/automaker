@@ -29,7 +29,7 @@ export function FutureOfCodingSection() {
           <h2 className="text-3xl md:text-4xl lg:text-6xl leading-tight mb-6 md:mb-8">
             {t("home.future.headingLine1")}{" "}
             <span className="text-theme-400">{t("home.future.headingLine2")}</span>
-            , {t("home.future.headingLine3")}{" "}
+            {t("home.future.headingLine3")}{" "}
             <span className="text-theme-400">{t("home.future.headingLine4")}</span>{" "}
           </h2>
 
