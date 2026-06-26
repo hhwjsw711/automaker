@@ -8,6 +8,8 @@ const pool = new pg.Pool({
   max: 20,
   idleTimeoutMillis: 300000,
   connectionTimeoutMillis: 5000,
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 30000,
 });
 
 // Log idle client errors without crashing — Neon serverless postgres
