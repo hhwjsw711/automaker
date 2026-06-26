@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { useRouterState, useNavigate } from "@tanstack/react-router";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +13,8 @@ import { cn } from "~/lib/utils";
 
 export function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { location } = useRouterState();
 
   const currentLocale = i18n.language?.split("-")[0] ?? "en";
   const supportedLocale = supportedLngs.includes(currentLocale as SupportedLocale)
@@ -32,6 +35,7 @@ export function LanguageSwitcher() {
             key={locale}
             onClick={() => {
               i18n.changeLanguage(locale);
+              navigate({ to: location.pathname, replace: true });
             }}
             className={cn(
               "flex items-center gap-2",

@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { processUnsubscribeFn } from "~/fn/user-settings";
 import {
@@ -36,6 +36,7 @@ export const Route = createFileRoute("/unsubscribe")({
 function UnsubscribePage() {
   const data = Route.useLoaderData();
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const renderContent = () => {
     if (data.status === "success") {
@@ -63,7 +64,7 @@ function UnsubscribePage() {
               {t("unsubscribe.managePrefs")}
             </p>
             <Button
-              onClick={() => (window.location.href = "/")}
+              onClick={() => navigate({ to: "/" })}
               className="btn-gradient"
             >
               {t("unsubscribe.returnHome")}
@@ -91,13 +92,13 @@ function UnsubscribePage() {
             </p>
             <div className="flex gap-3 justify-center">
               <Button
-                onClick={() => (window.location.href = "/")}
+                onClick={() => navigate({ to: "/" })}
                 variant="outline"
               >
                 {t("unsubscribe.returnHome")}
               </Button>
               <Button
-                onClick={() => (window.location.href = "/settings")}
+                onClick={() => navigate({ to: "/settings" })}
                 className="btn-gradient"
               >
                 {t("unsubscribe.manageSettings")}

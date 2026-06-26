@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { useTranslation } from "react-i18next";
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/dev-login")({
 function DevLoginPage() {
   const { redirect_uri: redirectUri } = Route.useSearch();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "premium@localhost.test", name: "Premium User", isAdmin: false, isPremium: true });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,17 +36,15 @@ function DevLoginPage() {
     setIsLoading(true);
     try {
       await devLoginFn({ data: formData });
-      // Validate redirect is relative or same origin to prevent open redirect
       try {
         const url = new URL(redirectUri, window.location.origin);
         if (url.origin === window.location.origin) {
-          window.location.href = url.pathname + url.search;
+          navigate({ to: url.pathname + url.search });
         } else {
-          window.location.href = "/";
+          navigate({ to: "/" });
         }
       } catch {
-        // If URL parsing fails, redirect to home
-        window.location.href = "/";
+        navigate({ to: "/" });
       }
     } catch (error) {
       console.error("Dev login failed:", error);

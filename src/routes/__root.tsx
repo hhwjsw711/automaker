@@ -43,10 +43,15 @@ const getOgImageUrl = () => {
   return `${baseUrl}${OG_IMAGE_PATH}`;
 };
 
+import { getPendingSsrLocale, readClientCookieLocale } from "~/router";
+
 const isDev = process.env.NODE_ENV === "development";
 
 async function detectInitialLocale(): Promise<string> {
   if (import.meta.env.SSR) {
+    const fromRewrite = getPendingSsrLocale();
+    if (fromRewrite) return fromRewrite;
+
     try {
       const { getCookie } = await import("@tanstack/react-start/server");
       const locale = getCookie(cookieName);
@@ -217,11 +222,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 );
 
 function RootComponent() {
-  // Initialize analytics tracking
   useAnalytics();
   const routerState = useRouterState();
   const loaderData = Route.useLoaderData();
-  const initialLocale = (loaderData?.initialLocale ?? fallbackLng) as string;
+  const loaderLocale = (loaderData?.initialLocale ?? fallbackLng) as string;
+  const pendingLocale = getPendingSsrLocale();
+  const rawLocale = typeof document === "undefined"
+    ? (pendingLocale ?? loaderLocale)
+    : (pendingLocale ?? readClientCookieLocale());
+  const initialLocale = (rawLocale && supportedLngs.includes(rawLocale as SupportedLocale)) ? rawLocale : fallbackLng;
 
   // Load Google Analytics scripts client-side only to avoid hydration mismatch
   // (gtag dynamically injects scripts which breaks React hydration)
@@ -284,7 +293,7 @@ function SeoHreflangLinks({
       <link
         rel="alternate"
         hrefLang="zh"
-        href={`${baseUrl}${canonicalPath}?lang=zh`}
+        href={`${baseUrl}/zh${canonicalPath}`}
       />
       <link
         rel="alternate"

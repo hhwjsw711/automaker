@@ -39,7 +39,7 @@ function hreflang(baseUrl: string, path: string): string {
   const u = baseUrl + path;
   return [
     '<xhtml:link rel="alternate" hreflang="en" href="' + e(u) + '"/>',
-    '<xhtml:link rel="alternate" hreflang="zh" href="' + e(u + "?lang=zh") + '"/>',
+    '<xhtml:link rel="alternate" hreflang="zh" href="' + e(baseUrl + "/zh" + path) + '"/>',
     '<xhtml:link rel="alternate" hreflang="x-default" href="' + e(u) + '"/>',
   ].join("\n    ");
 }

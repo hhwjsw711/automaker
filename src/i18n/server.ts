@@ -1,19 +1,4 @@
-import { getCookie } from "@tanstack/react-start/server";
-import { cookieName, fallbackLng, supportedLngs } from "./settings";
-import type { SupportedLocale } from "./settings";
-
-export function detectLocaleFromRequest(): SupportedLocale {
-  try {
-    const cookieLocale = getCookie(cookieName);
-    if (cookieLocale && isSupported(cookieLocale)) {
-      return cookieLocale;
-    }
-  } catch {
-    // getCookie throws if called outside request context
-  }
-  return fallbackLng;
-}
-
-function isSupported(locale: string): locale is SupportedLocale {
-  return supportedLngs.includes(locale as SupportedLocale);
-}
+// i18n server utilities
+// Locale detection is handled by src/routes/__root.tsx (detectInitialLocale)
+// and src/router.tsx (rewrite.input with URL prefix detection).
+// This file is kept as a placeholder for future server-side i18n needs.
