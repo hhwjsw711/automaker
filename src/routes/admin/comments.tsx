@@ -65,7 +65,7 @@ export const Route = createFileRoute("/admin/comments")({
 });
 
 function AdminComments() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [filterAdminReplied, setFilterAdminReplied] = useState(true);
   const { data: comments, isLoading } = useQuery(
     allCommentsQuery(filterAdminReplied)
@@ -386,7 +386,7 @@ function CommentItem({
   isPendingReply,
   level = 0,
 }: CommentItemProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const hasAdminReply = (comment as any).hasAdminReply;
 
   return (
@@ -435,7 +435,7 @@ function CommentItem({
                     </span>
                   )}
                   <span className="text-sm text-muted-foreground">
-                    {getTimeAgo(comment.createdAt)}
+                    {getTimeAgo(comment.createdAt, i18n.language)}
                   </span>
                 </div>
                 <Link
@@ -578,7 +578,7 @@ function CommentItem({
                             )}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            {getTimeAgo(child.createdAt)}
+                            {getTimeAgo(child.createdAt, i18n.language)}
                           </span>
                         </div>
                         <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">
