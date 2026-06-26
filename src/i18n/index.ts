@@ -4,6 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import { fallbackLng, supportedLngs, defaultNS, cookieName } from "./settings";
 import en from "./locales/en.json";
 import zh from "./locales/zh.json";
+import zhTW from "./locales/zh-TW.json";
 
 export function initI18n(lng?: string) {
   const instance = i18n.createInstance();
@@ -15,6 +16,7 @@ export function initI18n(lng?: string) {
       resources: {
         en: { [defaultNS]: en },
         zh: { [defaultNS]: zh },
+        "zh-TW": { [defaultNS]: zhTW },
       },
       lng: lng ?? fallbackLng,
       fallbackLng,

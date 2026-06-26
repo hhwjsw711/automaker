@@ -14,10 +14,13 @@ import { cn } from "~/lib/utils";
 export function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
 
-  const currentLocale = i18n.language?.split("-")[0] ?? "en";
-  const supportedLocale = supportedLngs.includes(currentLocale as SupportedLocale)
-    ? currentLocale
-    : "en";
+  const rawLocale = i18n.language ?? fallbackLng;
+  const supportedLocale = (() => {
+    if (supportedLngs.includes(rawLocale as SupportedLocale)) return rawLocale;
+    const base = rawLocale.split("-")[0];
+    if (supportedLngs.includes(base as SupportedLocale)) return base;
+    return fallbackLng;
+  })();
 
   return (
     <DropdownMenu>
