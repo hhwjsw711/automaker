@@ -24,8 +24,9 @@ export function initI18n(lng?: string) {
         escapeValue: false,
       },
       detection: {
-        order: ["cookie", "htmlTag", "navigator"],
+        order: ["querystring", "cookie", "htmlTag", "navigator"],
         lookupCookie: cookieName,
+        lookupQuerystring: "lang",
         caches: ["cookie"],
         cookieMinutes: 365 * 24 * 60,
       },

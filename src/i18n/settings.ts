@@ -21,3 +21,9 @@ export function isRtl(locale: string): boolean {
 
 export const defaultNS = "translation";
 export const cookieName = "lang";
+
+export function localeToOgLocale(locale: string): string {
+  if (locale === "zh") return "zh_CN";
+  if (locale === "en") return "en_US";
+  return locale;
+}

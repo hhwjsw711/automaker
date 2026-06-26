@@ -14,6 +14,7 @@ import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as UnauthenticatedRouteImport } from './routes/unauthenticated'
 import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as SuccessRouteImport } from './routes/success'
+import { Route as SitemapRouteImport } from './routes/sitemap'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PurchaseRouteImport } from './routes/purchase'
@@ -110,6 +111,11 @@ const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
 const SuccessRoute = SuccessRouteImport.update({
   id: '/success',
   path: '/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapRoute = SitemapRouteImport.update({
+  id: '/sitemap',
+  path: '/sitemap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -495,6 +501,7 @@ export interface FileRoutesByFullPath {
   '/purchase': typeof PurchaseRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/settings': typeof SettingsRoute
+  '/sitemap': typeof SitemapRoute
   '/success': typeof SuccessRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/unauthenticated': typeof UnauthenticatedRoute
@@ -574,6 +581,7 @@ export interface FileRoutesByTo {
   '/purchase': typeof PurchaseRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/settings': typeof SettingsRoute
+  '/sitemap': typeof SitemapRoute
   '/success': typeof SuccessRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/unauthenticated': typeof UnauthenticatedRoute
@@ -651,6 +659,7 @@ export interface FileRoutesById {
   '/purchase': typeof PurchaseRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/settings': typeof SettingsRoute
+  '/sitemap': typeof SitemapRoute
   '/success': typeof SuccessRoute
   '/terms-of-service': typeof TermsOfServiceRoute
   '/unauthenticated': typeof UnauthenticatedRoute
@@ -732,6 +741,7 @@ export interface FileRouteTypes {
     | '/purchase'
     | '/refund-policy'
     | '/settings'
+    | '/sitemap'
     | '/success'
     | '/terms-of-service'
     | '/unauthenticated'
@@ -811,6 +821,7 @@ export interface FileRouteTypes {
     | '/purchase'
     | '/refund-policy'
     | '/settings'
+    | '/sitemap'
     | '/success'
     | '/terms-of-service'
     | '/unauthenticated'
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | '/purchase'
     | '/refund-policy'
     | '/settings'
+    | '/sitemap'
     | '/success'
     | '/terms-of-service'
     | '/unauthenticated'
@@ -967,6 +979,7 @@ export interface RootRouteChildren {
   PurchaseRoute: typeof PurchaseRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   SettingsRoute: typeof SettingsRoute
+  SitemapRoute: typeof SitemapRoute
   SuccessRoute: typeof SuccessRoute
   TermsOfServiceRoute: typeof TermsOfServiceRoute
   UnauthenticatedRoute: typeof UnauthenticatedRoute
@@ -1031,6 +1044,13 @@ declare module '@tanstack/react-router' {
       path: '/success'
       fullPath: '/success'
       preLoaderRoute: typeof SuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap': {
+      id: '/sitemap'
+      path: '/sitemap'
+      fullPath: '/sitemap'
+      preLoaderRoute: typeof SitemapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -1664,6 +1684,7 @@ const rootRouteChildren: RootRouteChildren = {
   PurchaseRoute: PurchaseRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   SettingsRoute: SettingsRoute,
+  SitemapRoute: SitemapRoute,
   SuccessRoute: SuccessRoute,
   TermsOfServiceRoute: TermsOfServiceRoute,
   UnauthenticatedRoute: UnauthenticatedRoute,

@@ -25,7 +25,7 @@ import { useAnalytics } from "~/hooks/use-analytics";
 import { publicEnv } from "~/utils/env-public";
 import { lazy, Suspense } from "react";
 import { I18nProvider } from "~/i18n/i18n-provider";
-import { fallbackLng, cookieName, supportedLngs, isRtl } from "~/i18n/settings";
+import { fallbackLng, cookieName, supportedLngs, isRtl, localeToOgLocale } from "~/i18n/settings";
 import type { SupportedLocale } from "~/i18n/settings";
 
 // Lazy load DevFloatingMenu - only needed in development
@@ -264,6 +264,47 @@ function RootComponent() {
   );
 }
 
+function SeoHreflangLinks({
+  initialLocale,
+  pathname,
+}: {
+  initialLocale: string;
+  pathname: string;
+}) {
+  const baseUrl = publicEnv.VITE_HOST_NAME.replace(/\/$/, "");
+  const canonicalPath = pathname || "/";
+
+  return (
+    <>
+      <link
+        rel="alternate"
+        hrefLang="en"
+        href={`${baseUrl}${canonicalPath}`}
+      />
+      <link
+        rel="alternate"
+        hrefLang="zh"
+        href={`${baseUrl}${canonicalPath}?lang=zh`}
+      />
+      <link
+        rel="alternate"
+        hrefLang="x-default"
+        href={`${baseUrl}${canonicalPath}`}
+      />
+      <meta property="og:locale" content={localeToOgLocale(initialLocale)} />
+      {supportedLngs
+        .filter((l) => l !== initialLocale)
+        .map((altLocale) => (
+          <meta
+            key={altLocale}
+            property="og:locale:alternate"
+            content={localeToOgLocale(altLocale)}
+          />
+        ))}
+    </>
+  );
+}
+
 function RootDocument({
   children,
   initialLocale = fallbackLng,
@@ -317,6 +358,10 @@ function RootDocument({
     >
       <head>
         <HeadContent />
+        <SeoHreflangLinks
+          initialLocale={initialLocale}
+          pathname={routerState.location.pathname}
+        />
       </head>
       <body className="min-h-screen flex flex-col">
         <I18nProvider

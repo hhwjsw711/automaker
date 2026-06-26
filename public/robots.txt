@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://automaker.dev/sitemap.xml
+Sitemap: https://automaker.dev/sitemap

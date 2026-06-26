@@ -1,14 +1,22 @@
+import { supportedLngs, localeToOgLocale } from "~/i18n/settings";
+
 export const seo = ({
   title,
   description,
   keywords,
   image,
+  locale,
 }: {
   title: string;
   description?: string;
   image?: string;
   keywords?: string;
+  locale?: string;
 }) => {
+  const alternateLocales = locale
+    ? supportedLngs.filter((l) => l !== locale)
+    : [];
+
   const tags = [
     { title },
     { name: "description", content: description },
@@ -20,6 +28,15 @@ export const seo = ({
     { property: "og:type", content: "website" },
     { property: "og:title", content: title },
     { property: "og:description", content: description },
+    ...(locale
+      ? [
+          { property: "og:locale", content: localeToOgLocale(locale) },
+          ...alternateLocales.map((l) => ({
+            property: "og:locale:alternate",
+            content: localeToOgLocale(l),
+          })),
+        ]
+      : []),
     ...(image
       ? [
           { name: "twitter:image", content: image },
