@@ -398,7 +398,45 @@
     "contentDeleteConfirmDesc": "此操作无法撤销。将永久删除此内容及其所有关联的文件和附件。",
     "failedVideoComplete": "标记视频完成失败",
     "failedVideoIncomplete": "标记视频未完成失败",
-    "selectSegmentFallback": "选择一个片段"
+    "selectSegmentFallback": "选择一个片段",
+    "noLessonContent": "此课程片段暂无内容。",
+    "segmentForm": {
+      "basicInfo": "基本信息",
+      "title": "标题",
+      "titlePlaceholder": "输入一个有吸引力的标题",
+      "urlSlug": "URL Slug",
+      "slugPlaceholder": "url-friendly-slug",
+      "premiumContent": "高级内容",
+      "premiumContentDesc": "仅高级用户可查看",
+      "comingSoon": "即将推出",
+      "comingSoonDesc": "显示占位内容",
+      "module": "模块",
+      "modulePlaceholder": "搜索或输入模块名称",
+      "moduleNotFound": "未找到模块。",
+      "media": "媒体",
+      "content": "内容",
+      "transcripts": "字幕",
+      "icon": "图标",
+      "videoFile": "视频文件（可选）",
+      "clickToUpload": "点击上传",
+      "mp4Hint": "MP4 文件（最大 500MB）",
+      "remove": "移除",
+      "uploading": "正在上传视频...",
+      "mbUploaded": "MB 已上传",
+      "mbTotal": "MB 总计",
+      "lessonContent": "课时内容（可选）",
+      "contentPlaceholder": "# 欢迎来到本课时\n\n使用 **Markdown** 格式编写内容...\n\n- 列表\n- 代码块\n- 更多！",
+      "markdownHint": "支持 Markdown 语法：标题、链接、代码块等",
+      "videoTranscripts": "视频字幕（可选）",
+      "transcriptsPlaceholder": "# 视频字幕\n\n在此粘贴字幕，支持 **Markdown** 格式...",
+      "transcriptsHint": "支持 Markdown 语法，便于搜索和访问",
+      "segmentIcon": "课时图标（可选）",
+      "iconHint": "选择在导航中显示在此课时旁的图标"
+    },
+    "noSummary": "此课程片段暂无摘要。",
+    "noTranscripts": "此课程片段暂无字幕文本。",
+    "videoLoadError": "无法加载视频",
+    "videoLoadHint": "请尝试刷新页面"
   },
   "home": {
     "hero": {
@@ -641,7 +679,13 @@
     "language": "语言",
     "toggleMenu": "切换菜单",
     "navigationMenu": "导航菜单",
-    "navigationDescription": "包含网站各版块链接的主导航菜单"
+    "navigationDescription": "包含网站各版块链接的主导航菜单",
+    "iconPicker": {
+      "searchPlaceholder": "搜索图标...",
+      "noIconsFound": "未找到图标",
+      "selected": "已选择：",
+      "clear": "清除"
+    }
   },
   "footer": {
     "learn": "学习",

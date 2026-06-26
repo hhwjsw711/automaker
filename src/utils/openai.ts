@@ -14,6 +14,17 @@ const MAX_AUDIO_CHUNK_SIZE_BYTES = 20 * 1024 * 1024;
 // This typically results in ~15-20MB MP3 files at 128kbps
 const AUDIO_CHUNK_DURATION_SECONDS = 600;
 
+export interface TranscriptSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+export interface TranscriptionResult {
+  segments: TranscriptSegment[];
+  fullText: string;
+}
+
 if (!OPENAI_API_KEY) {
   console.warn(
     "OPENAI_API_KEY is not set. Transcript generation will not work."
@@ -168,12 +179,26 @@ async function splitAudioIntoChunks(audioBuffer: Buffer): Promise<Buffer[]> {
   }
 }
 
+interface WhisperVerboseSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+interface WhisperVerboseResponse {
+  language: string;
+  duration: number;
+  text: string;
+  segments: WhisperVerboseSegment[];
+}
+
 /**
  * Sends a single audio chunk to OpenAI Whisper API for transcription
+ * Returns both timed segments and full text
  */
 async function transcribeSingleAudioChunk(
   audioBuffer: Buffer
-): Promise<string> {
+): Promise<TranscriptionResult> {
   console.log(`[OpenAI] transcribeSingleAudioChunk - input: ${audioBuffer.length} bytes`);
   if (!OPENAI_API_KEY) {
     console.log(`[OpenAI] transcribeSingleAudioChunk - OPENAI_API_KEY not configured`);
@@ -186,7 +211,7 @@ async function transcribeSingleAudioChunk(
   });
   formData.append("file", audioBlob, "audio.mp3");
   formData.append("model", "whisper-1");
-  formData.append("response_format", "text");
+  formData.append("response_format", "verbose_json");
 
   console.log(`[OpenAI] transcribeSingleAudioChunk - calling Whisper API...`);
   const startTime = Date.now();
@@ -210,15 +235,25 @@ async function transcribeSingleAudioChunk(
     );
   }
 
-  const result = await response.text();
-  console.log(`[OpenAI] transcribeSingleAudioChunk - completed in ${duration}ms, output: ${result.length} characters`);
-  return result;
+  const result = (await response.json()) as WhisperVerboseResponse;
+  const segments: TranscriptSegment[] = result.segments.map((s) => ({
+    start: s.start,
+    end: s.end,
+    text: s.text.trim(),
+  }));
+
+  console.log(`[OpenAI] transcribeSingleAudioChunk - completed in ${duration}ms, segments: ${segments.length}, text: ${result.text.length} chars`);
+  return {
+    segments,
+    fullText: result.text.trim(),
+  };
 }
 
 /**
- * Transcribes audio, automatically splitting into chunks if the file is too large
+ * Transcribes audio, automatically splitting into chunks if the file is too large.
+ * Returns timed segments with proper time offsets for multi-chunk audio.
  */
-async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
+async function transcribeAudio(audioBuffer: Buffer): Promise<TranscriptionResult> {
   // If audio is under the size limit, transcribe directly
   if (audioBuffer.length <= MAX_AUDIO_CHUNK_SIZE_BYTES) {
     return transcribeSingleAudioChunk(audioBuffer);
@@ -231,17 +266,36 @@ async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
   const chunks = await splitAudioIntoChunks(audioBuffer);
   console.log(`Split audio into ${chunks.length} chunks`);
 
-  const transcripts: string[] = [];
+  const allSegments: TranscriptSegment[] = [];
+  const fullTexts: string[] = [];
+  let timeOffset = 0;
+
   for (let i = 0; i < chunks.length; i++) {
     console.log(
       `Transcribing chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)...`
     );
-    const transcript = await transcribeSingleAudioChunk(chunks[i]);
-    transcripts.push(transcript);
+    const result = await transcribeSingleAudioChunk(chunks[i]);
+
+    // Adjust timestamps for this chunk's position in the full video
+    for (const seg of result.segments) {
+      allSegments.push({
+        start: seg.start + timeOffset,
+        end: seg.end + timeOffset,
+        text: seg.text,
+      });
+    }
+
+    fullTexts.push(result.fullText);
+
+    // Estimate next chunk's time offset based on chunk duration
+    // AUDIO_CHUNK_DURATION_SECONDS is a reliable estimate since ffmpeg splits at fixed intervals
+    timeOffset += AUDIO_CHUNK_DURATION_SECONDS;
   }
 
-  // Join all transcripts with a space
-  return transcripts.join(" ");
+  return {
+    segments: allSegments,
+    fullText: fullTexts.join(" "),
+  };
 }
 
 /**
@@ -305,14 +359,15 @@ IMPORTANT RULES:
 }
 
 /**
- * Main function to generate a transcript from a video buffer
+ * Main function to generate a transcript from a video buffer.
+ * Returns both timed segments (for VTT/srt generation) and formatted plain text.
  * 1. Extracts audio from the video
- * 2. Sends audio to OpenAI Whisper for transcription
+ * 2. Sends audio to OpenAI Whisper for transcription (verbose_json)
  * 3. Formats the transcript into paragraphs using GPT
  */
 export async function generateTranscriptFromVideo(
   videoBuffer: Buffer
-): Promise<string> {
+): Promise<TranscriptionResult> {
   console.log(`[OpenAI] generateTranscriptFromVideo - starting with ${videoBuffer.length} bytes`);
   const overallStartTime = Date.now();
 
@@ -323,17 +378,19 @@ export async function generateTranscriptFromVideo(
 
   console.log("[OpenAI] generateTranscriptFromVideo - step 2: transcribing with Whisper...");
   const transcribeStartTime = Date.now();
-  const rawTranscript = await transcribeAudio(audioBuffer);
-  console.log(`[OpenAI] generateTranscriptFromVideo - raw transcript: ${rawTranscript.length} characters in ${Date.now() - transcribeStartTime}ms`);
+  const { segments, fullText } = await transcribeAudio(audioBuffer);
+  console.log(`[OpenAI] generateTranscriptFromVideo - ${segments.length} segments, ${fullText.length} chars in ${Date.now() - transcribeStartTime}ms`);
 
   console.log("[OpenAI] generateTranscriptFromVideo - step 3: formatting into paragraphs...");
   const formatStartTime = Date.now();
-  const formattedTranscript =
-    await formatTranscriptIntoParagraphs(rawTranscript);
-  console.log(`[OpenAI] generateTranscriptFromVideo - formatted transcript: ${formattedTranscript.length} characters in ${Date.now() - formatStartTime}ms`);
+  const formattedTranscript = await formatTranscriptIntoParagraphs(fullText);
+  console.log(`[OpenAI] generateTranscriptFromVideo - formatted: ${formattedTranscript.length} chars in ${Date.now() - formatStartTime}ms`);
 
   console.log(`[OpenAI] generateTranscriptFromVideo - completed in ${Date.now() - overallStartTime}ms`);
-  return formattedTranscript;
+  return {
+    segments,
+    fullText: formattedTranscript,
+  };
 }
 
 /**
@@ -416,4 +473,94 @@ IMPORTANT:
   const result = data.choices[0].message.content.trim();
   console.log(`[OpenAI] generateSummaryFromTranscript - completed in ${duration}ms, output: ${result.length} characters`);
   return result;
+}
+
+/**
+ * Translates timed transcript segments using GPT, preserving the timestamp structure.
+ * Each segment's text is translated independently while keeping start/end times intact.
+ */
+export async function translateTranscriptSegments(
+  segments: TranscriptSegment[],
+  targetLanguage: string
+): Promise<TranscriptSegment[]> {
+  console.log(`[OpenAI] translateTranscriptSegments - ${segments.length} segments to ${targetLanguage}`);
+  if (!OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is not configured");
+  }
+  if (segments.length === 0) return [];
+
+  const languageNames: Record<string, string> = {
+    zh: "Simplified Chinese",
+    "zh-TW": "Traditional Chinese (Taiwan)",
+  };
+  const langName = languageNames[targetLanguage] || targetLanguage;
+
+  // Process in batches of 30 segments to keep prompt size manageable
+  const BATCH_SIZE = 30;
+  const allTranslated: TranscriptSegment[] = [];
+
+  for (let i = 0; i < segments.length; i += BATCH_SIZE) {
+    const batch = segments.slice(i, i + BATCH_SIZE);
+    const inputJson = JSON.stringify(
+      batch.map((s) => ({ start: s.start, end: s.end, text: s.text }))
+    );
+
+    const startTime = Date.now();
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional subtitle translator. Translate the following timed transcript segments into ${langName}.
+
+IMPORTANT RULES:
+1. Translate naturally and fluently — use proper ${langName} conventions for technical terms
+2. PRESERVE the EXACT JSON structure — output valid JSON only
+3. Keep "start" and "end" values unchanged
+4. Translation should fit typical subtitle reading speed (shorter is better)
+5. Output ONLY the JSON array, no other text`,
+          },
+          {
+            role: "user",
+            content: inputJson,
+          },
+        ],
+        temperature: 0.1,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    const duration = Date.now() - startTime;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Translation failed for ${targetLanguage}: ${response.status} - ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+    const translated = JSON.parse(data.choices[0].message.content);
+
+    // Handle both { segments: [...] } and bare [...] formats
+    const items: Array<{ start: number; end: number; text: string }> =
+      translated.segments ?? translated;
+
+    for (const item of items) {
+      allTranslated.push({
+        start: item.start,
+        end: item.end,
+        text: item.text.trim(),
+      });
+    }
+
+    console.log(`[OpenAI] translateTranscriptSegments - batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(segments.length / BATCH_SIZE)} done in ${duration}ms`);
+  }
+
+  return allTranslated;
 }

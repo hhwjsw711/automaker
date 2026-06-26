@@ -15,7 +15,9 @@ import { getVideoQualityKey } from "~/utils/storage/r2";
 import {
   generateTranscriptFromVideo,
   generateSummaryFromTranscript,
+  translateTranscriptSegments,
 } from "~/utils/openai";
+import { segmentsToVtt } from "~/utils/vtt";
 import { queueSummaryJobUseCase } from "~/use-cases/video-processing";
 import {
   transcodeVideo,
@@ -202,15 +204,27 @@ class VideoProcessingWorker {
     // Generate the transcript
     console.log(`[Worker:Transcript] Generating transcript for segment ${segmentId}`);
     const transcriptStartTime = Date.now();
-    const transcript = await generateTranscriptFromVideo(videoBuffer);
+    const result = await generateTranscriptFromVideo(videoBuffer);
     const transcriptDuration = Date.now() - transcriptStartTime;
-    console.log(`[Worker:Transcript] Transcript generated in ${transcriptDuration}ms: ${transcript.length} characters`);
+    console.log(`[Worker:Transcript] Transcript generated in ${transcriptDuration}ms: ${result.segments.length} segments, ${result.fullText.length} chars`);
 
-    // Update the segment with the new transcript
+    // Update the segment with the formatted transcript
     console.log(`[Worker:Transcript] Saving transcript to segment ${segmentId}`);
     await editSegmentUseCase(segmentId, {
-      transcripts: transcript,
+      transcripts: result.fullText,
     });
+
+    // Generate and upload VTT subtitles for all supported languages
+    if (result.segments.length > 0) {
+      try {
+        await this.generateSubtitles(segmentId, result.segments, segment.videoKey);
+      } catch (error) {
+        console.error(
+          `[Worker:Transcript] Subtitle generation failed (non-fatal):`,
+          error instanceof Error ? error.message : error
+        );
+      }
+    }
 
     console.log(`[Worker:Transcript] Transcript job completed for segment ${segmentId}`);
 
@@ -228,6 +242,51 @@ class VideoProcessingWorker {
         `[Worker] Failed to queue summary job for segment ${segmentId}:`,
         error
       );
+    }
+  }
+
+  /**
+   * Generates VTT subtitle files for all supported languages and uploads them to R2.
+   * - English VTT from original transcript segments
+   * - zh / zh-TW VTT from GPT translation
+   */
+  private async generateSubtitles(
+    segmentId: number,
+    segments: Array<{ start: number; end: number; text: string }>,
+    videoKey: string
+  ): Promise<void> {
+    const { storage } = getStorage();
+    const baseKey = videoKey.replace(/\.\w+$/, "");
+    const vttKeys: Record<string, string> = {};
+
+    // Generate English VTT
+    const enVtt = segmentsToVtt(segments);
+    const enKey = `${baseKey}_en.vtt`;
+    await storage.upload(enKey, Buffer.from(enVtt, "utf-8"), "text/vtt");
+    vttKeys.en = enKey;
+    console.log(`[Worker:Subtitles] English VTT uploaded: ${enKey}`);
+
+    // Translate and generate VTT for non-English locales
+    const targetLocales = ["zh", "zh-TW"] as const;
+    for (const locale of targetLocales) {
+      try {
+        const translated = await translateTranscriptSegments(segments, locale);
+        const vtt = segmentsToVtt(translated);
+        const key = `${baseKey}_${locale}.vtt`;
+        await storage.upload(key, Buffer.from(vtt, "utf-8"), "text/vtt");
+        vttKeys[locale] = key;
+        console.log(`[Worker:Subtitles] ${locale} VTT uploaded: ${key}`);
+      } catch (error) {
+        console.error(
+          `[Worker:Subtitles] ${locale} translation failed (skipping):`,
+          error instanceof Error ? error.message : error
+        );
+      }
+    }
+
+    if (Object.keys(vttKeys).length > 0) {
+      await editSegmentUseCase(segmentId, { vttKeys });
+      console.log(`[Worker:Subtitles] VTT keys saved:`, vttKeys);
     }
   }
 

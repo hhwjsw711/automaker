@@ -26,7 +26,7 @@ export function ContentPanel({ currentSegment, isAdmin }: ContentPanelProps) {
       field="content"
       content={currentSegment.content}
       isAdmin={isAdmin ?? false}
-      emptyMessage="No lesson content available for this segment."
+      emptyMessage={t("learn.noLessonContent")}
       emptyIcon={<FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />}
     />
   );

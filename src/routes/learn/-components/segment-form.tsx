@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import {
   Form,
   FormControl,
@@ -115,6 +116,8 @@ export function SegmentForm({
     },
   });
 
+  const { t } = useTranslation();
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Header Section */}
@@ -141,7 +144,7 @@ export function SegmentForm({
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-theme-500 to-theme-600 shadow-lg">
                     <Edit className="h-4 w-4 text-primary-foreground" />
                   </div>
-                  Basic Information
+                  {t("learn.segmentForm.basicInfo")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -153,12 +156,12 @@ export function SegmentForm({
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-sm">
                           <FileText className="h-3 w-3" />
-                          Title
+                          {t("learn.segmentForm.title")}
                         </FormLabel>
                         <FormControl>
                           <Input
                             autoFocus
-                            placeholder="Enter a compelling title"
+                            placeholder={t("learn.segmentForm.titlePlaceholder")}
                             className="text-sm border-theme-200/40 dark:border-theme-800/40 focus:border-theme-500 dark:focus:border-theme-400 transition-colors duration-200"
                             {...field}
                           />
@@ -175,11 +178,11 @@ export function SegmentForm({
                       <FormItem>
                         <FormLabel className="flex items-center gap-2 text-sm">
                           <LinkIcon className="h-3 w-3" />
-                          URL Slug
+                          {t("learn.segmentForm.urlSlug")}
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="url-friendly-slug"
+                            placeholder={t("learn.segmentForm.slugPlaceholder")}
                             className="text-sm font-mono border-theme-200/40 dark:border-theme-800/40 focus:border-theme-500 dark:focus:border-theme-400 transition-colors duration-200"
                             {...field}
                           />
@@ -200,11 +203,11 @@ export function SegmentForm({
                           <FormLabel className="text-sm font-semibold flex items-center gap-2">
                             <Crown className="h-3 w-3 text-amber-600" />
                             <span className="text-amber-700 dark:text-amber-400">
-                              Premium Content
+                              {t("learn.segmentForm.premiumContent")}
                             </span>
                           </FormLabel>
                           <FormDescription className="text-xs text-muted-foreground">
-                            Only premium users can view
+                            {t("learn.segmentForm.premiumContentDesc")}
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -227,11 +230,11 @@ export function SegmentForm({
                           <FormLabel className="text-sm font-semibold flex items-center gap-2">
                             <Clock className="h-3 w-3 text-blue-600" />
                             <span className="text-blue-700 dark:text-blue-400">
-                              Coming Soon
+                              {t("learn.segmentForm.comingSoon")}
                             </span>
                           </FormLabel>
                           <FormDescription className="text-xs text-muted-foreground">
-                            Show placeholder instead
+                            {t("learn.segmentForm.comingSoonDesc")}
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -253,7 +256,7 @@ export function SegmentForm({
                     <FormItem>
                       <FormLabel className="flex items-center gap-2 text-sm">
                         <FolderOpen className="h-3 w-3" />
-                        Module
+                        {t("learn.segmentForm.module")}
                       </FormLabel>
                       <FormControl>
                         <AutoComplete
@@ -266,8 +269,8 @@ export function SegmentForm({
                             label: name,
                           }))}
                           isLoading={false}
-                          placeholder="Search or enter a module name"
-                          emptyMessage="No modules found."
+                          placeholder={t("learn.segmentForm.modulePlaceholder")}
+                          emptyMessage={t("learn.segmentForm.moduleNotFound")}
                         />
                       </FormControl>
                       <FormMessage />
@@ -287,28 +290,28 @@ export function SegmentForm({
                       className="flex items-center gap-2"
                     >
                       <Video className="h-4 w-4" />
-                      Media
+                      {t("learn.segmentForm.media")}
                     </TabsTrigger>
                     <TabsTrigger
                       value="content"
                       className="flex items-center gap-2"
                     >
                       <FileText className="h-4 w-4" />
-                      Content
+                      {t("learn.segmentForm.content")}
                     </TabsTrigger>
                     <TabsTrigger
                       value="transcripts"
                       className="flex items-center gap-2"
                     >
                       <FileText className="h-4 w-4" />
-                      Transcripts
+                      {t("learn.segmentForm.transcripts")}
                     </TabsTrigger>
                     <TabsTrigger
                       value="icon"
                       className="flex items-center gap-2"
                     >
                       <ImageIcon className="h-4 w-4" />
-                      Icon
+                      {t("learn.segmentForm.icon")}
                     </TabsTrigger>
                   </TabsList>
                 </CardHeader>
@@ -321,7 +324,7 @@ export function SegmentForm({
                       render={({ field: { value, onChange, ...field } }) => (
                         <FormItem>
                           <FormLabel className="text-sm">
-                            Video File (Optional)
+                            {t("learn.segmentForm.videoFile")}
                           </FormLabel>
                           <FormControl>
                             <div className="space-y-3">
@@ -334,11 +337,11 @@ export function SegmentForm({
                                       </div>
                                       <p className="mb-1 text-sm text-foreground">
                                         <span className="font-semibold text-theme-600 dark:text-theme-400">
-                                          Click to upload
+                                          {t("learn.segmentForm.clickToUpload")}
                                         </span>
                                       </p>
                                       <p className="text-xs text-muted-foreground">
-                                        MP4 files (Max 500MB)
+                                        {t("learn.segmentForm.mp4Hint")}
                                       </p>
                                     </div>
                                     <Input
@@ -379,7 +382,7 @@ export function SegmentForm({
                                         onClick={() => onChange(undefined)}
                                         className="text-muted-foreground hover:text-destructive h-8 px-2"
                                       >
-                                        Remove
+                                        {t("learn.segmentForm.remove")}
                                       </Button>
                                     </div>
                                   </CardContent>
@@ -394,7 +397,7 @@ export function SegmentForm({
                                         <div className="flex items-center gap-2">
                                           <Loader2 className="h-3 w-3 animate-spin text-primary" />
                                           <span className="text-xs font-medium">
-                                            Uploading video...
+                                            {t("learn.segmentForm.uploading")}
                                           </span>
                                         </div>
                                         <Badge
@@ -412,14 +415,14 @@ export function SegmentForm({
                                         <span>
                                           {Math.round(
                                             uploadProgress.loaded / 1024 / 1024
-                                          )}{" "}
-                                          MB uploaded
+                                          )}                                          {" "}
+                                          {t("learn.segmentForm.mbUploaded")}
                                         </span>
                                         <span>
                                           {Math.round(
                                             uploadProgress.total / 1024 / 1024
-                                          )}{" "}
-                                          MB total
+                                          )}                                          {" "}
+                                          {t("learn.segmentForm.mbTotal")}
                                         </span>
                                       </div>
                                     </div>
@@ -441,18 +444,17 @@ export function SegmentForm({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm">
-                            Lesson Content (Optional)
+                            {t("learn.segmentForm.lessonContent")}
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="# Welcome to the lesson&#10;&#10;Write your content here using **Markdown** formatting...&#10;&#10;- Bullet points&#10;- Code blocks&#10;- And more!"
+                              placeholder={t("learn.segmentForm.contentPlaceholder")}
                               className="min-h-[300px] text-sm font-mono border-theme-200/40 dark:border-theme-800/40 focus:border-theme-500 dark:focus:border-theme-400 transition-colors duration-200 resize-none"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription className="text-xs">
-                            Supports Markdown syntax for headers, links, code
-                            blocks, and more
+                            {t("learn.segmentForm.markdownHint")}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -467,18 +469,17 @@ export function SegmentForm({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm">
-                            Video Transcripts (Optional)
+                            {t("learn.segmentForm.videoTranscripts")}
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="# Video Transcripts&#10;&#10;Paste your transcripts here using **Markdown** formatting..."
+                              placeholder={t("learn.segmentForm.transcriptsPlaceholder")}
                               className="min-h-[300px] text-sm font-mono border-theme-200/40 dark:border-theme-800/40 focus:border-theme-500 dark:focus:border-theme-400 transition-colors duration-200 resize-none"
                               {...field}
                             />
                           </FormControl>
                           <FormDescription className="text-xs">
-                            Supports Markdown syntax; great for searchable,
-                            accessible transcripts
+                            {t("learn.segmentForm.transcriptsHint")}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -493,7 +494,7 @@ export function SegmentForm({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-sm">
-                            Segment Icon (Optional)
+                            {t("learn.segmentForm.segmentIcon")}
                           </FormLabel>
                           <FormControl>
                             <IconPicker
@@ -502,8 +503,7 @@ export function SegmentForm({
                             />
                           </FormControl>
                           <FormDescription className="text-xs">
-                            Choose an icon to display next to this segment in
-                            the navigation
+                            {t("learn.segmentForm.iconHint")}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>

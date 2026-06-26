@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { cn } from "~/lib/utils";
 import { Input } from "~/components/ui/input";
+import { useTranslation } from "react-i18next";
 import {
   BookOpen,
   Code,
@@ -324,6 +325,7 @@ interface IconPickerProps {
 
 export function IconPicker({ value, onChange, className }: IconPickerProps) {
   const [search, setSearch] = useState("");
+  const { t } = useTranslation();
 
   const filteredIcons = useMemo(() => {
     const query = search.toLowerCase();
@@ -335,7 +337,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
   return (
     <div className={cn("space-y-3", className)}>
       <Input
-        placeholder="Search icons..."
+        placeholder={t("common.iconPicker.searchPlaceholder")}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="h-9"
@@ -361,13 +363,13 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
         </div>
         {filteredIcons.length === 0 && (
           <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
-            No icons found
+            {t("common.iconPicker.noIconsFound")}
           </div>
         )}
       </div>
       {value && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>Selected:</span>
+          <span>{t("common.iconPicker.selected")}</span>
           <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-muted">
             {renderIcon(value, { className: "h-4 w-4" })}
             <span className="font-mono text-xs">{value}</span>
@@ -377,7 +379,7 @@ export function IconPicker({ value, onChange, className }: IconPickerProps) {
             onClick={() => onChange(null)}
             className="text-xs text-destructive hover:underline"
           >
-            Clear
+            {t("common.iconPicker.clear")}
           </button>
         </div>
       )}

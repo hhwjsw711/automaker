@@ -3,6 +3,7 @@ import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { useRouterState } from "@tanstack/react-router";
 import { z } from "zod";
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { AuthenticationError } from "~/use-cases/errors";
 import { getSegmentByIdUseCase } from "~/use-cases/segments";
 import { getAuthenticatedUser } from "~/utils/auth";
@@ -124,6 +125,82 @@ function setStoredMuted(muted: boolean): void {
 }
 
 // Map quality values to display labels
+const SUBTITLE_LABELS: Record<string, string> = {
+  en: "English",
+  zh: "中文",
+  "zh-TW": "繁體中文",
+};
+
+const SUBTITLE_ORDER = ["en", "zh", "zh-TW"];
+
+const getSubtitleUrlsFn = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ segmentId: z.number() }))
+  .handler(async ({ data }) => {
+    const { storage } = getStorage();
+    const segment = await getSegmentByIdUseCase(data.segmentId);
+    if (!segment || !segment.vttKeys) return null;
+    const vttKeys = segment.vttKeys as Record<string, string>;
+    const urls: Record<string, string> = {};
+    for (const [locale, key] of Object.entries(vttKeys)) {
+      urls[locale] = await storage.getPresignedUrl(key);
+    }
+    return urls;
+  });
+
+function SubtitleTracks({ urls }: { urls: Record<string, string> }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = ref.current;
+    if (!container) return;
+
+    function injectTracks() {
+      const video = container
+        ?.closest(".relative.z-10")
+        ?.querySelector("video") as HTMLVideoElement | null | undefined;
+      if (!video) return;
+
+      // CORS must be set on video AND each track for cross-origin VTT loading
+      video.setAttribute("crossorigin", "anonymous");
+
+      video.querySelectorAll("track").forEach((t) => t.remove());
+      SUBTITLE_ORDER.forEach((locale) => {
+        const src = urls[locale];
+        if (!src) return;
+        const track = document.createElement("track");
+        track.setAttribute("crossorigin", "anonymous");
+        track.kind = "subtitles";
+        track.src = src;
+        track.srclang = locale;
+        track.label = SUBTITLE_LABELS[locale];
+        video.appendChild(track);
+      });
+
+      // Trigger the browser to reload text track list
+      const textTracks = video.textTracks;
+      if (textTracks.length > 0) {
+        for (let i = 0; i < textTracks.length; i++) {
+          textTracks[i].mode = "hidden";
+        }
+      }
+    }
+
+    // Try immediately (video might already exist)
+    injectTracks();
+
+    // Watch for video element appearing (ReactPlayer renders asynchronously)
+    const observer = new MutationObserver(() => injectTracks());
+    const parent = container.closest(".relative.z-10");
+    if (parent) {
+      observer.observe(parent, { childList: true, subtree: true });
+    }
+
+    return () => observer.disconnect();
+  }, [urls]);
+
+  return <div ref={ref} style={{ display: "none" }} />;
+}
+
 const QUALITY_TO_LABEL: Record<string, string> = {
   original: "1080p",
   "720p": "720p",
@@ -168,6 +245,13 @@ export function VideoPlayer({
   const [muted, setMuted] = useState(() => getStoredMuted());
   const [hasAutoCompleted, setHasAutoCompleted] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const { t } = useTranslation();
+  const getSubtitleUrls = useServerFn(getSubtitleUrlsFn);
+  const { data: subtitleUrls } = useQuery({
+    queryKey: ["segment-subtitles", segmentId],
+    queryFn: () => getSubtitleUrls({ data: { segmentId } }),
+    staleTime: 5 * 60 * 1000,
+  });
   const getAvailableQualities = useServerFn(getAvailableQualitiesFn);
   const getThumbnailUrl = useServerFn(getThumbnailUrlFn);
   const trackDownload = useServerFn(trackVideoDownloadFn);
@@ -501,10 +585,10 @@ export function VideoPlayer({
           </div>
           <div className="text-center">
             <p className="text-sm text-muted-foreground mb-2">
-              Unable to load video
+              {t("learn.videoLoadError")}
             </p>
             <p className="text-xs text-muted-foreground">
-              Please try refreshing the page
+              {t("learn.videoLoadHint")}
             </p>
           </div>
         </div>
@@ -654,13 +738,16 @@ export function VideoPlayer({
           }}
           light={false}
         />
+        {subtitleUrls && (
+          <SubtitleTracks urls={subtitleUrls} />
+        )}
       </div>
       {hasError && (
         <div className="absolute inset-0 z-[20] flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="text-center p-4">
-            <p className="text-sm text-white mb-2">Unable to load video</p>
+            <p className="text-sm text-white mb-2">{t("learn.videoLoadError")}</p>
             <p className="text-xs text-white/70">
-              Please try refreshing the page
+              {t("learn.videoLoadHint")}
             </p>
           </div>
         </div>

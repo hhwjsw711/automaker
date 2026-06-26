@@ -113,7 +113,7 @@ export function VideoContentTabsPanel({
             field="summary"
             content={currentSegment.summary}
             isAdmin={isAdmin ?? false}
-            emptyMessage="No summary available for this segment."
+            emptyMessage={t("learn.noSummary")}
             emptyIcon={
               <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
             }
@@ -130,7 +130,7 @@ export function VideoContentTabsPanel({
             field="transcripts"
             content={currentSegment.transcripts}
             isAdmin={isAdmin ?? false}
-            emptyMessage="No transcripts available for this segment."
+            emptyMessage={t("learn.noTranscripts")}
             emptyIcon={
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
             }

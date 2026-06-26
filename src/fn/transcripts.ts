@@ -37,12 +37,12 @@ export const generateTranscriptFn = createServerFn({ method: "POST" })
     console.log(`Downloaded video: ${videoBuffer.length} bytes`);
 
     // Generate the transcript
-    const transcript = await generateTranscriptFromVideo(videoBuffer);
+    const result = await generateTranscriptFromVideo(videoBuffer);
 
-    // Update the segment with the new transcript
+    // Update the segment with the formatted transcript text
     await editSegmentUseCase(segmentId, {
-      transcripts: transcript,
+      transcripts: result.fullText,
     });
 
-    return { success: true, transcript };
+    return { success: true, transcript: result.fullText };
   });

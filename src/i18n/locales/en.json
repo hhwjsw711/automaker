@@ -398,7 +398,45 @@
     "contentDeleteConfirmDesc": "This action cannot be undone. This will permanently delete this content and all its associated files and attachments.",
     "failedVideoComplete": "Failed to mark video as complete",
     "failedVideoIncomplete": "Failed to mark video as incomplete",
-    "selectSegmentFallback": "Select a segment"
+    "selectSegmentFallback": "Select a segment",
+    "noLessonContent": "No lesson content available for this segment.",
+    "segmentForm": {
+      "basicInfo": "Basic Information",
+      "title": "Title",
+      "titlePlaceholder": "Enter a compelling title",
+      "urlSlug": "URL Slug",
+      "slugPlaceholder": "url-friendly-slug",
+      "premiumContent": "Premium Content",
+      "premiumContentDesc": "Only premium users can view",
+      "comingSoon": "Coming Soon",
+      "comingSoonDesc": "Show placeholder instead",
+      "module": "Module",
+      "modulePlaceholder": "Search or enter a module name",
+      "moduleNotFound": "No modules found.",
+      "media": "Media",
+      "content": "Content",
+      "transcripts": "Transcripts",
+      "icon": "Icon",
+      "videoFile": "Video File (Optional)",
+      "clickToUpload": "Click to upload",
+      "mp4Hint": "MP4 files (Max 500MB)",
+      "remove": "Remove",
+      "uploading": "Uploading video...",
+      "mbUploaded": "MB uploaded",
+      "mbTotal": "MB total",
+      "lessonContent": "Lesson Content (Optional)",
+      "contentPlaceholder": "# Welcome to the lesson\n\nWrite your content here using **Markdown** formatting...\n\n- Bullet points\n- Code blocks\n- And more!",
+      "markdownHint": "Supports Markdown syntax for headers, links, code blocks, and more",
+      "videoTranscripts": "Video Transcripts (Optional)",
+      "transcriptsPlaceholder": "# Video Transcripts\n\nPaste your transcripts here using **Markdown** formatting...",
+      "transcriptsHint": "Supports Markdown syntax; great for searchable, accessible transcripts",
+      "segmentIcon": "Segment Icon (Optional)",
+      "iconHint": "Choose an icon to display next to this segment in the navigation"
+    },
+    "noSummary": "No summary available for this segment.",
+    "noTranscripts": "No transcripts available for this segment.",
+    "videoLoadError": "Unable to load video",
+    "videoLoadHint": "Please try refreshing the page"
   },
   "home": {
     "hero": {
@@ -641,7 +679,13 @@
     "language": "Language",
     "toggleMenu": "Toggle menu",
     "navigationMenu": "Navigation Menu",
-    "navigationDescription": "Main navigation menu with links to different sections of the website"
+    "navigationDescription": "Main navigation menu with links to different sections of the website",
+    "iconPicker": {
+      "searchPlaceholder": "Search icons...",
+      "noIconsFound": "No icons found",
+      "selected": "Selected:",
+      "clear": "Clear"
+    }
   },
   "footer": {
     "learn": "Learn",

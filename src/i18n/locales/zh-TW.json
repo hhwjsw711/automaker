@@ -398,7 +398,45 @@
     "contentDeleteConfirmDesc": "此操作無法撤銷。將永久刪除此內容及其所有關聯的檔案和附件。",
     "failedVideoComplete": "標記影片完成失敗",
     "failedVideoIncomplete": "標記影片未完成失敗",
-    "selectSegmentFallback": "選擇一個片段"
+    "selectSegmentFallback": "選擇一個片段",
+    "noLessonContent": "此課程片段暫無內容。",
+    "segmentForm": {
+      "basicInfo": "基本資訊",
+      "title": "標題",
+      "titlePlaceholder": "輸入一個有吸引力的標題",
+      "premiumContent": "進階內容",
+      "premiumContentDesc": "僅進階使用者可檢視",
+      "comingSoon": "即將推出",
+      "comingSoonDesc": "顯示佔位內容",
+      "module": "模組",
+      "modulePlaceholder": "搜尋或輸入模組名稱",
+      "moduleNotFound": "未找到模組。",
+      "media": "媒體",
+      "content": "內容",
+      "transcripts": "字幕",
+      "icon": "圖示",
+      "videoFile": "影片檔案（可選）",
+      "clickToUpload": "點擊上傳",
+      "mp4Hint": "MP4 檔案（最大 500MB）",
+      "remove": "移除",
+      "uploading": "正在上傳影片...",
+      "mbUploaded": "MB 已上傳",
+      "mbTotal": "MB 總計",
+      "lessonContent": "課時內容（可選）",
+      "contentPlaceholder": "# 歡迎來到本課時\n\n使用 **Markdown** 格式編寫內容...\n\n- 列表\n- 程式碼區塊\n- 更多！",
+      "markdownHint": "支援 Markdown 語法：標題、連結、程式碼區塊等",
+      "videoTranscripts": "影片字幕（可選）",
+      "transcriptsPlaceholder": "# 影片字幕\n\n在此貼上字幕，支援 **Markdown** 格式...",
+      "transcriptsHint": "支援 Markdown 語法，便於搜尋和存取",
+      "segmentIcon": "課時圖示（可選）",
+      "iconHint": "選擇在導航中顯示在此課時旁的圖示",
+      "urlSlug": "URL Slug",
+      "slugPlaceholder": "url-friendly-slug"
+    },
+    "noSummary": "此課程片段暫無摘要。",
+    "noTranscripts": "此課程片段暫無字幕文本。",
+    "videoLoadError": "無法載入影片",
+    "videoLoadHint": "請嘗試重新整理頁面"
   },
   "home": {
     "hero": {
@@ -641,7 +679,13 @@
     "language": "語言",
     "toggleMenu": "切換選單",
     "navigationMenu": "導航選單",
-    "navigationDescription": "包含網站各版塊連結的主導航選單"
+    "navigationDescription": "包含網站各版塊連結的主導航選單",
+    "iconPicker": {
+      "searchPlaceholder": "搜尋圖示...",
+      "noIconsFound": "未找到圖示",
+      "selected": "已選擇：",
+      "clear": "清除"
+    }
   },
   "footer": {
     "learn": "學習",
