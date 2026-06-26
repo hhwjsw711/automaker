@@ -8,8 +8,8 @@ import { env } from "~/utils/env";
 const OPENAI_API_KEY = env.OPENAI_API_KEY;
 
 // OpenAI Whisper API has a 25MB limit (26,214,400 bytes)
-// We use 20MB chunks to have buffer room for encoding overhead
-const MAX_AUDIO_CHUNK_SIZE_BYTES = 20 * 1024 * 1024;
+// We use 12MB chunks to have safe buffer room for encoding overhead and to reduce 500 risk
+const MAX_AUDIO_CHUNK_SIZE_BYTES = 12 * 1024 * 1024;
 // Duration in seconds for each chunk (10 minutes)
 // This typically results in ~15-20MB MP3 files at 128kbps
 const AUDIO_CHUNK_DURATION_SECONDS = 600;
@@ -195,58 +195,92 @@ interface WhisperVerboseResponse {
 /**
  * Sends a single audio chunk to OpenAI Whisper API for transcription
  * Returns both timed segments and full text
+ * Retries on 5xx errors with exponential backoff (max 3 attempts)
  */
 async function transcribeSingleAudioChunk(
-  audioBuffer: Buffer
+  audioBuffer: Buffer,
+  retries = 3
 ): Promise<TranscriptionResult> {
   console.log(`[OpenAI] transcribeSingleAudioChunk - input: ${audioBuffer.length} bytes`);
   if (!OPENAI_API_KEY) {
-    console.log(`[OpenAI] transcribeSingleAudioChunk - OPENAI_API_KEY not configured`);
     throw new Error("OPENAI_API_KEY is not configured");
   }
 
-  const formData = new FormData();
-  const audioBlob = new Blob([new Uint8Array(audioBuffer)], {
-    type: "audio/mp3",
-  });
-  formData.append("file", audioBlob, "audio.mp3");
-  formData.append("model", "whisper-1");
-  formData.append("response_format", "verbose_json");
+  let lastError: Error | null = null;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    const formData = new FormData();
+    const audioBlob = new Blob([new Uint8Array(audioBuffer)], {
+      type: "audio/mp3",
+    });
+    formData.append("file", audioBlob, "audio.mp3");
+    formData.append("model", "whisper-1");
+    formData.append("response_format", "verbose_json");
 
-  console.log(`[OpenAI] transcribeSingleAudioChunk - calling Whisper API...`);
-  const startTime = Date.now();
-  const response = await fetch(
-    "https://api.openai.com/v1/audio/transcriptions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
+    console.log(`[OpenAI] transcribeSingleAudioChunk - attempt ${attempt}/${retries}, calling Whisper API...`);
+    const startTime = Date.now();
+    let response: Response;
+    try {
+      response = await fetch(
+        "https://api.openai.com/v1/audio/transcriptions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+          },
+          body: formData,
+        }
+      );
+    } catch (fetchError) {
+      lastError = fetchError instanceof Error
+        ? fetchError
+        : new Error(String(fetchError));
+      console.log(`[OpenAI] transcribeSingleAudioChunk - fetch error attempt ${attempt}: ${lastError.message}`);
+      if (attempt < retries) {
+        const delay = Math.pow(2, attempt) * 1000;
+        console.log(`[OpenAI] transcribeSingleAudioChunk - retrying in ${delay}ms...`);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      throw new Error(
+        `OpenAI transcription failed after ${retries} attempts: ${lastError.message}`
+      );
     }
-  );
-  const duration = Date.now() - startTime;
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.log(`[OpenAI] transcribeSingleAudioChunk - API error after ${duration}ms: ${response.status} - ${errorText}`);
-    throw new Error(
+    const duration = Date.now() - startTime;
+
+    if (response.ok) {
+      const result = (await response.json()) as WhisperVerboseResponse;
+      const segments: TranscriptSegment[] = result.segments.map((s) => ({
+        start: s.start,
+        end: s.end,
+        text: s.text.trim(),
+      }));
+
+      console.log(`[OpenAI] transcribeSingleAudioChunk - completed in ${duration}ms, segments: ${segments.length}, text: ${result.text.length} chars`);
+      return { segments, fullText: result.text.trim() };
+    }
+
+    const errorText = await response.text().catch(() => "");
+    const isRetryable = response.status >= 500 || response.status === 429;
+    lastError = new Error(
       `OpenAI transcription failed: ${response.status} - ${errorText}`
     );
+
+    console.log(
+      `[OpenAI] transcribeSingleAudioChunk - API error after ${duration}ms on attempt ${attempt}: ${response.status} (retryable=${isRetryable})`
+    );
+
+    if (attempt < retries && isRetryable) {
+      const delay = Math.pow(2, attempt) * 1000;
+      console.log(`[OpenAI] transcribeSingleAudioChunk - retrying in ${delay}ms...`);
+      await new Promise((r) => setTimeout(r, delay));
+      continue;
+    }
+
+    throw lastError;
   }
 
-  const result = (await response.json()) as WhisperVerboseResponse;
-  const segments: TranscriptSegment[] = result.segments.map((s) => ({
-    start: s.start,
-    end: s.end,
-    text: s.text.trim(),
-  }));
-
-  console.log(`[OpenAI] transcribeSingleAudioChunk - completed in ${duration}ms, segments: ${segments.length}, text: ${result.text.length} chars`);
-  return {
-    segments,
-    fullText: result.text.trim(),
-  };
+  throw lastError ?? new Error("OpenAI transcription failed");
 }
 
 /**
@@ -266,17 +300,23 @@ async function transcribeAudio(audioBuffer: Buffer): Promise<TranscriptionResult
   const chunks = await splitAudioIntoChunks(audioBuffer);
   console.log(`Split audio into ${chunks.length} chunks`);
 
+  const chunkResults = await Promise.all(
+    chunks.map(async (chunk, i) => {
+      console.log(
+        `Transcribing chunk ${i + 1}/${chunks.length} (${chunk.length} bytes)...`
+      );
+      const result = await transcribeSingleAudioChunk(chunk);
+      return { index: i, result };
+    })
+  );
+
+  chunkResults.sort((a, b) => a.index - b.index);
+
   const allSegments: TranscriptSegment[] = [];
   const fullTexts: string[] = [];
   let timeOffset = 0;
 
-  for (let i = 0; i < chunks.length; i++) {
-    console.log(
-      `Transcribing chunk ${i + 1}/${chunks.length} (${chunks[i].length} bytes)...`
-    );
-    const result = await transcribeSingleAudioChunk(chunks[i]);
-
-    // Adjust timestamps for this chunk's position in the full video
+  for (const { result } of chunkResults) {
     for (const seg of result.segments) {
       allSegments.push({
         start: seg.start + timeOffset,
@@ -286,9 +326,6 @@ async function transcribeAudio(audioBuffer: Buffer): Promise<TranscriptionResult
     }
 
     fullTexts.push(result.fullText);
-
-    // Estimate next chunk's time offset based on chunk duration
-    // AUDIO_CHUNK_DURATION_SECONDS is a reliable estimate since ffmpeg splits at fixed intervals
     timeOffset += AUDIO_CHUNK_DURATION_SECONDS;
   }
 
@@ -521,10 +558,9 @@ export async function translateTranscriptSegments(
 
 IMPORTANT RULES:
 1. Translate naturally and fluently — use proper ${langName} conventions for technical terms
-2. PRESERVE the EXACT JSON structure — output valid JSON only
-3. Keep "start" and "end" values unchanged
-4. Translation should fit typical subtitle reading speed (shorter is better)
-5. Output ONLY the JSON array, no other text`,
+2. Keep "start" and "end" values unchanged for each segment
+3. Translation should fit typical subtitle reading speed (shorter is better)
+4. Output a JSON object with a "segments" key containing the translated array`,
           },
           {
             role: "user",
@@ -545,17 +581,41 @@ IMPORTANT RULES:
     }
 
     const data = await response.json();
-    const translated = JSON.parse(data.choices[0].message.content);
+    let translated: unknown;
+    try {
+      translated = JSON.parse(data.choices[0].message.content);
+    } catch (parseError) {
+      throw new Error(
+        `Translation parsing failed for ${targetLanguage} batch ${Math.floor(i / BATCH_SIZE) + 1}: ${parseError instanceof Error ? parseError.message : parseError}`
+      );
+    }
 
-    // Handle both { segments: [...] } and bare [...] formats
-    const items: Array<{ start: number; end: number; text: string }> =
-      translated.segments ?? translated;
+    const itemsRaw: unknown =
+      (translated as Record<string, unknown>)?.segments ?? translated;
 
-    for (const item of items) {
+    if (!Array.isArray(itemsRaw)) {
+      throw new Error(
+        `Translation response is not an array for ${targetLanguage} batch ${Math.floor(i / BATCH_SIZE) + 1}`
+      );
+    }
+
+    for (const item of itemsRaw) {
+      if (
+        typeof item !== "object" ||
+        item === null ||
+        typeof (item as Record<string, unknown>).start !== "number" ||
+        typeof (item as Record<string, unknown>).end !== "number" ||
+        typeof (item as Record<string, unknown>).text !== "string"
+      ) {
+        throw new Error(
+          `Malformed translation item for ${targetLanguage} batch ${Math.floor(i / BATCH_SIZE) + 1}`
+        );
+      }
+      const seg = item as { start: number; end: number; text: string };
       allTranslated.push({
-        start: item.start,
-        end: item.end,
-        text: item.text.trim(),
+        start: seg.start,
+        end: seg.end,
+        text: seg.text.trim(),
       });
     }
 

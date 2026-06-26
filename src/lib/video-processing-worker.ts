@@ -266,20 +266,28 @@ class VideoProcessingWorker {
     vttKeys.en = enKey;
     console.log(`[Worker:Subtitles] English VTT uploaded: ${enKey}`);
 
-    // Translate and generate VTT for non-English locales
+    // Translate and generate VTT for non-English locales in parallel
     const targetLocales = ["zh", "zh-TW"] as const;
-    for (const locale of targetLocales) {
-      try {
+    const translationResults = await Promise.allSettled(
+      targetLocales.map(async (locale) => {
         const translated = await translateTranscriptSegments(segments, locale);
         const vtt = segmentsToVtt(translated);
         const key = `${baseKey}_${locale}.vtt`;
         await storage.upload(key, Buffer.from(vtt, "utf-8"), "text/vtt");
-        vttKeys[locale] = key;
         console.log(`[Worker:Subtitles] ${locale} VTT uploaded: ${key}`);
-      } catch (error) {
+        return { locale, key };
+      })
+    );
+
+    for (let i = 0; i < translationResults.length; i++) {
+      const result = translationResults[i];
+      const locale = targetLocales[i];
+      if (result.status === "fulfilled") {
+        vttKeys[result.value.locale] = result.value.key;
+      } else {
         console.error(
           `[Worker:Subtitles] ${locale} translation failed (skipping):`,
-          error instanceof Error ? error.message : error
+          result.reason instanceof Error ? result.reason.message : result.reason
         );
       }
     }

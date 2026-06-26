@@ -140,11 +140,16 @@ const getSubtitleUrlsFn = createServerFn({ method: "GET" })
     const segment = await getSegmentByIdUseCase(data.segmentId);
     if (!segment || !segment.vttKeys) return null;
     const vttKeys = segment.vttKeys as Record<string, string>;
-    const urls: Record<string, string> = {};
-    for (const [locale, key] of Object.entries(vttKeys)) {
-      urls[locale] = await storage.getPresignedUrl(key);
-    }
-    return urls;
+    const results = await Promise.allSettled(
+      Object.entries(vttKeys).map(async ([locale, key]) => {
+        const url = await storage.getPresignedUrl(key);
+        return [locale, url] as const;
+      })
+    );
+    const entries = results
+      .filter((r): r is PromiseFulfilledResult<readonly [string, string]> => r.status === "fulfilled")
+      .map((r) => r.value);
+    return Object.fromEntries(entries);
   });
 
 function SubtitleTracks({ urls }: { urls: Record<string, string> }) {
@@ -159,6 +164,19 @@ function SubtitleTracks({ urls }: { urls: Record<string, string> }) {
         ?.closest(".relative.z-10")
         ?.querySelector("video") as HTMLVideoElement | null | undefined;
       if (!video) return;
+
+      const existingLangs = new Set(
+        Array.from(video.querySelectorAll("track")).map((t) => t.srclang)
+      );
+      const targetLangs = new Set(
+        SUBTITLE_ORDER.filter((l) => urls[l])
+      );
+      if (
+        existingLangs.size === targetLangs.size &&
+        [...targetLangs].every((l) => existingLangs.has(l))
+      ) {
+        return;
+      }
 
       // CORS must be set on video AND each track for cross-origin VTT loading
       video.setAttribute("crossorigin", "anonymous");
