@@ -94,7 +94,9 @@ export async function writeBufferToTempFile(
 }
 
 /**
- * Extracts a thumbnail from a video file using ffmpeg
+ * Extracts a thumbnail from a video file using ffmpeg.
+ * On Linux (Railway), converts to progressive JPEG via ImageMagick for perceived loading speed.
+ * On Windows, skips ImageMagick due to `convert` command conflict with the OS utility.
  * @param options - Thumbnail extraction options
  * @returns Buffer containing the JPEG image data
  */
@@ -103,39 +105,33 @@ export async function extractThumbnail(
 ): Promise<Buffer> {
   const { inputPath, outputPath, width = 640, seekTime = 1 } = options;
 
-  // Create a temporary file for the initial extraction
-  // Use a unique temp path to avoid conflicts
   const tempOutputPath = createTempThumbnailPath("temp_thumb");
 
-  // Build ffmpeg command to extract thumbnail
-  // -ss 1 seeks to 1 second into the video (avoids black frames at start)
-  // -vframes 1 extracts only 1 frame
-  // -vf "scale=WIDTH:-1" scales to specified width maintaining aspect ratio
-  // -q:v 2 sets JPEG quality (1-31, lower is better)
   const ffmpegCommand = `ffmpeg -ss ${seekTime} -i "${inputPath}" -vframes 1 -vf "scale=${width}:-1" -q:v 2 -y "${tempOutputPath}"`;
 
   try {
-    // Extract thumbnail with ffmpeg
     await execAsync(ffmpegCommand);
 
-    // Convert to progressive JPEG using ImageMagick for faster perceived loading
-    // Progressive JPEGs display a low-quality version first and progressively improve
-    // This makes the thumbnail appear faster even while still downloading
-    const convertCommand = `convert "${tempOutputPath}" -interlace Plane -quality 85 "${outputPath}"`;
-    await execAsync(convertCommand);
+    const isWindows = process.platform === "win32";
 
-    // Clean up temp file
+    if (isWindows) {
+      await execAsync(
+        `ffmpeg -i "${tempOutputPath}" -q:v 2 -y "${outputPath}"`
+      );
+    } else {
+      const convertCommand = `convert "${tempOutputPath}" -interlace Plane -quality 85 "${outputPath}"`;
+      await execAsync(convertCommand);
+    }
+
     try {
       await unlink(tempOutputPath);
     } catch {
       // Ignore cleanup errors
     }
 
-    // Read the generated progressive JPEG thumbnail
     const thumbnailBuffer = await readFile(outputPath);
     return thumbnailBuffer;
   } catch (error) {
-    // Clean up temp file on error
     try {
       await unlink(tempOutputPath);
     } catch {

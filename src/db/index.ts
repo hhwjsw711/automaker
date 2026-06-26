@@ -10,10 +10,10 @@ const pool = new pg.Pool({
   connectionTimeoutMillis: 5000,
 });
 
-// Test the database connection
+// Log idle client errors without crashing — Neon serverless postgres
+// drops idle connections regularly, and pg.Pool handles reconnection automatically
 pool.on("error", (err) => {
-  console.error("Unexpected error on idle client", err);
-  process.exit(-1);
+  console.error("Unexpected error on idle client", err.message);
 });
 
 // Test connection on startup
