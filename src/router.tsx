@@ -5,35 +5,20 @@ import { routeTree } from "./routeTree.gen";
 import { DefaultCatchBoundary } from "./components/DefaultCatchBoundary";
 import { NotFound } from "./components/NotFound";
 import { fallbackLng, supportedLngs } from "./i18n/settings";
+import {
+  setPendingSsrLocale,
+  getPendingSsrLocale,
+  readCookieLocale,
+  isPublicPath,
+} from "./i18n/locale-detector";
 
-const LOCALE_PREFIX_RE = /^\/(en|zh)(\/|$)/;
-const INTERNAL_PATH_RE =
-  /^\/(admin|learn|api|profile|settings|login|dev-login|purchase|success|cancel|unsubscribe|unauthenticated|unauthorized|create-testimonial|affiliate-dashboard|health|sitemap)(\/|$)/;
+const LOCALE_PREFIX_RE = new RegExp(
+  `^/(${supportedLngs.join("|")})(/|$)`
+);
 
-let _pendingSsrLocale: string | null = null;
-
-export function getPendingSsrLocale(): string | null {
-  return _pendingSsrLocale;
+function resolveOutputLocale(): string | null {
+  return getPendingSsrLocale() ?? readCookieLocale();
 }
-
-function readCookieLocale(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    new RegExp("(?:^|;\\s*)lang=([^;]*)")
-  );
-  return match?.[1] ?? null;
-}
-
-export { readCookieLocale as readClientCookieLocale };
-
-function getLocale(): string | null {
-  if (_pendingSsrLocale) return _pendingSsrLocale;
-  return readCookieLocale();
-}
-
-// NOTE: Most of the integration code found here is experimental and will
-// definitely end up in a more streamlined API in the future. This is just
-// to show what's possible with the current APIs.
 
 export function getRouter() {
   const queryClient = new QueryClient();
@@ -48,12 +33,12 @@ export function getRouter() {
       defaultNotFoundComponent: () => <NotFound />,
       rewrite: {
         input: ({ url }) => {
-          _pendingSsrLocale = null;
+          setPendingSsrLocale(null);
           const match = url.pathname.match(LOCALE_PREFIX_RE);
           if (match) {
-            const locale = match[1];
+            const locale = match[1] as string;
             if (supportedLngs.includes(locale as any)) {
-              _pendingSsrLocale = locale;
+              setPendingSsrLocale(locale);
               url.pathname =
                 url.pathname.replace(LOCALE_PREFIX_RE, "$2") || "/";
               if (typeof document !== "undefined") {
@@ -64,11 +49,11 @@ export function getRouter() {
           return url;
         },
         output: ({ url }) => {
-          const locale = getLocale();
+          const locale = resolveOutputLocale();
           if (
             locale &&
             locale !== fallbackLng &&
-            !INTERNAL_PATH_RE.test(url.pathname)
+            isPublicPath(url.pathname)
           ) {
             const prefix = `/${locale}`;
             if (!url.pathname.startsWith(prefix)) {
@@ -83,7 +68,6 @@ export function getRouter() {
   );
 }
 
-// Keep createRouter as an alias for backwards compatibility
 export const createRouter = getRouter;
 
 declare module "@tanstack/react-router" {

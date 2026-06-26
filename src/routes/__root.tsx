@@ -43,27 +43,17 @@ const getOgImageUrl = () => {
   return `${baseUrl}${OG_IMAGE_PATH}`;
 };
 
-import { getPendingSsrLocale, readClientCookieLocale } from "~/router";
+import {
+  getPendingSsrLocale,
+  resolveClientLocale,
+  resolveInitialLocale,
+  readCookieLocale,
+  isPublicPath,
+} from "~/i18n/locale-detector";
 
 const isDev = process.env.NODE_ENV === "development";
 
-async function detectInitialLocale(): Promise<string> {
-  if (import.meta.env.SSR) {
-    const fromRewrite = getPendingSsrLocale();
-    if (fromRewrite) return fromRewrite;
 
-    try {
-      const { getCookie } = await import("@tanstack/react-start/server");
-      const locale = getCookie(cookieName);
-      if (locale && supportedLngs.includes(locale as SupportedLocale)) {
-        return locale;
-      }
-    } catch {
-      // getCookie not available
-    }
-  }
-  return fallbackLng;
-}
 
 function ThemedToaster() {
   const { theme } = useTheme();
@@ -89,6 +79,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       if (shouldShowEarlyAccess && location.pathname !== "/") {
         throw redirect({ to: "/" });
       }
+
+      const pendingLocale = getPendingSsrLocale();
+      if (!pendingLocale) {
+        let locale: string | null = null;
+        if (import.meta.env.SSR) {
+          try {
+            const { getCookie } = await import("@tanstack/react-start/server");
+            locale = getCookie(cookieName) ?? null;
+          } catch {}
+        } else {
+          locale = readCookieLocale();
+        }
+
+        if (
+          locale &&
+          locale !== fallbackLng &&
+          supportedLngs.includes(locale as SupportedLocale) &&
+          isPublicPath(location.pathname)
+        ) {
+          const barePath = location.pathname;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          throw redirect({ href: `/${locale}${barePath}` } as any);
+        }
+      }
     },
     loader: async () => {
       const shouldShowEarlyAccess = await shouldShowEarlyAccessFn();
@@ -99,7 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         currentUserId = await getCurrentUserIdFn();
       }
 
-      const initialLocale = await detectInitialLocale();
+      const initialLocale = await resolveInitialLocale();
 
       return { shouldShowEarlyAccess, isDev, currentUserId, initialLocale };
     },
@@ -224,13 +238,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
   useAnalytics();
   const routerState = useRouterState();
-  const loaderData = Route.useLoaderData();
-  const loaderLocale = (loaderData?.initialLocale ?? fallbackLng) as string;
-  const pendingLocale = getPendingSsrLocale();
-  const rawLocale = typeof document === "undefined"
-    ? (pendingLocale ?? loaderLocale)
-    : (pendingLocale ?? readClientCookieLocale());
-  const initialLocale = (rawLocale && supportedLngs.includes(rawLocale as SupportedLocale)) ? rawLocale : fallbackLng;
+  const initialLocale = resolveClientLocale(getPendingSsrLocale());
 
   // Load Google Analytics scripts client-side only to avoid hydration mismatch
   // (gtag dynamically injects scripts which breaks React hydration)
@@ -285,16 +293,18 @@ function SeoHreflangLinks({
 
   return (
     <>
-      <link
-        rel="alternate"
-        hrefLang="en"
-        href={`${baseUrl}${canonicalPath}`}
-      />
-      <link
-        rel="alternate"
-        hrefLang="zh"
-        href={`${baseUrl}/zh${canonicalPath}`}
-      />
+      {supportedLngs.map((locale) => (
+        <link
+          key={locale}
+          rel="alternate"
+          hrefLang={locale}
+          href={
+            locale === fallbackLng
+              ? `${baseUrl}${canonicalPath}`
+              : `${baseUrl}/${locale}${canonicalPath}`
+          }
+        />
+      ))}
       <link
         rel="alternate"
         hrefLang="x-default"

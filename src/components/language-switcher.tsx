@@ -8,6 +8,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
 import { supportedLngs, localeNames, localeFlags, fallbackLng, type SupportedLocale } from "~/i18n/settings";
+import { stripLocalePrefix, buildLocalePath } from "~/i18n/locale-detector";
 import { cn } from "~/lib/utils";
 
 export function LanguageSwitcher() {
@@ -32,9 +33,8 @@ export function LanguageSwitcher() {
             key={locale}
             onClick={() => {
               if (locale === supportedLocale) return;
-              const rawPath = window.location.pathname;
-              const barePath = rawPath.replace(/^\/(en|zh)(\/|$)/, "$2") || "/";
-              const targetPath = locale === fallbackLng ? barePath : `/${locale}${barePath}`;
+              const barePath = stripLocalePrefix(window.location.pathname);
+              const targetPath = buildLocalePath(barePath, locale);
               i18n.changeLanguage(locale);
               window.location.href = targetPath;
             }}

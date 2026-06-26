@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getPublishedBlogPosts } from "~/data-access/blog";
 import { getPublicAgents } from "~/data-access/agents";
 import { getAllLaunchKits } from "~/data-access/launch-kits";
+import { supportedLngs, fallbackLng } from "~/i18n/settings";
 
 const STATIC_ROUTES = [
   "/",
@@ -36,12 +37,16 @@ function e(s: string): string {
 }
 
 function hreflang(baseUrl: string, path: string): string {
-  const u = baseUrl + path;
-  return [
-    '<xhtml:link rel="alternate" hreflang="en" href="' + e(u) + '"/>',
-    '<xhtml:link rel="alternate" hreflang="zh" href="' + e(baseUrl + "/zh" + path) + '"/>',
-    '<xhtml:link rel="alternate" hreflang="x-default" href="' + e(u) + '"/>',
-  ].join("\n    ");
+  const defaultUrl = baseUrl + path;
+  const links = supportedLngs.map((locale) => {
+    const href =
+      locale === fallbackLng ? defaultUrl : baseUrl + "/" + locale + path;
+    return `<xhtml:link rel="alternate" hreflang="${locale}" href="${e(href)}"/>`;
+  });
+  links.push(
+    `<xhtml:link rel="alternate" hreflang="x-default" href="${e(defaultUrl)}"/>`
+  );
+  return links.join("\n    ");
 }
 
 function urlEntry(baseUrl: string, path: string, lastmod?: string): string {
