@@ -13,6 +13,7 @@ import {
   getAllRecentComments,
   deleteCommentAsAdmin,
 } from "~/data-access/comments";
+import { env } from "~/utils/env";
 
 const MAX_COMMENTS_PER_PAGE = 100;
 
@@ -81,4 +82,43 @@ export const deleteCommentAsAdminFn = createServerFn({ method: "POST" })
   .inputValidator(z.object({ commentId: z.number() }))
   .handler(async ({ data }) => {
     return deleteCommentAsAdmin(data.commentId);
+  });
+
+export const translateCommentFn = createServerFn({ method: "POST" })
+  .middleware([authenticatedMiddleware])
+  .inputValidator(z.object({ content: z.string().min(1), targetLanguage: z.string() }))
+  .handler(async ({ data }) => {
+    const apiKey = env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error("OpenAI API key not configured");
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a translator. Translate the following text into ${data.targetLanguage}. Return ONLY the translated text, no explanations or notes.`,
+          },
+          { role: "user", content: data.content },
+        ],
+        temperature: 0.1,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      throw new Error(`Translation failed: ${response.status} - ${errorText}`);
+    }
+
+    const result = await response.json();
+    const choice = result.choices?.[0];
+    if (!choice?.message?.content) {
+      throw new Error("Translation returned empty response");
+    }
+    return { translated: choice.message.content.trim() };
   });

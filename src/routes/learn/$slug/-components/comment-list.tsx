@@ -15,6 +15,9 @@ import {
   Heart,
   Lightbulb,
   Send,
+  Languages,
+  Loader2,
+  ArrowLeftRight,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -40,6 +43,7 @@ import { useDeleteComment } from "~/hooks/mutations/use-delete-comment";
 import { toast } from "sonner";
 import { useEditComment } from "~/hooks/mutations/use-edit-comment";
 import { useCreateComment } from "~/hooks/mutations/use-create-comment";
+import { translateCommentFn } from "~/fn/comments";
 import type { CommentsWithUser } from "~/data-access/comments";
 
 interface CommentItemProps {
@@ -48,7 +52,7 @@ interface CommentItemProps {
 }
 
 function CommentItem({ comment, level = 0 }: CommentItemProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const user = useAuth();
   const { segment } = useLoaderData({ from: "/learn/$slug/_layout/" });
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
@@ -58,6 +62,9 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
   );
   const [replyContent, setReplyContent] = useState("");
   const [deleteCommentId, setDeleteCommentId] = useState<number | null>(null);
+  const [translatedText, setTranslatedText] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [showTranslated, setShowTranslated] = useState(false);
 
   const { mutate: deleteComment, isPending: isDeleting } = useDeleteComment();
   const { mutate: editComment, isPending: isEditing } = useEditComment();
@@ -124,6 +131,28 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
           },
         }
       );
+    }
+  };
+
+  const langNames: Record<string, string> = {
+    en: "English",
+    zh: "Simplified Chinese",
+    "zh-TW": "Traditional Chinese",
+  };
+
+  const handleTranslate = async () => {
+    const targetLanguage = langNames[i18n.language] ?? i18n.language;
+    setIsTranslating(true);
+    try {
+      const result = await translateCommentFn({
+        data: { content: comment.content, targetLanguage },
+      });
+      setTranslatedText(result.translated);
+      setShowTranslated(true);
+    } catch {
+      toast.error(t("learn.translateFailed"));
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -219,7 +248,7 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                     <span className="text-xs text-muted-foreground/60">•</span>
 
                     <p className="text-xs text-muted-foreground whitespace-nowrap hover:text-foreground transition-colors">
-                      {getTimeAgo(comment.createdAt)}
+                      {getTimeAgo(comment.createdAt, i18n.language)}
                     </p>
 
                     {/* Reply indicator */}
@@ -332,9 +361,18 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                   <>
                     {/* Comment Text */}
                     <div className="prose prose-sm dark:prose-invert max-w-none">
-                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                        {comment.content}
-                      </p>
+                      {showTranslated && translatedText ? (
+                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {translatedText}
+                          <span className="block mt-1 text-xs text-muted-foreground/70 italic">
+                            {t("learn.translatedFrom")}
+                          </span>
+                        </p>
+                      ) : (
+                        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                          {comment.content}
+                        </p>
+                      )}
                     </div>
 
                     {/* Comment Actions */}
@@ -347,6 +385,38 @@ function CommentItem({ comment, level = 0 }: CommentItemProps) {
                       >
                         <Reply className="mr-1 h-3 w-3" />
                         {t("learn.replyButton")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          if (showTranslated) {
+                            setShowTranslated(false);
+                          } else if (translatedText) {
+                            setShowTranslated(true);
+                          } else {
+                            handleTranslate();
+                          }
+                        }}
+                        disabled={isTranslating}
+                        className="h-6 px-2 text-xs text-muted-foreground hover:text-theme-600 dark:hover:text-theme-400 transition-colors hover:bg-theme-50 dark:hover:bg-theme-950/50"
+                      >
+                        {isTranslating ? (
+                          <>
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            {t("learn.translating")}
+                          </>
+                        ) : showTranslated ? (
+                          <>
+                            <ArrowLeftRight className="mr-1 h-3 w-3" />
+                            {t("learn.showOriginal")}
+                          </>
+                        ) : (
+                          <>
+                            <Languages className="mr-1 h-3 w-3" />
+                            {t("learn.translate")}
+                          </>
+                        )}
                       </Button>
                     </div>
 
