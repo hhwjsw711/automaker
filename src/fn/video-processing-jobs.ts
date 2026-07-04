@@ -19,6 +19,7 @@ import { getStorage } from "~/utils/storage";
 import { getVideoQualityKey } from "~/utils/storage/r2";
 import { getThumbnailKey } from "~/utils/video-transcoding";
 import { startVideoProcessingWorker } from "~/lib/video-processing-worker";
+import { markProcessingJobsAsFailed, PROCESSING_JOB_ERROR_MANUAL } from "~/data-access/video-processing-jobs";
 
 /**
  * Queue a transcript job for a segment
@@ -314,4 +315,20 @@ export const queueMissingSummaryJobsFn = createServerFn({
       console.log(`[VideoProcessing] No missing summary jobs found`);
     }
     return { success: true, jobsQueued: jobs.length, jobs };
+  });
+
+/**
+ * Reset all stuck processing jobs to failed (e.g. after a crash)
+ */
+export const resetProcessingJobsFn = createServerFn({
+  method: "POST",
+})
+  .middleware([adminMiddleware])
+  .handler(async () => {
+    console.log(`[VideoProcessing] resetProcessingJobsFn called`);
+    const jobs = await markProcessingJobsAsFailed(
+      PROCESSING_JOB_ERROR_MANUAL
+    );
+    console.log(`[VideoProcessing] Reset ${jobs.length} stuck processing jobs`);
+    return { success: true, jobsReset: jobs.length, jobs };
   });

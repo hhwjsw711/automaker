@@ -1394,6 +1394,7 @@
       "description": "Manage video transcript generation and transcoding for all course segments.",
       "generateSummaries": "Generate Summaries",
       "processAllMissing": "Process All Missing",
+      "resetStuckJobs": "Reset Stuck Jobs",
       "queueing": "Queueing...",
       "segments": "{{count}} segments",
       "premium": "Premium",
@@ -1423,7 +1424,9 @@
         "failedToQueue": "Failed to queue processing jobs",
         "jobsQueuedForSegment": "Queued processing jobs for segment",
         "summaryJobsQueued": "Queued summary jobs",
-        "failedToQueueSummary": "Failed to queue summary job"
+        "failedToQueueSummary": "Failed to queue summary job",
+        "jobsReset": "Reset {{count}} stuck jobs",
+        "failedToReset": "Failed to reset stuck jobs"
       }
     },
     "vectorization": {

@@ -29,6 +29,7 @@ import {
   queueMissingJobsForAllSegmentsFn,
   queueAllJobsForSegmentFn,
   queueMissingSummaryJobsFn,
+  resetProcessingJobsFn,
 } from "~/fn/video-processing-jobs";
 import { toast } from "sonner";
 import { queryOptions } from "@tanstack/react-query";
@@ -117,12 +118,33 @@ function AdminVideoProcessing() {
     },
   });
 
+  const resetProcessingMutation = useMutation({
+    mutationFn: resetProcessingJobsFn,
+    onSuccess: (result) => {
+      toast.success(
+        t("admin_pages.videoProcessing.toast.jobsReset", { count: result.jobsReset })
+      );
+      queryClient.invalidateQueries({
+        queryKey: ["admin", "video-processing"],
+      });
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : t("admin_pages.videoProcessing.toast.failedToReset")
+      );
+    },
+  });
+
   const handleQueueAll = () => {
     queueAllMutation.mutate({});
   };
 
   const handleQueueSummaries = () => {
     queueSummariesMutation.mutate({});
+  };
+
+  const handleResetProcessing = () => {
+    resetProcessingMutation.mutate({});
   };
 
   const handleQueueSegment = (segmentId: number) => {
@@ -194,27 +216,45 @@ function AdminVideoProcessing() {
         description={t("admin_pages.videoProcessing.description")}
         actions={
           <div className="flex items-center gap-2">
-            <Button
-              onClick={handleQueueSummaries}
-              disabled={
-                queueSummariesMutation.isPending || segmentsNeedingSummary === 0
-              }
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              {queueSummariesMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  {t("admin_pages.videoProcessing.queueing")}
-                </>
-              ) : (
-                <>
-                  <BookOpen className="h-4 w-4" />
-                  {t("admin_pages.videoProcessing.generateSummaries")}
-                </>
-              )}
-            </Button>
-            <Button
+              <Button
+                onClick={handleQueueSummaries}
+                disabled={
+                  queueSummariesMutation.isPending || segmentsNeedingSummary === 0
+                }
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {queueSummariesMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("admin_pages.videoProcessing.queueing")}
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="h-4 w-4" />
+                    {t("admin_pages.videoProcessing.generateSummaries")}
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={handleResetProcessing}
+                disabled={resetProcessingMutation.isPending}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                {resetProcessingMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t("admin_pages.videoProcessing.resetStuckJobs")}
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    {t("admin_pages.videoProcessing.resetStuckJobs")}
+                  </>
+                )}
+              </Button>
+              <Button
               onClick={handleQueueAll}
               disabled={
                 queueAllMutation.isPending ||

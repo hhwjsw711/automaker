@@ -1394,6 +1394,7 @@
       "description": "管理所有课程课节的视频字幕生成和转码。",
       "generateSummaries": "生成摘要",
       "processAllMissing": "处理所有未处理",
+      "resetStuckJobs": "重置卡住的任务",
       "queueing": "队列中…",
       "segments": "{{count}} 个片段",
       "premium": "高级",
@@ -1423,7 +1424,9 @@
         "failedToQueue": "加入处理队列失败",
         "jobsQueuedForSegment": "已为片段加入处理任务",
         "summaryJobsQueued": "摘要任务已加入队列",
-        "failedToQueueSummary": "加入摘要任务失败"
+        "failedToQueueSummary": "加入摘要任务失败",
+        "jobsReset": "已重置 {{count}} 个卡住的任务",
+        "failedToReset": "重置任务失败"
       }
     },
     "vectorization": {

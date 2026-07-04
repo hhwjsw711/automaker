@@ -4,6 +4,8 @@ import {
   markJobAsProcessing,
   markJobAsCompleted,
   markJobAsFailed,
+  markProcessingJobsAsFailed,
+  PROCESSING_JOB_ERROR_CRASH,
 } from "~/data-access/video-processing-jobs";
 import {
   getSegmentByIdUseCase,
@@ -53,6 +55,21 @@ class VideoProcessingWorker {
     this.isRunning = true;
     this.shouldStop = false;
     console.log("[Worker] Video processing worker started at", new Date().toISOString());
+
+    // Recover stuck processing jobs from previous crashed instance
+    try {
+      const recoveredJobs = await markProcessingJobsAsFailed(
+        PROCESSING_JOB_ERROR_CRASH
+      );
+      if (recoveredJobs.length > 0) {
+        console.log(
+          `[Worker] Reset ${recoveredJobs.length} stuck processing jobs (from crashed instance):`,
+          recoveredJobs.map((j) => `${j.jobType}(${j.id})`).join(", ")
+        );
+      }
+    } catch (error) {
+      console.error("[Worker] Failed to recover stuck processing jobs:", error);
+    }
 
     // Process jobs in a loop
     this.processJobsLoop().catch((error) => {

@@ -134,6 +134,23 @@ export async function hasPendingOrProcessingJobs(segmentId: number) {
   return result.length > 0;
 }
 
+export const PROCESSING_JOB_ERROR_CRASH = "Previous worker instance crashed or was terminated";
+export const PROCESSING_JOB_ERROR_MANUAL = "Manually reset from admin panel";
+
+export async function markProcessingJobsAsFailed(error: string) {
+  const result = await database
+    .update(videoProcessingJobs)
+    .set({
+      status: "failed",
+      error,
+      completedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(videoProcessingJobs.status, "processing"))
+    .returning();
+  return result;
+}
+
 export async function cancelPendingOrProcessingJobsByType(
   segmentId: number,
   jobType: string
