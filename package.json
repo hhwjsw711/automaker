@@ -22,6 +22,8 @@
     "db:logs": "docker compose logs -f",
     "stripe:listen": "stripe listen --forward-to http://localhost:4000/api/stripe/webhook",
     "upload:videos": "tsx ./scripts/upload-videos-to-r2.ts",
+    "transcode:local": "tsx ./scripts/transcode-videos-local.ts",
+    "transcode:local:dry": "tsx ./scripts/transcode-videos-local.ts --dry-run",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
